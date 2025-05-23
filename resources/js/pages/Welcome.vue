@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Button } from "@/components/ui/Button"
+import { Button } from "@/components/ui/button"
 import { Head } from '@inertiajs/vue3';
 </script>
 
