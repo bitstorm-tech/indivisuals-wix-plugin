@@ -1,3 +1,4 @@
+import ImagePicker from '@/components/image-picker';
 import { Head } from '@inertiajs/react';
 import { useState } from 'react';
 
@@ -19,6 +20,7 @@ export default function Welcome() {
                     Reset
                 </button>
                 <span>UserID: {userId}</span>
+                <ImagePicker />
             </div>
         </>
     );
