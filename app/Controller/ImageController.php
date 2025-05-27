@@ -11,9 +11,6 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ImageController
 {
-    /**
-     * Store an uploaded image
-     */
     public function store(Request $request): JsonResponse
     {
         // Validate the uploaded file
@@ -42,11 +39,6 @@ class ImageController
             return response()->json([
                 'success' => true,
                 'message' => 'Image uploaded successfully',
-                'data' => [
-                    'filename' => $filename,
-                    'path' => $path,
-                    // No public URL returned here
-                ],
             ], 200);
 
         } catch (\Exception $e) {
