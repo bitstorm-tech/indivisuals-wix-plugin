@@ -40,15 +40,26 @@ class ImageController
             // This makes it private by default
             $path = $image->storeAs('images', $filename, 'local');
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Image uploaded successfully',
-            ], 200);
+            // Call the image generation method
+            $generationResult = $this->processAndGenerateImage($path);
+
+            if ($generationResult['success']) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Image uploaded and generated successfully',
+                ], 200);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Image uploaded but failed to generate variation: '.$generationResult['message'],
+                    'error' => $generationResult['error'],
+                ], 500);
+            }
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to upload image',
+                'message' => 'Failed to upload or process image',
                 'error' => $e->getMessage(),
             ], 500);
         }
@@ -80,41 +91,22 @@ class ImageController
     }
 
     /**
-     * Generate an image using OpenAI API based on an uploaded image.
+     * Process an uploaded image and generate a variation using OpenAI API.
+     *
+     * @param  string  $imagePath  The path to the already stored image file.
+     * @return array An array containing the success status, message, and data or error details.
      */
-    public function generateImage(Request $request): JsonResponse
+    private function processAndGenerateImage(string $imagePath): array
     {
-        // Validate the uploaded file
-        $validator = Validator::make($request->all(), [
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048', // Max 2MB
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $validator->errors(),
-            ], 422);
-        }
-
         try {
-            $image = $request->file('image');
-
-            // Prepare the image for OpenAI API (using variations endpoint)
-            // OpenAI's API expects a file resource or path for image variations/edits
-            // We need to save the uploaded file temporarily to pass its path
-            $tempPath = $image->storeAs('temp', Str::uuid().'.'.$image->getClientOriginalExtension(), 'local');
-            $fullTempPath = Storage::disk('local')->path($tempPath);
+            $fullPath = Storage::disk('local')->path($imagePath);
 
             $response = OpenAI::images()->variation([
-                'image' => fopen($fullTempPath, 'r'), // Pass the file resource
+                'image' => fopen($fullPath, 'r'), // Pass the file resource
                 'prompt' => $this->systemPrompt, // Prompt is optional for variations but included as per request
                 'n' => 1, // Number of images to generate
                 'size' => '1024x1024', // Size of the generated image
             ]);
-
-            // Clean up the temporary file
-            Storage::disk('local')->delete($tempPath);
 
             $generatedImageUrl = $response->data[0]->url;
 
@@ -125,24 +117,19 @@ class ImageController
             $filename = Str::uuid().'.png'; // OpenAI usually returns PNG for generated images
 
             // Store the generated image in the 'generated' private directory
-            $path = Storage::disk('local')->put('generated/'.$filename, $imageContent);
+            Storage::disk('local')->put('generated/'.$filename, $imageContent);
 
-            return response()->json([
+            return [
                 'success' => true,
                 'message' => 'Image generated and stored successfully',
-                'data' => [
-                    'filename' => $filename,
-                    'path' => 'generated/'.$filename,
-                    'url' => '/images/generated/'.$filename, // Public URL for generated image
-                ],
-            ], 200);
+            ];
 
         } catch (\Exception $e) {
-            return response()->json([
+            return [
                 'success' => false,
                 'message' => 'Failed to generate image: '.$e->getMessage(),
                 'error' => $e->getMessage(),
-            ], 500);
+            ];
         }
     }
 }
