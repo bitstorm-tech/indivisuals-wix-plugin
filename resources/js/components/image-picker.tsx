@@ -39,7 +39,8 @@ export default function ImagePicker() {
 
             if (result.success && result.data) {
                 setUploadStatus('Bild erfolgreich hochgeladen!');
-                setUploadedImageUrl(result.data.url);
+                // Construct the URL for the private image
+                setUploadedImageUrl(`/images/${result.data.filename}`);
             } else {
                 setUploadStatus('Fehler beim Hochladen: ' + result.message);
             }
@@ -93,7 +94,8 @@ export default function ImagePicker() {
                 </div>
             )}
 
-            {prevImage && <img src={prevImage} className="mt-4 max-h-80 max-w-80" alt="Preview" />}
+            {prevImage && !uploadedImageUrl && <img src={prevImage} className="mt-4 max-h-80 max-w-80" alt="Preview" />}
+            {uploadedImageUrl && <img src={uploadedImageUrl} className="mt-4 max-h-80 max-w-80" alt="Uploaded Image" />}
 
             {uploadedImageUrl && (
                 <div className="mt-2">
