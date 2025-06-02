@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ImageController
 {
-    private $systemPrompt = '';
+    private $systemPrompt = 'Change the image to a pencil sketch';
 
     public function store(Request $request): JsonResponse
     {
@@ -101,7 +101,7 @@ class ImageController
         try {
             $fullPath = Storage::disk('local')->path($imagePath);
 
-            $response = OpenAI::images()->variation([
+            $response = OpenAI::images()->edit([
                 'image' => fopen($fullPath, 'r'), // Pass the file resource
                 'prompt' => $this->systemPrompt, // Prompt is optional for variations but included as per request
                 'n' => 1, // Number of images to generate
