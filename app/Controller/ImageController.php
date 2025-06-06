@@ -5,7 +5,6 @@ namespace App\Controller;
 use App\Services\OpenAiService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -14,10 +13,8 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 class ImageController
 {
     private $systemPrompt = 'Change the image to a pencil sketch';
-    
-    public function __construct(private OpenAiService $openAiService)
-    {
-    }
+
+    public function __construct(private OpenAiService $openAiService) {}
 
     public function store(Request $request): JsonResponse
     {
@@ -44,19 +41,28 @@ class ImageController
             // This makes it private by default
             $path = $image->storeAs('images', $filename, 'local');
 
+            // Convert to PNG if needed for OpenAI API
+            $pngPath = $this->convertToPng($path);
+
             // Call the image generation method
-            $fullPath = Storage::disk('local')->path($path);
-            $imageUrls = $this->openAiService->generateImage($fullPath, $this->systemPrompt);
-            
-            if (!empty($imageUrls)) {
-                // Download and store the generated image
-                $imageContent = Http::get($imageUrls[0])->body();
-                $filename = Str::uuid().'.png';
-                Storage::disk('local')->put('generated/'.$filename, $imageContent);
-                
+            $fullPath = Storage::disk('local')->path($pngPath);
+            $base64Json = $this->openAiService->generateImage($fullPath, $this->systemPrompt);
+
+            if (! empty($base64Json)) {
+                // Decode the base64 image data and store to disk
+                $imageContent = base64_decode($base64Json);
+
+                if ($imageContent === false) {
+                    throw new \Exception('Failed to decode base64 image data');
+                }
+
+                $generatedFilename = Str::uuid().'.png';
+                Storage::disk('local')->put('generated/'.$generatedFilename, $imageContent);
+
                 return response()->json([
                     'success' => true,
                     'message' => 'Image uploaded and generated successfully',
+                    'generated_filename' => $generatedFilename,
                 ], 200);
             } else {
                 return response()->json([
@@ -99,4 +105,58 @@ class ImageController
         ]);
     }
 
+    /**
+     * Convert an image to PNG format if it's not already PNG.
+     *
+     * @param  string  $imagePath  The path to the stored image file
+     * @return string The path to the PNG image (original if already PNG, converted if not)
+     */
+    private function convertToPng(string $imagePath): string
+    {
+        $fullPath = Storage::disk('local')->path($imagePath);
+        $imageInfo = getimagesize($fullPath);
+
+        if (! $imageInfo) {
+            throw new \Exception('Invalid image file');
+        }
+
+        // If already PNG, return the original path
+        if ($imageInfo[2] === IMAGETYPE_PNG) {
+            return $imagePath;
+        }
+
+        // Create image resource based on original format
+        $image = match ($imageInfo[2]) {
+            IMAGETYPE_JPEG => imagecreatefromjpeg($fullPath),
+            IMAGETYPE_GIF => imagecreatefromgif($fullPath),
+            IMAGETYPE_WEBP => imagecreatefromwebp($fullPath),
+            default => throw new \Exception('Unsupported image format')
+        };
+
+        if (! $image) {
+            throw new \Exception('Failed to create image resource');
+        }
+
+        // Generate new PNG filename
+        $pngFilename = Str::uuid().'.png';
+        $pngPath = 'images/'.$pngFilename;
+        $pngFullPath = Storage::disk('local')->path($pngPath);
+
+        // Ensure directory exists
+        $directory = dirname($pngFullPath);
+        if (! is_dir($directory)) {
+            mkdir($directory, 0755, true);
+        }
+
+        // Save as PNG
+        if (! imagepng($image, $pngFullPath)) {
+            imagedestroy($image);
+            throw new \Exception('Failed to convert image to PNG');
+        }
+
+        // Clean up memory
+        imagedestroy($image);
+
+        return $pngPath;
+    }
 }

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
+use Illuminate\Support\Facades\Log;
 
 class OpenAiService
 {
@@ -19,7 +20,7 @@ class OpenAiService
         $this->apiKey = env('OPENAI_API_KEY');
     }
 
-    public function generateImage(string $imagePath, string $prompt, int $n = 1, string $size = '1024x1024'): array
+    public function generateImage(string $imagePath, string $prompt, int $n = 1, string $size = '1024x1024'): string
     {
         try {
             if (! file_exists($imagePath) || ! is_readable($imagePath)) {
@@ -38,24 +39,34 @@ class OpenAiService
                         'filename' => basename($imagePath),
                     ],
                     [
+                        'name' => 'quality',
+                        'contents' => 'medium',
+                    ],
+                    [
                         'name' => 'prompt',
                         'contents' => $prompt,
                     ],
                     [
-                        'name' => 'n',
-                        'contents' => $n,
+                        'name' => 'model',
+                        'contents' => 'gpt-image-1',
                     ],
                     [
                         'name' => 'size',
                         'contents' => $size,
                     ],
+                    [
+                        'name' => 'n',
+                        'contents' => $n,
+                    ],
                 ],
             ]);
 
-            $data = json_decode($response->getBody()->getContents(), true);
+            $data = json_decode($response->getBody(), true);
 
             if (isset($data['data'])) {
-                return array_column($data['data'], 'url');
+                Log::info('Data: '.print_r($data['data'][0], true));
+
+                return $data['data'][0]['b64_json'];
             }
 
             // Handle unexpected response structure
