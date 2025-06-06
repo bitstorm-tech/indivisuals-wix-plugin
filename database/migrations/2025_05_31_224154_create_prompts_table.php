@@ -14,8 +14,9 @@ return new class extends Migration
         Schema::create('prompts', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->text('name')->nullable(false);
-            $table->text('prompt')->nullable(false);
+            $table->string('name');
+            $table->string('category');
+            $table->text('prompt');
             $table->boolean('active')->default(true);
         });
     }

@@ -4,62 +4,74 @@ namespace App\Http\Controllers;
 
 use App\Models\Prompt;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 
 class PromptController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(Request $request): JsonResponse
     {
-        //
+        $query = Prompt::query();
+
+        if ($request->has('category')) {
+            $query->byCategory($request->category);
+        }
+
+        if ($request->boolean('active_only', true)) {
+            $query->active();
+        }
+
+        $prompts = $query->orderBy('category')->orderBy('name')->get();
+
+        return response()->json($prompts);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function store(Request $request): JsonResponse
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'category' => 'required|string|max:255',
+            'prompt' => 'required|string',
+            'active' => 'boolean',
+        ]);
+
+        $prompt = Prompt::create($validated);
+
+        return response()->json($prompt, 201);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function show(Prompt $prompt): JsonResponse
     {
-        //
+        return response()->json($prompt);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Prompt $prompt)
+    public function update(Request $request, Prompt $prompt): JsonResponse
     {
-        //
+        $validated = $request->validate([
+            'name' => 'sometimes|string|max:255',
+            'category' => 'sometimes|string|max:255',
+            'prompt' => 'sometimes|string',
+            'active' => 'boolean',
+        ]);
+
+        $prompt->update($validated);
+
+        return response()->json($prompt);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Prompt $prompt)
+    public function destroy(Prompt $prompt): JsonResponse
     {
-        //
+        $prompt->delete();
+
+        return response()->json(null, 204);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Prompt $prompt)
+    public function categories(): JsonResponse
     {
-        //
-    }
+        $categories = Prompt::select('category')
+            ->distinct()
+            ->orderBy('category')
+            ->pluck('category');
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Prompt $prompt)
-    {
-        //
+        return response()->json($categories);
     }
 }

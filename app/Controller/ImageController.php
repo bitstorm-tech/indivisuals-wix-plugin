@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Models\Prompt;
 use App\Services\OpenAiService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -20,6 +21,7 @@ class ImageController
     {
         $validator = Validator::make($request->all(), [
             'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:4096',
+            'prompt_id' => 'nullable|exists:prompts,id',
         ]);
 
         if ($validator->fails()) {
@@ -36,8 +38,16 @@ class ImageController
             $path = $image->storeAs('images', $filename, 'local');
             $pngPath = $this->convertToPng($path);
 
+            $prompt = $this->systemPrompt;
+            if ($request->has('prompt_id')) {
+                $promptModel = Prompt::find($request->prompt_id);
+                if ($promptModel && $promptModel->active) {
+                    $prompt = $promptModel->prompt;
+                }
+            }
+
             $fullPath = Storage::disk('local')->path($pngPath);
-            $base64Json = $this->openAiService->generateImage($fullPath, $this->systemPrompt);
+            $base64Json = $this->openAiService->generateImage($fullPath, $prompt);
 
             if (! empty($base64Json)) {
                 $imageContent = base64_decode($base64Json);
