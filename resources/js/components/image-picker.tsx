@@ -4,11 +4,14 @@ interface UploadResponse {
     success: boolean;
     message: string;
     errors?: Record<string, string[]>;
+    generated_image_url?: string;
 }
 
 export default function ImagePicker() {
     const [selectedFile, setSelectedFile] = useState<File | undefined>(undefined);
     const [previewImage, setPreviewImage] = useState<string | undefined>(undefined);
+    const [generatedImage, setGeneratedImage] = useState<string | undefined>(undefined);
+    const [isProcessing, setIsProcessing] = useState<boolean>(false);
     const inputRef = useRef<HTMLInputElement>(null);
 
     async function uploadImage(): Promise<void> {
@@ -16,23 +19,31 @@ export default function ImagePicker() {
             return;
         }
 
-        const formData = new FormData();
-        formData.append('image', selectedFile);
+        setIsProcessing(true);
+        setGeneratedImage(undefined);
 
-        const response = await fetch('/upload-image', {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
-            },
-        });
+        try {
+            const formData = new FormData();
+            formData.append('image', selectedFile);
 
-        const result: UploadResponse = await response.json();
+            const response = await fetch('/upload-image', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+                },
+            });
 
-        if (result.success) {
-            setSelectedFile(undefined);
-            setPreviewImage(undefined);
+            const result: UploadResponse = await response.json();
+
+            if (result.success && result.generated_image_url) {
+                setGeneratedImage(result.generated_image_url);
+                setSelectedFile(undefined);
+                setPreviewImage(undefined);
+            }
+        } finally {
+            setIsProcessing(false);
         }
     }
 
@@ -46,6 +57,7 @@ export default function ImagePicker() {
         if (file) {
             setSelectedFile(file);
             setPreviewImage(URL.createObjectURL(file));
+            setGeneratedImage(undefined);
         } else {
             setSelectedFile(undefined);
             setPreviewImage(undefined);
@@ -59,8 +71,8 @@ export default function ImagePicker() {
                     Bild wählen
                 </button>
                 {selectedFile && (
-                    <button className="btn btn-success" onClick={uploadImage} disabled={!selectedFile}>
-                        Bild hochladen
+                    <button className="btn btn-success" onClick={uploadImage} disabled={!selectedFile || isProcessing}>
+                        {isProcessing ? 'Wird bearbeitet...' : 'Bild hochladen'}
                     </button>
                 )}
             </div>
@@ -70,6 +82,13 @@ export default function ImagePicker() {
                 <div className="mt-4">
                     <p className="text-sm text-gray-600">Vorschau:</p>
                     <img src={previewImage} className="mt-2 max-h-80 max-w-80" alt="Preview" />
+                </div>
+            )}
+
+            {generatedImage && (
+                <div className="mt-4">
+                    <p className="text-sm text-gray-600">Bearbeitetes Bild:</p>
+                    <img src={generatedImage} className="mt-2 max-h-80 max-w-80" alt="Generated" />
                 </div>
             )}
         </>

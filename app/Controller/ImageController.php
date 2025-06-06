@@ -48,9 +48,14 @@ class ImageController
 
                 Storage::disk('local')->put("generated/$filename.png", $imageContent);
 
+                // Return the image as base64 data URL for immediate display
+                $base64Image = 'data:image/png;base64,' . base64_encode($imageContent);
+
                 return response()->json([
                     'success' => true,
                     'message' => 'Image uploaded and generated successfully',
+                    'generated_image_path' => "generated/$filename.png",
+                    'generated_image_url' => $base64Image,
                 ], 200);
             } else {
                 return response()->json([
@@ -76,7 +81,12 @@ class ImageController
         // You would add authorization logic here
         // For example: if (!auth()->user()->canAccessImage($filename)) { abort(403); }
 
-        $path = 'images/'.$filename;
+        // Check if it's a generated image first
+        $path = 'generated/'.$filename;
+        if (! Storage::disk('local')->exists($path)) {
+            // Fall back to original images folder
+            $path = 'images/'.$filename;
+        }
 
         if (! Storage::disk('local')->exists($path)) {
             abort(404);
