@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 interface UploadResponse {
     success: boolean;
@@ -7,12 +7,43 @@ interface UploadResponse {
     generated_image_url?: string;
 }
 
+interface Prompt {
+    id: number;
+    name: string;
+    category: string;
+    prompt: string;
+    active: boolean;
+}
+
 export default function ImagePicker() {
     const [selectedFile, setSelectedFile] = useState<File | undefined>(undefined);
     const [previewImage, setPreviewImage] = useState<string | undefined>(undefined);
     const [generatedImage, setGeneratedImage] = useState<string | undefined>(undefined);
     const [isProcessing, setIsProcessing] = useState<boolean>(false);
+    const [prompts, setPrompts] = useState<Prompt[]>([]);
+    const [selectedPromptId, setSelectedPromptId] = useState<number | undefined>(undefined);
     const inputRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        fetchPrompts();
+    }, []);
+
+    async function fetchPrompts(): Promise<void> {
+        try {
+            const response = await fetch('/prompts?active_only=true', {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+            });
+
+            if (response.ok) {
+                const promptsData: Prompt[] = await response.json();
+                setPrompts(promptsData);
+            }
+        } catch (error) {
+            console.error('Error fetching prompts:', error);
+        }
+    }
 
     async function uploadImage(): Promise<void> {
         if (!selectedFile) {
@@ -25,6 +56,10 @@ export default function ImagePicker() {
         try {
             const formData = new FormData();
             formData.append('image', selectedFile);
+
+            if (selectedPromptId) {
+                formData.append('prompt_id', selectedPromptId.toString());
+            }
 
             const response = await fetch('/upload-image', {
                 method: 'POST',
@@ -66,16 +101,32 @@ export default function ImagePicker() {
 
     return (
         <>
-            <div className="flex items-center space-x-2">
-                <button className="btn btn-primary" onClick={() => inputRef?.current?.click()} disabled={isProcessing}>
-                    Bild wählen
-                </button>
-                {selectedFile && (
-                    <button className="btn btn-success" onClick={uploadImage} disabled={!selectedFile || isProcessing}>
-                        {isProcessing && <span className="loading loading-spinner loading-sm mr-2"></span>}
-                        {isProcessing ? 'Wird bearbeitet...' : 'Bild hochladen'}
+            <div className="space-y-4">
+                <select
+                    className="select select-bordered w-full max-w-xs"
+                    value={selectedPromptId || ''}
+                    onChange={(e) => setSelectedPromptId(e.target.value ? Number(e.target.value) : undefined)}
+                    disabled={isProcessing}
+                >
+                    <option value="" disabled>Bitte Stil auswählen...</option>
+                    {prompts.map((prompt) => (
+                        <option key={prompt.id} value={prompt.id}>
+                            {prompt.name}
+                        </option>
+                    ))}
+                </select>
+
+                <div className="flex items-center space-x-2">
+                    <button className="btn btn-primary" onClick={() => inputRef?.current?.click()} disabled={isProcessing}>
+                        Bild wählen
                     </button>
-                )}
+                    {selectedFile && (
+                        <button className="btn btn-success" onClick={uploadImage} disabled={!selectedFile || isProcessing}>
+                            {isProcessing && <span className="loading loading-spinner loading-sm mr-2"></span>}
+                            {isProcessing ? 'Wird bearbeitet...' : 'Bild hochladen'}
+                        </button>
+                    )}
+                </div>
             </div>
             <input type="file" className="input" onChange={handleFileChange} ref={inputRef} accept="image/*" hidden />
 
