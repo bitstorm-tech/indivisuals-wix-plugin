@@ -67,18 +67,29 @@ export default function ImagePicker() {
     return (
         <>
             <div className="flex items-center space-x-2">
-                <button className="btn btn-primary" onClick={() => inputRef?.current?.click()}>
+                <button className="btn btn-primary" onClick={() => inputRef?.current?.click()} disabled={isProcessing}>
                     Bild wählen
                 </button>
                 {selectedFile && (
                     <button className="btn btn-success" onClick={uploadImage} disabled={!selectedFile || isProcessing}>
+                        {isProcessing && <span className="loading loading-spinner loading-sm mr-2"></span>}
                         {isProcessing ? 'Wird bearbeitet...' : 'Bild hochladen'}
                     </button>
                 )}
             </div>
             <input type="file" className="input" onChange={handleFileChange} ref={inputRef} accept="image/*" hidden />
 
-            {previewImage && (
+            {isProcessing && (
+                <div className="alert alert-info mt-4">
+                    <span className="loading loading-spinner loading-md"></span>
+                    <div>
+                        <h3 className="font-bold">Bild wird bearbeitet</h3>
+                        <div className="text-xs">Ihr Bild wird von der KI bearbeitet. Dies kann einen Moment dauern...</div>
+                    </div>
+                </div>
+            )}
+
+            {previewImage && !isProcessing && (
                 <div className="mt-4">
                     <p className="text-sm text-gray-600">Vorschau:</p>
                     <img src={previewImage} className="mt-2 max-h-80 max-w-80" alt="Preview" />
