@@ -4,11 +4,12 @@ namespace App\Services;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
-use Illuminate\Support\Facades\Log;
 
 class OpenAiService
 {
     private Client $httpClient;
+
+    private string $systemPrompt = 'Prioritize subject fidelity in stylizations. Preserve facial identity (proportions, features, expression, skin tone) in portraits. For groups, maintain exact count, positions, and faces. For animals: pose, proportions, fur, eyes. For vehicles: shape, logo, angle. For buildings: windows, roof, layout. For landscapes: terrain, horizon, structure. Apply style as soft overlay only (Level 1–3), never distort form. Backgrounds may be fully stylized but remain secondary. Output must always be clearly recognizable. Target: mug prints.';
 
     private string $apiKey;
 
@@ -30,7 +31,6 @@ class OpenAiService
             $response = $this->httpClient->post($this->baseUrl, [
                 'headers' => [
                     'Authorization' => 'Bearer '.$this->apiKey,
-                    // Guzzle will set Content-Type to multipart/form-data
                 ],
                 'multipart' => [
                     [
@@ -44,7 +44,7 @@ class OpenAiService
                     ],
                     [
                         'name' => 'prompt',
-                        'contents' => $prompt,
+                        'contents' => "{$this->systemPrompt} {$prompt}",
                     ],
                     [
                         'name' => 'model',
@@ -64,18 +64,13 @@ class OpenAiService
             $data = json_decode($response->getBody(), true);
 
             if (isset($data['data'])) {
-                Log::info('Data: '.print_r($data['data'][0], true));
-
                 return $data['data'][0]['b64_json'];
             }
 
-            // Handle unexpected response structure
             throw new \Exception('Unexpected API response structure.');
         } catch (RequestException $e) {
-            // Log or rethrow a more specific exception
             throw new \Exception('OpenAI API request failed: '.$e->getMessage(), 0, $e);
         } catch (\Exception $e) {
-            // General error handling
             throw new \Exception('An error occurred: '.$e->getMessage(), 0, $e);
         }
     }
