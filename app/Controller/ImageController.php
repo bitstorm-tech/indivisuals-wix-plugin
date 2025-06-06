@@ -2,18 +2,22 @@
 
 namespace App\Controller;
 
+use App\Services\OpenAiService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
-use OpenAI\Laravel\Facades\OpenAI;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ImageController
 {
     private $systemPrompt = 'Change the image to a pencil sketch';
+    
+    public function __construct(private OpenAiService $openAiService)
+    {
+    }
 
     public function store(Request $request): JsonResponse
     {
@@ -41,9 +45,15 @@ class ImageController
             $path = $image->storeAs('images', $filename, 'local');
 
             // Call the image generation method
-            $generationResult = $this->processAndGenerateImage($path);
-
-            if ($generationResult['success']) {
+            $fullPath = Storage::disk('local')->path($path);
+            $imageUrls = $this->openAiService->generateImage($fullPath, $this->systemPrompt);
+            
+            if (!empty($imageUrls)) {
+                // Download and store the generated image
+                $imageContent = Http::get($imageUrls[0])->body();
+                $filename = Str::uuid().'.png';
+                Storage::disk('local')->put('generated/'.$filename, $imageContent);
+                
                 return response()->json([
                     'success' => true,
                     'message' => 'Image uploaded and generated successfully',
@@ -51,8 +61,7 @@ class ImageController
             } else {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Image uploaded but failed to generate variation: '.$generationResult['message'],
-                    'error' => $generationResult['error'],
+                    'message' => 'Image uploaded but failed to generate variation',
                 ], 500);
             }
 
@@ -90,46 +99,4 @@ class ImageController
         ]);
     }
 
-    /**
-     * Process an uploaded image and generate a variation using OpenAI API.
-     *
-     * @param  string  $imagePath  The path to the already stored image file.
-     * @return array An array containing the success status, message, and data or error details.
-     */
-    private function processAndGenerateImage(string $imagePath): array
-    {
-        try {
-            $fullPath = Storage::disk('local')->path($imagePath);
-
-            $response = OpenAI::images()->edit([
-                'image' => fopen($fullPath, 'r'), // Pass the file resource
-                'prompt' => $this->systemPrompt, // Prompt is optional for variations but included as per request
-                'n' => 1, // Number of images to generate
-                'size' => '1024x1024', // Size of the generated image
-            ]);
-
-            $generatedImageUrl = $response->data[0]->url;
-
-            // Download the generated image
-            $imageContent = Http::get($generatedImageUrl)->body();
-
-            // Generate a unique filename for the generated image
-            $filename = Str::uuid().'.png'; // OpenAI usually returns PNG for generated images
-
-            // Store the generated image in the 'generated' private directory
-            Storage::disk('local')->put('generated/'.$filename, $imageContent);
-
-            return [
-                'success' => true,
-                'message' => 'Image generated and stored successfully',
-            ];
-
-        } catch (\Exception $e) {
-            return [
-                'success' => false,
-                'message' => 'Failed to generate image: '.$e->getMessage(),
-                'error' => $e->getMessage(),
-            ];
-        }
-    }
 }
