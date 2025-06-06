@@ -121,7 +121,7 @@ export default function ImagePicker() {
                         Bild wählen
                     </button>
                     {selectedFile && (
-                        <button className="btn btn-success" onClick={uploadImage} disabled={!selectedFile || isProcessing}>
+                        <button className="btn btn-success" onClick={uploadImage} disabled={!selectedFile || !selectedPromptId || isProcessing}>
                             {isProcessing && <span className="loading loading-spinner loading-sm mr-2"></span>}
                             {isProcessing ? 'Wird bearbeitet...' : 'Bild hochladen'}
                         </button>
