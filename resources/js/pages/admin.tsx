@@ -133,9 +133,7 @@ export default function Admin({ prompts }: AdminProps) {
                                                     onChange={(e) => handleInputChange(prompt.id, 'name', e.target.value)}
                                                 />
                                             ) : (
-                                                <span className="hover:bg-base-200 cursor-pointer rounded p-2" onClick={() => handleEdit(prompt)}>
-                                                    {prompt.name}
-                                                </span>
+                                                <span>{prompt.name}</span>
                                             )}
                                         </td>
                                         <td>
@@ -152,9 +150,7 @@ export default function Admin({ prompts }: AdminProps) {
                                                     ))}
                                                 </select>
                                             ) : (
-                                                <span className="hover:bg-base-200 cursor-pointer rounded p-2" onClick={() => handleEdit(prompt)}>
-                                                    {prompt.category}
-                                                </span>
+                                                <span>{prompt.category}</span>
                                             )}
                                         </td>
                                         <td>
@@ -166,11 +162,7 @@ export default function Admin({ prompts }: AdminProps) {
                                                     onChange={(e) => handleInputChange(prompt.id, 'prompt', e.target.value)}
                                                 />
                                             ) : (
-                                                <span
-                                                    className="hover:bg-base-200 block max-w-md cursor-pointer truncate rounded p-2"
-                                                    onClick={() => handleEdit(prompt)}
-                                                    title={prompt.prompt}
-                                                >
+                                                <span className="block max-w-md truncate" title={prompt.prompt}>
                                                     {prompt.prompt}
                                                 </span>
                                             )}
