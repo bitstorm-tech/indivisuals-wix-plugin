@@ -1,5 +1,5 @@
 import { Head, router } from '@inertiajs/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface Prompt {
     id: number;
@@ -15,6 +15,16 @@ interface AdminProps {
 
 export default function Admin({ prompts }: AdminProps) {
     const [editingPrompts, setEditingPrompts] = useState<Record<number, Prompt>>({});
+    const [categories, setCategories] = useState<string[]>([]);
+
+    useEffect(() => {
+        fetch('/prompt-categories')
+            .then((response) => response.json())
+            .then((data) => setCategories(data))
+            .catch((error) => {
+                console.error('Error fetching categories:', error);
+            });
+    }, []);
 
     const handleEdit = (prompt: Prompt) => {
         setEditingPrompts((prev) => ({
@@ -130,12 +140,17 @@ export default function Admin({ prompts }: AdminProps) {
                                         </td>
                                         <td>
                                             {editing ? (
-                                                <input
-                                                    type="text"
-                                                    className="input input-bordered w-full"
+                                                <select
+                                                    className="select select-bordered w-full"
                                                     value={currentPrompt.category}
                                                     onChange={(e) => handleInputChange(prompt.id, 'category', e.target.value)}
-                                                />
+                                                >
+                                                    {categories.map((category) => (
+                                                        <option key={category} value={category}>
+                                                            {category}
+                                                        </option>
+                                                    ))}
+                                                </select>
                                             ) : (
                                                 <span className="hover:bg-base-200 cursor-pointer rounded p-2" onClick={() => handleEdit(prompt)}>
                                                     {prompt.category}
