@@ -2,8 +2,7 @@ import ImagePicker from '@/components/image-picker';
 import { Head } from '@inertiajs/react';
 
 export default function Welcome() {
-    window.addEventListener('message', () => {
-    });
+    window.addEventListener('message', () => {});
 
     return (
         <>

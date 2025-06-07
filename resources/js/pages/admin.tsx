@@ -16,6 +16,7 @@ interface AdminProps {
 export default function Admin({ prompts }: AdminProps) {
     const [editingPrompts, setEditingPrompts] = useState<Record<number, Prompt>>({});
     const [categories, setCategories] = useState<string[]>([]);
+    const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
     useEffect(() => {
         fetch('/prompt-categories')
@@ -25,6 +26,9 @@ export default function Admin({ prompts }: AdminProps) {
                 console.error('Error fetching categories:', error);
             });
     }, []);
+
+    // Filter prompts based on selected category
+    const filteredPrompts = selectedCategory === 'all' ? prompts : prompts.filter((prompt) => prompt.category === selectedCategory);
 
     const handleEdit = (prompt: Prompt) => {
         setEditingPrompts((prev) => ({
@@ -106,18 +110,36 @@ export default function Admin({ prompts }: AdminProps) {
             <div className="container mx-auto p-6">
                 <h1 className="mb-6 text-3xl font-bold">Admin Dashboard - Prompts</h1>
 
+                {/* Category Filter Dropdown */}
+                <div className="mb-4 flex gap-4">
+                    <label className="label">
+                        <span className="label-text">Filter by Category:</span>
+                    </label>
+                    <select
+                        className="select select-bordered w-full max-w-xs"
+                        value={selectedCategory}
+                        onChange={(e) => setSelectedCategory(e.target.value)}
+                    >
+                        <option value="all">All Categories</option>
+                        {categories.map((category) => (
+                            <option key={category} value={category}>
+                                {category}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
                 <div className="overflow-x-auto">
                     <table className="table-zebra table w-full">
                         <thead>
                             <tr>
                                 <th>Name</th>
-                                <th>Category</th>
                                 <th>Prompt</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {prompts.map((prompt) => {
+                            {filteredPrompts.map((prompt) => {
                                 const editing = isEditing(prompt.id);
                                 const changed = hasChanges(prompt);
                                 const currentPrompt = editing ? editingPrompts[prompt.id] : prompt;
@@ -138,29 +160,25 @@ export default function Admin({ prompts }: AdminProps) {
                                         </td>
                                         <td>
                                             {editing ? (
-                                                <select
-                                                    className="select select-bordered w-full"
-                                                    value={currentPrompt.category}
-                                                    onChange={(e) => handleInputChange(prompt.id, 'category', e.target.value)}
-                                                >
-                                                    {categories.map((category) => (
-                                                        <option key={category} value={category}>
-                                                            {category}
-                                                        </option>
-                                                    ))}
-                                                </select>
-                                            ) : (
-                                                <span>{prompt.category}</span>
-                                            )}
-                                        </td>
-                                        <td>
-                                            {editing ? (
-                                                <textarea
-                                                    className="textarea textarea-bordered w-full"
-                                                    rows={3}
-                                                    value={currentPrompt.prompt}
-                                                    onChange={(e) => handleInputChange(prompt.id, 'prompt', e.target.value)}
-                                                />
+                                                <div className="space-y-2">
+                                                    <select
+                                                        className="select select-bordered w-full"
+                                                        value={currentPrompt.category}
+                                                        onChange={(e) => handleInputChange(prompt.id, 'category', e.target.value)}
+                                                    >
+                                                        {categories.map((category) => (
+                                                            <option key={category} value={category}>
+                                                                {category}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                    <textarea
+                                                        className="textarea textarea-bordered w-full"
+                                                        rows={3}
+                                                        value={currentPrompt.prompt}
+                                                        onChange={(e) => handleInputChange(prompt.id, 'prompt', e.target.value)}
+                                                    />
+                                                </div>
                                             ) : (
                                                 <span className="block max-w-md truncate" title={prompt.prompt}>
                                                     {prompt.prompt}
@@ -181,11 +199,7 @@ export default function Admin({ prompts }: AdminProps) {
                                                         <button className="btn btn-ghost btn-sm" onClick={() => handleCancel(prompt.id)}>
                                                             Cancel
                                                         </button>
-                                                        <button
-                                                            className={`btn btn-error btn-sm ${!changed ? 'btn-disabled' : ''}`}
-                                                            onClick={() => handleDelete(prompt.id)}
-                                                            disabled={!changed}
-                                                        >
+                                                        <button className="btn btn-error btn-sm" onClick={() => handleDelete(prompt.id)}>
                                                             Delete
                                                         </button>
                                                     </>
