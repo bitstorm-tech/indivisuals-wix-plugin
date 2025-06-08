@@ -15,13 +15,17 @@ interface Prompt {
     active: boolean;
 }
 
-export default function ImagePicker() {
+interface ImagePickerProps {
+    defaultPromptId?: number;
+}
+
+export default function ImagePicker({ defaultPromptId }: ImagePickerProps) {
     const [selectedFile, setSelectedFile] = useState<File | undefined>(undefined);
     const [previewImage, setPreviewImage] = useState<string | undefined>(undefined);
     const [generatedImage, setGeneratedImage] = useState<string | undefined>(undefined);
     const [isProcessing, setIsProcessing] = useState<boolean>(false);
     const [prompts, setPrompts] = useState<Prompt[]>([]);
-    const [selectedPromptId, setSelectedPromptId] = useState<number | undefined>(undefined);
+    const [selectedPromptId, setSelectedPromptId] = useState<number | undefined>(defaultPromptId);
     const inputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -108,7 +112,9 @@ export default function ImagePicker() {
                     onChange={(e) => setSelectedPromptId(e.target.value ? Number(e.target.value) : undefined)}
                     disabled={isProcessing}
                 >
-                    <option value="" disabled>Bitte Stil auswählen...</option>
+                    <option value="" disabled>
+                        Bitte Stil auswählen...
+                    </option>
                     {prompts.map((prompt) => (
                         <option key={prompt.id} value={prompt.id}>
                             {prompt.name}

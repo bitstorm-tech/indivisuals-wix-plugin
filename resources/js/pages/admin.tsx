@@ -1,3 +1,4 @@
+import ImagePicker from '@/components/image-picker';
 import { Head, router } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 
@@ -17,6 +18,8 @@ export default function Admin({ prompts }: AdminProps) {
     const [editingPrompts, setEditingPrompts] = useState<Record<number, Prompt>>({});
     const [categories, setCategories] = useState<string[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<string>('all');
+    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+    const [testingPromptId, setTestingPromptId] = useState<number | undefined>(undefined);
 
     useEffect(() => {
         fetch('/prompt-categories')
@@ -86,6 +89,16 @@ export default function Admin({ prompts }: AdminProps) {
         } catch (error) {
             console.error('Error deleting prompt:', error);
         }
+    };
+
+    const handleTest = (promptId: number) => {
+        setTestingPromptId(promptId);
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setTestingPromptId(undefined);
     };
 
     const handleInputChange = (promptId: number, field: keyof Prompt, value: string) => {
@@ -204,9 +217,14 @@ export default function Admin({ prompts }: AdminProps) {
                                                         </button>
                                                     </>
                                                 ) : (
-                                                    <button className="btn btn-primary btn-sm" onClick={() => handleEdit(prompt)}>
-                                                        Edit
-                                                    </button>
+                                                    <>
+                                                        <button className="btn btn-primary btn-sm" onClick={() => handleEdit(prompt)}>
+                                                            Edit
+                                                        </button>
+                                                        <button className="btn btn-secondary btn-sm" onClick={() => handleTest(prompt.id)}>
+                                                            Test
+                                                        </button>
+                                                    </>
                                                 )}
                                             </div>
                                         </td>
@@ -216,6 +234,22 @@ export default function Admin({ prompts }: AdminProps) {
                         </tbody>
                     </table>
                 </div>
+
+                {/* Modal for testing prompts */}
+                {isModalOpen && (
+                    <div className="modal modal-open">
+                        <div className="modal-box max-w-4xl">
+                            <h3 className="mb-4 text-lg font-bold">Test Prompt</h3>
+                            <ImagePicker defaultPromptId={testingPromptId} />
+                            <div className="modal-action">
+                                <button className="btn" onClick={closeModal}>
+                                    Close
+                                </button>
+                            </div>
+                        </div>
+                        <div className="modal-backdrop" onClick={closeModal}></div>
+                    </div>
+                )}
             </div>
         </>
     );
