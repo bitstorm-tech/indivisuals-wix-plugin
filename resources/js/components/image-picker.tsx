@@ -68,7 +68,6 @@ export default function ImagePicker({ defaultPromptId }: ImagePickerProps) {
             if (result.success && result.generated_image_url) {
                 setGeneratedImage(result.generated_image_url);
                 setSelectedFile(undefined);
-                setPreviewImage(undefined);
             }
         } finally {
             setIsProcessing(false);
@@ -110,7 +109,7 @@ export default function ImagePicker({ defaultPromptId }: ImagePickerProps) {
 
             <ProcessingIndicator isVisible={isProcessing} />
 
-            <ImageDisplay previewImage={previewImage} generatedImage={generatedImage} isProcessing={isProcessing} />
+            <ImageDisplay previewImage={previewImage} generatedImage={generatedImage} />
         </>
     );
 }
