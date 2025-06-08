@@ -17,13 +17,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Frontend Commands
 
-- `npm run dev` - Start Vite dev server
-- `npm run build` - Build for production
-- `npm run build:ssr` - Build with SSR support
-- `npm run lint` - Run ESLint (with auto-fix)
-- `npm run types` - TypeScript type checking
-- `npm run format` - Format code with Prettier
-- `npm run format:check` - Check code formatting
+- `bun run dev` - Start Vite dev server
+- `bun run build` - Build for production
+- `bun run build:ssr` - Build with SSR support
+- `bun run lint` - Run ESLint (with auto-fix)
+- `bun run types` - TypeScript type checking
+- `bun run format` - Format code with Prettier
+- `bun run format:check` - Check code formatting
 
 ### Code Quality
 
