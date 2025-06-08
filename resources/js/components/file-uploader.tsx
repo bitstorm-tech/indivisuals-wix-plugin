@@ -1,4 +1,5 @@
 import React, { useRef } from 'react';
+import { Button } from './ui/button';
 
 interface FileUploaderProps {
   selectedFile: File | undefined;
@@ -13,14 +14,14 @@ export default function FileUploader({ selectedFile, onFileChange, onUpload, can
 
   return (
     <div className="flex items-center space-x-2">
-      <button className="btn btn-primary" onClick={() => inputRef?.current?.click()} disabled={isProcessing}>
+      <Button onClick={() => inputRef?.current?.click()} disabled={isProcessing}>
         Bild wählen
-      </button>
+      </Button>
       {selectedFile && (
-        <button className="btn btn-success" onClick={onUpload} disabled={!canUpload || isProcessing}>
-          {isProcessing && <span className="loading loading-spinner loading-sm mr-2"></span>}
+        <Button onClick={onUpload} disabled={!canUpload || isProcessing}>
+          {isProcessing && <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"></div>}
           {isProcessing ? 'Wird bearbeitet...' : 'Bild hochladen'}
-        </button>
+        </Button>
       )}
       <input type="file" className="input" onChange={onFileChange} ref={inputRef} accept="image/*" hidden />
     </div>

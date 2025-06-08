@@ -1,4 +1,5 @@
 import { Prompt } from '../types/image-picker';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
 interface PromptSelectorProps {
   prompts: Prompt[];
@@ -9,20 +10,21 @@ interface PromptSelectorProps {
 
 export default function PromptSelector({ prompts, selectedPromptId, onPromptChange, disabled = false }: PromptSelectorProps) {
   return (
-    <select
-      className="select select-bordered w-full max-w-xs"
-      value={selectedPromptId || ''}
-      onChange={(e) => onPromptChange(e.target.value ? Number(e.target.value) : undefined)}
+    <Select
+      value={selectedPromptId?.toString() || ''}
+      onValueChange={(value) => onPromptChange(value ? Number(value) : undefined)}
       disabled={disabled}
     >
-      <option value="" disabled>
-        Bitte Stil auswählen...
-      </option>
-      {prompts.map((prompt) => (
-        <option key={prompt.id} value={prompt.id}>
-          {prompt.name}
-        </option>
-      ))}
-    </select>
+      <SelectTrigger className="w-full max-w-xs">
+        <SelectValue placeholder="Bitte Stil auswählen..." />
+      </SelectTrigger>
+      <SelectContent>
+        {prompts.map((prompt) => (
+          <SelectItem key={prompt.id} value={prompt.id.toString()}>
+            {prompt.name}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   );
 }

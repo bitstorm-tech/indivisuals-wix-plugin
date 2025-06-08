@@ -1,3 +1,5 @@
+import { Alert, AlertDescription, AlertTitle } from './ui/alert';
+
 interface ProcessingIndicatorProps {
   isVisible: boolean;
 }
@@ -6,12 +8,12 @@ export default function ProcessingIndicator({ isVisible }: ProcessingIndicatorPr
   if (!isVisible) return null;
 
   return (
-    <div className="alert alert-info mt-4">
-      <span className="loading loading-spinner loading-md"></span>
-      <div>
-        <h3 className="font-bold">Bild wird bearbeitet</h3>
-        <div className="text-xs">Ihr Bild wird von der KI bearbeitet. Dies kann einen Moment dauern...</div>
-      </div>
-    </div>
+    <Alert variant="info" className="mt-4">
+      <div className="h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent"></div>
+      <AlertTitle>Bild wird bearbeitet</AlertTitle>
+      <AlertDescription>
+        Ihr Bild wird von der KI bearbeitet. Dies kann einen Moment dauern...
+      </AlertDescription>
+    </Alert>
   );
 }
