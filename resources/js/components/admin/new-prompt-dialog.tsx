@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { useEffect, useState } from 'react';
 
 interface NewPromptData {
   name: string;
@@ -22,6 +23,16 @@ interface NewPromptDialogProps {
 }
 
 export default function NewPromptDialog({ isOpen, newPrompt, categories, onSave, onCancel, onInputChange }: NewPromptDialogProps) {
+  const [useCustomCategory, setUseCustomCategory] = useState(false);
+  const [customCategory, setCustomCategory] = useState('');
+
+  useEffect(() => {
+    if (!isOpen) {
+      setUseCustomCategory(false);
+      setCustomCategory('');
+    }
+  }, [isOpen]);
+
   const isFormValid = newPrompt.name && newPrompt.category && newPrompt.prompt;
 
   return (
@@ -36,19 +47,51 @@ export default function NewPromptDialog({ isOpen, newPrompt, categories, onSave,
             <Input type="text" value={newPrompt.name} onChange={(e) => onInputChange('name', e.target.value)} placeholder="Enter prompt name" />
           </div>
           <div>
-            <label className="text-sm font-medium">Category</label>
-            <Select value={newPrompt.category} onValueChange={(value) => onInputChange('category', value)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select a category" />
-              </SelectTrigger>
-              <SelectContent>
-                {categories.map((category) => (
-                  <SelectItem key={category} value={category}>
-                    {category}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="useCustomCategory"
+                  checked={useCustomCategory}
+                  onCheckedChange={(checked) => {
+                    setUseCustomCategory(checked as boolean);
+                    if (checked) {
+                      onInputChange('category', customCategory);
+                    } else {
+                      onInputChange('category', '');
+                      setCustomCategory('');
+                    }
+                  }}
+                />
+                <label htmlFor="useCustomCategory" className="text-sm">
+                  Create new category
+                </label>
+              </div>
+
+              {useCustomCategory ? (
+                <Input
+                  type="text"
+                  value={customCategory}
+                  onChange={(e) => {
+                    setCustomCategory(e.target.value);
+                    onInputChange('category', e.target.value);
+                  }}
+                  placeholder="Enter new category name"
+                />
+              ) : (
+                <Select value={newPrompt.category} onValueChange={(value) => onInputChange('category', value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {category}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            </div>
           </div>
           <div>
             <label className="text-sm font-medium">Prompt</label>
@@ -60,11 +103,7 @@ export default function NewPromptDialog({ isOpen, newPrompt, categories, onSave,
             />
           </div>
           <div className="flex items-center space-x-2">
-            <Checkbox
-              id="active"
-              checked={newPrompt.active}
-              onCheckedChange={(checked) => onInputChange('active', checked as boolean)}
-            />
+            <Checkbox id="active" checked={newPrompt.active} onCheckedChange={(checked) => onInputChange('active', checked as boolean)} />
             <label htmlFor="active" className="text-sm font-medium">
               Active
             </label>
