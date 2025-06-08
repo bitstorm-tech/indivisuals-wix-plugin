@@ -1,5 +1,5 @@
 import AdminHeader from '@/components/admin/admin-header';
-import CategoryFilter from '@/components/admin/category-filter';
+import PromptTableHeader from '@/components/admin/prompt-table-header';
 import DeleteConfirmationDialog from '@/components/admin/delete-confirmation-dialog';
 import NewPromptDialog from '@/components/admin/new-prompt-dialog';
 import PromptTable from '@/components/admin/prompt-table';
@@ -207,7 +207,7 @@ export default function Admin({ prompts, auth }: AdminProps) {
       <div className="container mx-auto p-6">
         <AdminHeader user={auth.user} />
 
-        <CategoryFilter
+        <PromptTableHeader
           categories={categories}
           selectedCategory={selectedCategory}
           onCategoryChange={setSelectedCategory}

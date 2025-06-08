@@ -1,14 +1,14 @@
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-interface CategoryFilterProps {
+interface PromptTableHeaderProps {
   categories: string[];
   selectedCategory: string;
   onCategoryChange: (category: string) => void;
   onNewPrompt: () => void;
 }
 
-export default function CategoryFilter({ categories, selectedCategory, onCategoryChange, onNewPrompt }: CategoryFilterProps) {
+export default function PromptTableHeader({ categories, selectedCategory, onCategoryChange, onNewPrompt }: PromptTableHeaderProps) {
   return (
     <div className="mb-4 flex items-center justify-between">
       <Button onClick={onNewPrompt}>New Prompt</Button>
