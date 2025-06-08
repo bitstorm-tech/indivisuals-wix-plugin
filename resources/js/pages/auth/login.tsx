@@ -1,7 +1,6 @@
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Head, router } from '@inertiajs/react';
@@ -18,7 +17,6 @@ export default function Login({ errors = {} }: LoginProps) {
   const [data, setData] = useState({
     email: '',
     password: '',
-    remember: false,
   });
   const [processing, setProcessing] = useState(false);
 
@@ -79,13 +77,6 @@ export default function Login({ errors = {} }: LoginProps) {
                       <AlertDescription>{errors.password}</AlertDescription>
                     </Alert>
                   )}
-                </div>
-
-                <div className="flex items-center space-x-2">
-                  <Checkbox id="remember" checked={data.remember} onCheckedChange={(checked) => setData({ ...data, remember: checked as boolean })} />
-                  <Label htmlFor="remember" className="text-sm">
-                    Remember me
-                  </Label>
                 </div>
 
                 <Button type="submit" className="w-full" disabled={processing}>
