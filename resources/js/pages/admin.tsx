@@ -1,20 +1,9 @@
-import ImagePicker from '@/components/image-picker';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Textarea } from '@/components/ui/textarea';
+import AdminHeader from '@/components/admin-header';
+import CategoryFilter from '@/components/category-filter';
+import DeleteConfirmationDialog from '@/components/delete-confirmation-dialog';
+import NewPromptDialog from '@/components/new-prompt-dialog';
+import PromptTable from '@/components/prompt-table';
+import TestPromptDialog from '@/components/test-prompt-dialog';
 import { Head, router } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 
@@ -163,9 +152,6 @@ export default function Admin({ prompts, auth }: AdminProps) {
     return edited && (edited.name !== prompt.name || edited.category !== prompt.category || edited.prompt !== prompt.prompt);
   };
 
-  const handleLogout = () => {
-    router.post('/logout');
-  };
 
   const handleNewPrompt = () => {
     setIsNewPromptDialogOpen(true);
@@ -215,215 +201,49 @@ export default function Admin({ prompts, auth }: AdminProps) {
     <>
       <Head title="Admin Dashboard" />
       <div className="container mx-auto p-6">
-        <div className="mb-6 flex items-center justify-between">
-          <h1 className="text-3xl font-bold">Admin Dashboard - Prompts</h1>
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-600">Welcome, {auth.user.name}</span>
-            <Button variant="outline" onClick={handleLogout}>
-              Logout
-            </Button>
-          </div>
-        </div>
+        <AdminHeader user={auth.user} />
 
-        {/* New Prompt Button and Category Filter */}
-        <div className="mb-4 flex items-center justify-between">
-          <Button onClick={handleNewPrompt}>New Prompt</Button>
-          <div className="flex items-center gap-4">
-            <label className="text-sm font-medium">Filter by Category:</label>
-            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger className="w-[200px]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
-                {categories.map((category) => (
-                  <SelectItem key={category} value={category}>
-                    {category}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
+        <CategoryFilter
+          categories={categories}
+          selectedCategory={selectedCategory}
+          onCategoryChange={setSelectedCategory}
+          onNewPrompt={handleNewPrompt}
+        />
 
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Prompt</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredPrompts.map((prompt) => {
-                const editing = isEditing(prompt.id);
-                const changed = hasChanges(prompt);
-                const currentPrompt = editing ? editingPrompts[prompt.id] : prompt;
+        <PromptTable
+          prompts={filteredPrompts}
+          editingPrompts={editingPrompts}
+          categories={categories}
+          isEditing={isEditing}
+          hasChanges={hasChanges}
+          onEdit={handleEdit}
+          onCancel={handleCancel}
+          onSave={handleSave}
+          onDelete={handleDelete}
+          onTest={handleTest}
+          onInputChange={handleInputChange}
+        />
 
-                return (
-                  <TableRow key={prompt.id}>
-                    <TableCell>
-                      {editing ? (
-                        <Input
-                          type="text"
-                          value={currentPrompt.name}
-                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange(prompt.id, 'name', e.target.value)}
-                        />
-                      ) : (
-                        <span>{prompt.name}</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {editing ? (
-                        <Select value={currentPrompt.category} onValueChange={(value) => handleInputChange(prompt.id, 'category', value)}>
-                          <SelectTrigger className="w-full">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {categories.map((category) => (
-                              <SelectItem key={category} value={category}>
-                                {category}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      ) : (
-                        <span>{prompt.category}</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {editing ? (
-                        <Textarea
-                          rows={3}
-                          value={currentPrompt.prompt}
-                          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleInputChange(prompt.id, 'prompt', e.target.value)}
-                        />
-                      ) : (
-                        <span className="block max-w-md truncate" title={prompt.prompt}>
-                          {prompt.prompt}
-                        </span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-2">
-                        {editing ? (
-                          <>
-                            <Button variant={!changed ? 'outline' : 'default'} size="sm" onClick={() => handleSave(prompt.id)} disabled={!changed}>
-                              Save
-                            </Button>
-                            <Button variant="ghost" size="sm" onClick={() => handleCancel(prompt.id)}>
-                              Cancel
-                            </Button>
-                            <Button variant="destructive" size="sm" onClick={() => handleDelete(prompt.id)}>
-                              Delete
-                            </Button>
-                          </>
-                        ) : (
-                          <>
-                            <Button variant="default" size="sm" onClick={() => handleEdit(prompt)}>
-                              Edit
-                            </Button>
-                            <Button variant="secondary" size="sm" onClick={() => handleTest(prompt.id)}>
-                              Test
-                            </Button>
-                          </>
-                        )}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </div>
+        <TestPromptDialog
+          isOpen={isModalOpen}
+          testingPromptId={testingPromptId}
+          onClose={closeModal}
+        />
 
-        {/* Dialog for testing prompts */}
-        <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Test Prompt</DialogTitle>
-            </DialogHeader>
-            <ImagePicker defaultPromptId={testingPromptId} />
-            <DialogFooter>
-              <Button variant="outline" onClick={closeModal}>
-                Close
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <DeleteConfirmationDialog
+          isOpen={isDeleteDialogOpen}
+          onConfirm={confirmDelete}
+          onCancel={cancelDelete}
+        />
 
-        {/* Alert Dialog for delete confirmation */}
-        <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-              <AlertDialogDescription>This action cannot be undone. This will permanently delete the prompt.</AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel onClick={cancelDelete}>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={confirmDelete} className="bg-destructive">
-                Delete
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-
-        {/* Dialog for creating new prompt */}
-        <Dialog open={isNewPromptDialogOpen} onOpenChange={setIsNewPromptDialogOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Create New Prompt</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div>
-                <label className="text-sm font-medium">Name</label>
-                <Input
-                  type="text"
-                  value={newPrompt.name}
-                  onChange={(e) => handleNewPromptInputChange('name', e.target.value)}
-                  placeholder="Enter prompt name"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium">Category</label>
-                <Select value={newPrompt.category} onValueChange={(value) => handleNewPromptInputChange('category', value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.map((category) => (
-                      <SelectItem key={category} value={category}>
-                        {category}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <label className="text-sm font-medium">Prompt</label>
-                <Textarea
-                  rows={4}
-                  value={newPrompt.prompt}
-                  onChange={(e) => handleNewPromptInputChange('prompt', e.target.value)}
-                  placeholder="Enter the prompt text"
-                />
-              </div>
-            </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={handleCancelNewPrompt}>
-                Cancel
-              </Button>
-              <Button
-                onClick={handleSaveNewPrompt}
-                disabled={!newPrompt.name || !newPrompt.category || !newPrompt.prompt}
-              >
-                Save
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <NewPromptDialog
+          isOpen={isNewPromptDialogOpen}
+          newPrompt={newPrompt}
+          categories={categories}
+          onSave={handleSaveNewPrompt}
+          onCancel={handleCancelNewPrompt}
+          onInputChange={handleNewPromptInputChange}
+        />
       </div>
     </>
   );
