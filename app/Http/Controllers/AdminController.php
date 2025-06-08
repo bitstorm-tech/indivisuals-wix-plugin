@@ -11,9 +11,9 @@ class AdminController extends Controller
     public function dashboard()
     {
         $prompts = Prompt::all();
-        
+
         return Inertia::render('admin', [
-            'prompts' => $prompts
+            'prompts' => $prompts,
         ]);
     }
 
@@ -29,7 +29,7 @@ class AdminController extends Controller
 
         return response()->json([
             'success' => true,
-            'prompt' => $prompt->fresh()
+            'prompt' => $prompt->fresh(),
         ]);
     }
 
@@ -38,7 +38,7 @@ class AdminController extends Controller
         $prompt->delete();
 
         return response()->json([
-            'success' => true
+            'success' => true,
         ]);
     }
 }

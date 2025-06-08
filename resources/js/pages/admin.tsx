@@ -26,11 +26,20 @@ interface Prompt {
   active: boolean;
 }
 
-interface AdminProps {
-  prompts: Prompt[];
+interface User {
+  id: number;
+  name: string;
+  email: string;
 }
 
-export default function Admin({ prompts }: AdminProps) {
+interface AdminProps {
+  prompts: Prompt[];
+  auth: {
+    user: User;
+  };
+}
+
+export default function Admin({ prompts, auth }: AdminProps) {
   const [editingPrompts, setEditingPrompts] = useState<Record<number, Prompt>>({});
   const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -148,11 +157,23 @@ export default function Admin({ prompts }: AdminProps) {
     return edited && (edited.name !== prompt.name || edited.category !== prompt.category || edited.prompt !== prompt.prompt);
   };
 
+  const handleLogout = () => {
+    router.post('/logout');
+  };
+
   return (
     <>
       <Head title="Admin Dashboard" />
       <div className="container mx-auto p-6">
-        <h1 className="mb-6 text-3xl font-bold">Admin Dashboard - Prompts</h1>
+        <div className="mb-6 flex items-center justify-between">
+          <h1 className="text-3xl font-bold">Admin Dashboard - Prompts</h1>
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-gray-600">Welcome, {auth.user.name}</span>
+            <Button variant="outline" onClick={handleLogout}>
+              Logout
+            </Button>
+          </div>
+        </div>
 
         {/* Category Filter Dropdown */}
         <div className="mb-4 flex items-center gap-4">
