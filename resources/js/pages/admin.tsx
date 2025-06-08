@@ -198,6 +198,7 @@ export default function Admin({ prompts, auth }: AdminProps) {
             <TableHeader>
               <TableRow>
                 <TableHead>Name</TableHead>
+                <TableHead>Category</TableHead>
                 <TableHead>Prompt</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
@@ -223,25 +224,29 @@ export default function Admin({ prompts, auth }: AdminProps) {
                     </TableCell>
                     <TableCell>
                       {editing ? (
-                        <div className="space-y-2">
-                          <Select value={currentPrompt.category} onValueChange={(value) => handleInputChange(prompt.id, 'category', value)}>
-                            <SelectTrigger className="w-full">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {categories.map((category) => (
-                                <SelectItem key={category} value={category}>
-                                  {category}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <Textarea
-                            rows={3}
-                            value={currentPrompt.prompt}
-                            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleInputChange(prompt.id, 'prompt', e.target.value)}
-                          />
-                        </div>
+                        <Select value={currentPrompt.category} onValueChange={(value) => handleInputChange(prompt.id, 'category', value)}>
+                          <SelectTrigger className="w-full">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {categories.map((category) => (
+                              <SelectItem key={category} value={category}>
+                                {category}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      ) : (
+                        <span>{prompt.category}</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {editing ? (
+                        <Textarea
+                          rows={3}
+                          value={currentPrompt.prompt}
+                          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleInputChange(prompt.id, 'prompt', e.target.value)}
+                        />
                       ) : (
                         <span className="block max-w-md truncate" title={prompt.prompt}>
                           {prompt.prompt}
