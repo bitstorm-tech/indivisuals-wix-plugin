@@ -1,6 +1,7 @@
 import ImagePicker from '@/components/image-picker';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Head, router } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 
@@ -126,12 +127,10 @@ export default function Admin({ prompts }: AdminProps) {
                 <h1 className="mb-6 text-3xl font-bold">Admin Dashboard - Prompts</h1>
 
                 {/* Category Filter Dropdown */}
-                <div className="mb-4 flex gap-4">
-                    <label className="label">
-                        <span className="label-text">Filter by Category:</span>
-                    </label>
+                <div className="mb-4 flex items-center gap-4">
+                    <label className="text-sm font-medium">Filter by Category:</label>
                     <select
-                        className="select select-bordered w-full max-w-xs"
+                        className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus:ring-ring flex h-10 w-[200px] items-center justify-between rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                         value={selectedCategory}
                         onChange={(e) => setSelectedCategory(e.target.value)}
                     >
@@ -144,42 +143,46 @@ export default function Admin({ prompts }: AdminProps) {
                     </select>
                 </div>
 
-                <div className="overflow-x-auto">
-                    <table className="table-zebra table w-full">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Prompt</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+                <div className="rounded-md border">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Name</TableHead>
+                                <TableHead>Prompt</TableHead>
+                                <TableHead>Actions</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
                             {filteredPrompts.map((prompt) => {
                                 const editing = isEditing(prompt.id);
                                 const changed = hasChanges(prompt);
                                 const currentPrompt = editing ? editingPrompts[prompt.id] : prompt;
 
                                 return (
-                                    <tr key={prompt.id}>
-                                        <td>
+                                    <TableRow key={prompt.id}>
+                                        <TableCell>
                                             {editing ? (
                                                 <input
                                                     type="text"
-                                                    className="input input-bordered w-full"
+                                                    className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex h-10 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                                                     value={currentPrompt.name}
-                                                    onChange={(e) => handleInputChange(prompt.id, 'name', e.target.value)}
+                                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                                                        handleInputChange(prompt.id, 'name', e.target.value)
+                                                    }
                                                 />
                                             ) : (
                                                 <span>{prompt.name}</span>
                                             )}
-                                        </td>
-                                        <td>
+                                        </TableCell>
+                                        <TableCell>
                                             {editing ? (
                                                 <div className="space-y-2">
                                                     <select
-                                                        className="select select-bordered w-full"
+                                                        className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus:ring-ring flex h-10 w-full items-center justify-between rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                                                         value={currentPrompt.category}
-                                                        onChange={(e) => handleInputChange(prompt.id, 'category', e.target.value)}
+                                                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                                                            handleInputChange(prompt.id, 'category', e.target.value)
+                                                        }
                                                     >
                                                         {categories.map((category) => (
                                                             <option key={category} value={category}>
@@ -188,10 +191,12 @@ export default function Admin({ prompts }: AdminProps) {
                                                         ))}
                                                     </select>
                                                     <textarea
-                                                        className="textarea textarea-bordered w-full"
+                                                        className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex min-h-[80px] w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                                                         rows={3}
                                                         value={currentPrompt.prompt}
-                                                        onChange={(e) => handleInputChange(prompt.id, 'prompt', e.target.value)}
+                                                        onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                                                            handleInputChange(prompt.id, 'prompt', e.target.value)
+                                                        }
                                                     />
                                                 </div>
                                             ) : (
@@ -199,8 +204,8 @@ export default function Admin({ prompts }: AdminProps) {
                                                     {prompt.prompt}
                                                 </span>
                                             )}
-                                        </td>
-                                        <td>
+                                        </TableCell>
+                                        <TableCell>
                                             <div className="flex gap-2">
                                                 {editing ? (
                                                     <>
@@ -230,12 +235,12 @@ export default function Admin({ prompts }: AdminProps) {
                                                     </>
                                                 )}
                                             </div>
-                                        </td>
-                                    </tr>
+                                        </TableCell>
+                                    </TableRow>
                                 );
                             })}
-                        </tbody>
-                    </table>
+                        </TableBody>
+                    </Table>
                 </div>
 
                 {/* Dialog for testing prompts */}
