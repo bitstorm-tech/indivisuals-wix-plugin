@@ -91,3 +91,4 @@ This is a Laravel + Inertia.js + React application focused on AI-powered image p
 - New UI components must be generated with shadcn-ui with `bunx --bun shadcn@latest add`
 - Use as much Laravel functionallity in the backend as possible
 - Use Inertia functionallity whereever possible
+- Use `git mv` to move files that are under version control
