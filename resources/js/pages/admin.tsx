@@ -1,5 +1,6 @@
 import ImagePicker from '@/components/image-picker';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Head, router } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 
@@ -237,21 +238,20 @@ export default function Admin({ prompts }: AdminProps) {
                     </table>
                 </div>
 
-                {/* Modal for testing prompts */}
-                {isModalOpen && (
-                    <div className="modal modal-open">
-                        <div className="modal-box max-w-4xl">
-                            <h3 className="mb-4 text-lg font-bold">Test Prompt</h3>
-                            <ImagePicker defaultPromptId={testingPromptId} />
-                            <div className="modal-action">
-                                <Button variant="outline" onClick={closeModal}>
-                                    Close
-                                </Button>
-                            </div>
-                        </div>
-                        <div className="modal-backdrop" onClick={closeModal}></div>
-                    </div>
-                )}
+                {/* Dialog for testing prompts */}
+                <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+                    <DialogContent className="max-w-4xl">
+                        <DialogHeader>
+                            <DialogTitle>Test Prompt</DialogTitle>
+                        </DialogHeader>
+                        <ImagePicker defaultPromptId={testingPromptId} />
+                        <DialogFooter>
+                            <Button variant="outline" onClick={closeModal}>
+                                Close
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
             </div>
         </>
     );
