@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Prompt, UploadResponse } from '../types/image-picker';
+import { Prompt, UploadResponse } from '../../types/image-picker';
 import FileUploader from './file-uploader';
 import ImageDisplay from './image-display';
 import ProcessingIndicator from './processing-indicator';

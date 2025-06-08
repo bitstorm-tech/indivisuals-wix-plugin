@@ -1,5 +1,5 @@
-import { Prompt } from '../types/image-picker';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { Prompt } from '../../types/image-picker';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 
 interface PromptSelectorProps {
   prompts: Prompt[];
@@ -12,7 +12,7 @@ export default function PromptSelector({ prompts, selectedPromptId, onPromptChan
   return (
     <Select
       value={selectedPromptId?.toString() || ''}
-      onValueChange={(value) => onPromptChange(value ? Number(value) : undefined)}
+      onValueChange={(value: string) => onPromptChange(value ? Number(value) : undefined)}
       disabled={disabled}
     >
       <SelectTrigger className="w-full max-w-xs">
