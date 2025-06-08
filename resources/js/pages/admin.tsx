@@ -1,4 +1,5 @@
 import ImagePicker from '@/components/image-picker';
+import { Button } from '@/components/ui/button';
 import { Head, router } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 
@@ -202,28 +203,29 @@ export default function Admin({ prompts }: AdminProps) {
                                             <div className="flex gap-2">
                                                 {editing ? (
                                                     <>
-                                                        <button
-                                                            className={`btn btn-success btn-sm ${!changed ? 'btn-disabled' : ''}`}
+                                                        <Button
+                                                            variant={!changed ? 'outline' : 'default'}
+                                                            size="sm"
                                                             onClick={() => handleSave(prompt.id)}
                                                             disabled={!changed}
                                                         >
                                                             Save
-                                                        </button>
-                                                        <button className="btn btn-ghost btn-sm" onClick={() => handleCancel(prompt.id)}>
+                                                        </Button>
+                                                        <Button variant="ghost" size="sm" onClick={() => handleCancel(prompt.id)}>
                                                             Cancel
-                                                        </button>
-                                                        <button className="btn btn-error btn-sm" onClick={() => handleDelete(prompt.id)}>
+                                                        </Button>
+                                                        <Button variant="destructive" size="sm" onClick={() => handleDelete(prompt.id)}>
                                                             Delete
-                                                        </button>
+                                                        </Button>
                                                     </>
                                                 ) : (
                                                     <>
-                                                        <button className="btn btn-primary btn-sm" onClick={() => handleEdit(prompt)}>
+                                                        <Button variant="default" size="sm" onClick={() => handleEdit(prompt)}>
                                                             Edit
-                                                        </button>
-                                                        <button className="btn btn-secondary btn-sm" onClick={() => handleTest(prompt.id)}>
+                                                        </Button>
+                                                        <Button variant="secondary" size="sm" onClick={() => handleTest(prompt.id)}>
                                                             Test
-                                                        </button>
+                                                        </Button>
                                                     </>
                                                 )}
                                             </div>
@@ -242,9 +244,9 @@ export default function Admin({ prompts }: AdminProps) {
                             <h3 className="mb-4 text-lg font-bold">Test Prompt</h3>
                             <ImagePicker defaultPromptId={testingPromptId} />
                             <div className="modal-action">
-                                <button className="btn" onClick={closeModal}>
+                                <Button variant="outline" onClick={closeModal}>
                                     Close
-                                </button>
+                                </Button>
                             </div>
                         </div>
                         <div className="modal-backdrop" onClick={closeModal}></div>

@@ -40,7 +40,7 @@ This is a Laravel + Inertia.js + React application focused on AI-powered image p
 - **Backend**: Laravel 12 with PHP 8.2+
 - **Frontend**: React 19 with TypeScript
 - **Bridge**: Inertia.js 2.0 for SPA behavior
-- **Styling**: Tailwind CSS 4 + DaisyUI
+- **Styling**: Tailwind CSS 4 + shadcn-ui
 - **AI Integration**: OpenAI API via `openai-php/laravel`
 - **Testing**: Pest (PHP), no frontend tests configured
 - **Database**: SQLite (development)
@@ -87,6 +87,6 @@ This is a Laravel + Inertia.js + React application focused on AI-powered image p
 - German UI text in image picker component
 - Concurrent development setup runs all services simultaneously
 - Private image storage requires route-based access control
-- Use DaisyUI and Tailwind CSS for the styling in the frontend
+- Use shadcn-ui and Tailwind CSS for the styling in the frontend
 - Use as much Laravel functionallity in the backend as possible
 - Use Inertia functionallity whereever possible
