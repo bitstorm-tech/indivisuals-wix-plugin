@@ -20,7 +20,7 @@ interface PromptTableProps {
   onSave: (promptId: number) => void;
   onDelete: (promptId: number) => void;
   onTest: (promptId: number) => void;
-  onInputChange: (promptId: number, field: keyof Prompt, value: string) => void;
+  onInputChange: (promptId: number, field: keyof Prompt, value: string | boolean) => void;
 }
 
 export default function PromptTable({
@@ -41,6 +41,7 @@ export default function PromptTable({
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead>Active</TableHead>
             <TableHead>Name</TableHead>
             <TableHead>Category</TableHead>
             <TableHead>Prompt</TableHead>

@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -8,6 +9,7 @@ interface NewPromptData {
   name: string;
   category: string;
   prompt: string;
+  active: boolean;
 }
 
 interface NewPromptDialogProps {
@@ -16,7 +18,7 @@ interface NewPromptDialogProps {
   categories: string[];
   onSave: () => void;
   onCancel: () => void;
-  onInputChange: (field: keyof NewPromptData, value: string) => void;
+  onInputChange: (field: keyof NewPromptData, value: string | boolean) => void;
 }
 
 export default function NewPromptDialog({ isOpen, newPrompt, categories, onSave, onCancel, onInputChange }: NewPromptDialogProps) {
@@ -56,6 +58,16 @@ export default function NewPromptDialog({ isOpen, newPrompt, categories, onSave,
               onChange={(e) => onInputChange('prompt', e.target.value)}
               placeholder="Enter the prompt text"
             />
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="active"
+              checked={newPrompt.active}
+              onCheckedChange={(checked) => onInputChange('active', checked as boolean)}
+            />
+            <label htmlFor="active" className="text-sm font-medium">
+              Active
+            </label>
           </div>
         </div>
         <DialogFooter>

@@ -37,10 +37,11 @@ export default function Admin({ prompts, auth }: AdminProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const [promptToDelete, setPromptToDelete] = useState<number | undefined>(undefined);
   const [isNewPromptDialogOpen, setIsNewPromptDialogOpen] = useState<boolean>(false);
-  const [newPrompt, setNewPrompt] = useState<{ name: string; category: string; prompt: string }>({
+  const [newPrompt, setNewPrompt] = useState<{ name: string; category: string; prompt: string; active: boolean }>({
     name: '',
     category: '',
-    prompt: ''
+    prompt: '',
+    active: true,
   });
 
   useEffect(() => {
@@ -85,6 +86,7 @@ export default function Admin({ prompts, auth }: AdminProps) {
           name: editedPrompt.name,
           category: editedPrompt.category,
           prompt: editedPrompt.prompt,
+          active: editedPrompt.active,
         }),
       });
 
@@ -136,12 +138,12 @@ export default function Admin({ prompts, auth }: AdminProps) {
     setTestingPromptId(undefined);
   };
 
-  const handleInputChange = (promptId: number, field: keyof Prompt, value: string) => {
+  const handleInputChange = (promptId: number, field: keyof Prompt, value: string | boolean) => {
     setEditingPrompts((prev) => ({
       ...prev,
       [promptId]: {
         ...prev[promptId],
-        [field]: value,
+        [field]: field === 'active' ? value === 'true' || value === true : value,
       },
     }));
   };
@@ -149,15 +151,17 @@ export default function Admin({ prompts, auth }: AdminProps) {
   const isEditing = (promptId: number) => promptId in editingPrompts;
   const hasChanges = (prompt: Prompt) => {
     const edited = editingPrompts[prompt.id];
-    return edited && (edited.name !== prompt.name || edited.category !== prompt.category || edited.prompt !== prompt.prompt);
+    return (
+      edited &&
+      (edited.name !== prompt.name || edited.category !== prompt.category || edited.prompt !== prompt.prompt || edited.active !== prompt.active)
+    );
   };
-
 
   const handleNewPrompt = () => {
     setIsNewPromptDialogOpen(true);
   };
 
-  const handleNewPromptInputChange = (field: keyof typeof newPrompt, value: string) => {
+  const handleNewPromptInputChange = (field: keyof typeof newPrompt, value: string | boolean) => {
     setNewPrompt((prev) => ({
       ...prev,
       [field]: value,
@@ -180,13 +184,13 @@ export default function Admin({ prompts, auth }: AdminProps) {
           name: newPrompt.name,
           category: newPrompt.category,
           prompt: newPrompt.prompt,
-          active: true,
+          active: newPrompt.active,
         }),
       });
 
       router.reload({ only: ['prompts'] });
       setIsNewPromptDialogOpen(false);
-      setNewPrompt({ name: '', category: '', prompt: '' });
+      setNewPrompt({ name: '', category: '', prompt: '', active: true });
     } catch (error) {
       console.error('Error creating prompt:', error);
     }
@@ -194,7 +198,7 @@ export default function Admin({ prompts, auth }: AdminProps) {
 
   const handleCancelNewPrompt = () => {
     setIsNewPromptDialogOpen(false);
-    setNewPrompt({ name: '', category: '', prompt: '' });
+    setNewPrompt({ name: '', category: '', prompt: '', active: true });
   };
 
   return (
@@ -224,17 +228,9 @@ export default function Admin({ prompts, auth }: AdminProps) {
           onInputChange={handleInputChange}
         />
 
-        <TestPromptDialog
-          isOpen={isModalOpen}
-          testingPromptId={testingPromptId}
-          onClose={closeModal}
-        />
+        <TestPromptDialog isOpen={isModalOpen} testingPromptId={testingPromptId} onClose={closeModal} />
 
-        <DeleteConfirmationDialog
-          isOpen={isDeleteDialogOpen}
-          onConfirm={confirmDelete}
-          onCancel={cancelDelete}
-        />
+        <DeleteConfirmationDialog isOpen={isDeleteDialogOpen} onConfirm={confirmDelete} onCancel={cancelDelete} />
 
         <NewPromptDialog
           isOpen={isNewPromptDialogOpen}

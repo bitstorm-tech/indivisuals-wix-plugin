@@ -23,6 +23,7 @@ class AdminController extends Controller
             'name' => 'required|string|max:255',
             'category' => 'required|string|max:255',
             'prompt' => 'required|string',
+            'active' => 'boolean',
         ]);
 
         $prompt->update($validated);

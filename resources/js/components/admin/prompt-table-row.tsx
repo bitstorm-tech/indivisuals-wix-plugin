@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { TableCell, TableRow } from '@/components/ui/table';
@@ -23,7 +24,7 @@ interface PromptTableRowProps {
   onSave: (promptId: number) => void;
   onDelete: (promptId: number) => void;
   onTest: (promptId: number) => void;
-  onInputChange: (promptId: number, field: keyof Prompt, value: string) => void;
+  onInputChange: (promptId: number, field: keyof Prompt, value: string | boolean) => void;
 }
 
 export default function PromptTableRow({
@@ -43,6 +44,13 @@ export default function PromptTableRow({
 
   return (
     <TableRow>
+      <TableCell>
+        {isEditing ? (
+          <Checkbox checked={currentPrompt.active} onCheckedChange={(checked) => onInputChange(prompt.id, 'active', checked ? 'true' : 'false')} />
+        ) : (
+          <span className={prompt.active ? 'text-green-600' : 'text-red-600'}>{prompt.active ? 'Yes' : 'No'}</span>
+        )}
+      </TableCell>
       <TableCell>
         {isEditing ? (
           <Input
