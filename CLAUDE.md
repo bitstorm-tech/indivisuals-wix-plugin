@@ -88,5 +88,6 @@ This is a Laravel + Inertia.js + React application focused on AI-powered image p
 - Concurrent development setup runs all services simultaneously
 - Private image storage requires route-based access control
 - Use shadcn-ui and Tailwind CSS for the styling in the frontend
+- New UI components must be generated with shadcn-ui with `bunx --bun shadcn@latest add`
 - Use as much Laravel functionallity in the backend as possible
 - Use Inertia functionallity whereever possible
