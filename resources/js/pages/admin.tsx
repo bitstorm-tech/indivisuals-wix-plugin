@@ -11,8 +11,10 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Textarea } from '@/components/ui/textarea';
 import { Head, router } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 
@@ -189,9 +191,8 @@ export default function Admin({ prompts }: AdminProps) {
                   <TableRow key={prompt.id}>
                     <TableCell>
                       {editing ? (
-                        <input
+                        <Input
                           type="text"
-                          className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex h-10 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                           value={currentPrompt.name}
                           onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange(prompt.id, 'name', e.target.value)}
                         />
@@ -214,8 +215,7 @@ export default function Admin({ prompts }: AdminProps) {
                               ))}
                             </SelectContent>
                           </Select>
-                          <textarea
-                            className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex min-h-[80px] w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                          <Textarea
                             rows={3}
                             value={currentPrompt.prompt}
                             onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleInputChange(prompt.id, 'prompt', e.target.value)}
