@@ -8,12 +8,12 @@ export default function ProcessingIndicator({ isVisible }: ProcessingIndicatorPr
   if (!isVisible) return null;
 
   return (
-    <Alert variant="info" className="mt-4">
+    <Alert variant="info" className="mt-4 flex items-center gap-4">
       <div className="h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent"></div>
-      <AlertTitle>Bild wird bearbeitet</AlertTitle>
-      <AlertDescription>
-        Ihr Bild wird von der KI bearbeitet. Dies kann einen Moment dauern...
-      </AlertDescription>
+      <div className="flex flex-col">
+        <AlertTitle>Bild wird bearbeitet</AlertTitle>
+        <AlertDescription>Ihr Bild wird von der KI bearbeitet. Dies kann einen Moment dauern...</AlertDescription>
+      </div>
     </Alert>
   );
 }
