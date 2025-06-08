@@ -3,7 +3,9 @@
     "allow": [
       "Bash(rg:*)",
       "WebFetch(domain:platform.openai.com)",
-      "Bash(bunx:*)"
+      "Bash(bunx:*)",
+      "Bash(bun run:*)",
+      "Bash(php:*)"
     ]
   },
   "enableAllProjectMcpServers": false

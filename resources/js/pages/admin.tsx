@@ -47,6 +47,12 @@ export default function Admin({ prompts, auth }: AdminProps) {
   const [testingPromptId, setTestingPromptId] = useState<number | undefined>(undefined);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const [promptToDelete, setPromptToDelete] = useState<number | undefined>(undefined);
+  const [isNewPromptDialogOpen, setIsNewPromptDialogOpen] = useState<boolean>(false);
+  const [newPrompt, setNewPrompt] = useState<{ name: string; category: string; prompt: string }>({
+    name: '',
+    category: '',
+    prompt: ''
+  });
 
   useEffect(() => {
     fetch('/prompt-categories')
@@ -161,6 +167,50 @@ export default function Admin({ prompts, auth }: AdminProps) {
     router.post('/logout');
   };
 
+  const handleNewPrompt = () => {
+    setIsNewPromptDialogOpen(true);
+  };
+
+  const handleNewPromptInputChange = (field: keyof typeof newPrompt, value: string) => {
+    setNewPrompt((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  const handleSaveNewPrompt = async () => {
+    if (!newPrompt.name || !newPrompt.category || !newPrompt.prompt) {
+      return;
+    }
+
+    try {
+      await fetch('/admin/prompts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+        },
+        body: JSON.stringify({
+          name: newPrompt.name,
+          category: newPrompt.category,
+          prompt: newPrompt.prompt,
+          active: true,
+        }),
+      });
+
+      router.reload({ only: ['prompts'] });
+      setIsNewPromptDialogOpen(false);
+      setNewPrompt({ name: '', category: '', prompt: '' });
+    } catch (error) {
+      console.error('Error creating prompt:', error);
+    }
+  };
+
+  const handleCancelNewPrompt = () => {
+    setIsNewPromptDialogOpen(false);
+    setNewPrompt({ name: '', category: '', prompt: '' });
+  };
+
   return (
     <>
       <Head title="Admin Dashboard" />
@@ -175,22 +225,25 @@ export default function Admin({ prompts, auth }: AdminProps) {
           </div>
         </div>
 
-        {/* Category Filter Dropdown */}
-        <div className="mb-4 flex items-center gap-4">
-          <label className="text-sm font-medium">Filter by Category:</label>
-          <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-            <SelectTrigger className="w-[200px]">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Categories</SelectItem>
-              {categories.map((category) => (
-                <SelectItem key={category} value={category}>
-                  {category}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        {/* New Prompt Button and Category Filter */}
+        <div className="mb-4 flex items-center justify-between">
+          <Button onClick={handleNewPrompt}>New Prompt</Button>
+          <div className="flex items-center gap-4">
+            <label className="text-sm font-medium">Filter by Category:</label>
+            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+              <SelectTrigger className="w-[200px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Categories</SelectItem>
+                {categories.map((category) => (
+                  <SelectItem key={category} value={category}>
+                    {category}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         <div className="rounded-md border">
@@ -316,6 +369,61 @@ export default function Admin({ prompts, auth }: AdminProps) {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+
+        {/* Dialog for creating new prompt */}
+        <Dialog open={isNewPromptDialogOpen} onOpenChange={setIsNewPromptDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Create New Prompt</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium">Name</label>
+                <Input
+                  type="text"
+                  value={newPrompt.name}
+                  onChange={(e) => handleNewPromptInputChange('name', e.target.value)}
+                  placeholder="Enter prompt name"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Category</label>
+                <Select value={newPrompt.category} onValueChange={(value) => handleNewPromptInputChange('category', value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {category}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="text-sm font-medium">Prompt</label>
+                <Textarea
+                  rows={4}
+                  value={newPrompt.prompt}
+                  onChange={(e) => handleNewPromptInputChange('prompt', e.target.value)}
+                  placeholder="Enter the prompt text"
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={handleCancelNewPrompt}>
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSaveNewPrompt}
+                disabled={!newPrompt.name || !newPrompt.category || !newPrompt.prompt}
+              >
+                Save
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </>
   );
