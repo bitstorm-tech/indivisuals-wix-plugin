@@ -1,19 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
-
-interface UploadResponse {
-    success: boolean;
-    message: string;
-    errors?: Record<string, string[]>;
-    generated_image_url?: string;
-}
-
-interface Prompt {
-    id: number;
-    name: string;
-    category: string;
-    prompt: string;
-    active: boolean;
-}
+import React, { useEffect, useState } from 'react';
+import { Prompt, UploadResponse } from '../types/image-picker';
+import FileUploader from './file-uploader';
+import ImageDisplay from './image-display';
+import ProcessingIndicator from './processing-indicator';
+import PromptSelector from './prompt-selector';
 
 interface ImagePickerProps {
     defaultPromptId?: number;
@@ -26,7 +16,6 @@ export default function ImagePicker({ defaultPromptId }: ImagePickerProps) {
     const [isProcessing, setIsProcessing] = useState<boolean>(false);
     const [prompts, setPrompts] = useState<Prompt[]>([]);
     const [selectedPromptId, setSelectedPromptId] = useState<number | undefined>(defaultPromptId);
-    const inputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         fetchPrompts();
@@ -103,62 +92,25 @@ export default function ImagePicker({ defaultPromptId }: ImagePickerProps) {
         }
     }
 
+    const canUpload = selectedFile && selectedPromptId && !isProcessing;
+
     return (
         <>
             <div className="space-y-4">
-                <select
-                    className="select select-bordered w-full max-w-xs"
-                    value={selectedPromptId || ''}
-                    onChange={(e) => setSelectedPromptId(e.target.value ? Number(e.target.value) : undefined)}
-                    disabled={isProcessing}
-                >
-                    <option value="" disabled>
-                        Bitte Stil auswählen...
-                    </option>
-                    {prompts.map((prompt) => (
-                        <option key={prompt.id} value={prompt.id}>
-                            {prompt.name}
-                        </option>
-                    ))}
-                </select>
+                <PromptSelector prompts={prompts} selectedPromptId={selectedPromptId} onPromptChange={setSelectedPromptId} disabled={isProcessing} />
 
-                <div className="flex items-center space-x-2">
-                    <button className="btn btn-primary" onClick={() => inputRef?.current?.click()} disabled={isProcessing}>
-                        Bild wählen
-                    </button>
-                    {selectedFile && (
-                        <button className="btn btn-success" onClick={uploadImage} disabled={!selectedFile || !selectedPromptId || isProcessing}>
-                            {isProcessing && <span className="loading loading-spinner loading-sm mr-2"></span>}
-                            {isProcessing ? 'Wird bearbeitet...' : 'Bild hochladen'}
-                        </button>
-                    )}
-                </div>
+                <FileUploader
+                    selectedFile={selectedFile}
+                    onFileChange={handleFileChange}
+                    onUpload={uploadImage}
+                    canUpload={!!canUpload}
+                    isProcessing={isProcessing}
+                />
             </div>
-            <input type="file" className="input" onChange={handleFileChange} ref={inputRef} accept="image/*" hidden />
 
-            {isProcessing && (
-                <div className="alert alert-info mt-4">
-                    <span className="loading loading-spinner loading-md"></span>
-                    <div>
-                        <h3 className="font-bold">Bild wird bearbeitet</h3>
-                        <div className="text-xs">Ihr Bild wird von der KI bearbeitet. Dies kann einen Moment dauern...</div>
-                    </div>
-                </div>
-            )}
+            <ProcessingIndicator isVisible={isProcessing} />
 
-            {previewImage && !isProcessing && (
-                <div className="mt-4">
-                    <p className="text-sm text-gray-600">Vorschau:</p>
-                    <img src={previewImage} className="mt-2 max-h-80 max-w-80" alt="Preview" />
-                </div>
-            )}
-
-            {generatedImage && (
-                <div className="mt-4">
-                    <p className="text-sm text-gray-600">Bearbeitetes Bild:</p>
-                    <img src={generatedImage} className="mt-2 max-h-80 max-w-80" alt="Generated" />
-                </div>
-            )}
+            <ImageDisplay previewImage={previewImage} generatedImage={generatedImage} isProcessing={isProcessing} />
         </>
     );
 }
