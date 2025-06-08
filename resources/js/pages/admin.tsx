@@ -1,9 +1,9 @@
-import AdminHeader from '@/components/admin-header';
-import CategoryFilter from '@/components/category-filter';
-import DeleteConfirmationDialog from '@/components/delete-confirmation-dialog';
-import NewPromptDialog from '@/components/new-prompt-dialog';
-import PromptTable from '@/components/prompt-table';
-import TestPromptDialog from '@/components/test-prompt-dialog';
+import AdminHeader from '@/components/admin/admin-header';
+import CategoryFilter from '@/components/admin/category-filter';
+import DeleteConfirmationDialog from '@/components/admin/delete-confirmation-dialog';
+import NewPromptDialog from '@/components/admin/new-prompt-dialog';
+import PromptTable from '@/components/admin/prompt-table';
+import TestPromptDialog from '@/components/admin/test-prompt-dialog';
 import { Head, router } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 
