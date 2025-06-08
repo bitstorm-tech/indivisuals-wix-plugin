@@ -262,7 +262,7 @@ export default function Admin({ prompts }: AdminProps) {
 
         {/* Dialog for testing prompts */}
         <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-          <DialogContent className="max-w-4xl">
+          <DialogContent>
             <DialogHeader>
               <DialogTitle>Test Prompt</DialogTitle>
             </DialogHeader>
