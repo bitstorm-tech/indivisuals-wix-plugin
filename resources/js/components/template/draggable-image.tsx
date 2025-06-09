@@ -67,8 +67,8 @@ export default function DraggableImage({
       y: e.clientY - rect.top
     };
 
-    // Start with visual feedback
-    setVisualTransform({ x: 0, y: 0, scale: 1.05 });
+    // Start with visual positioning only (no scale feedback)
+    setVisualTransform({ x: 0, y: 0, scale: 1 });
 
     setDragState({
       isDragging: true,
@@ -90,8 +90,8 @@ export default function DraggableImage({
       canvasRectRef.current = canvas.getBoundingClientRect();
     }
 
-    // Visual feedback for resize
-    setVisualTransform({ x: 0, y: 0, scale: 1.02 });
+    // Visual positioning for resize (no scale feedback)
+    setVisualTransform({ x: 0, y: 0, scale: 1 });
 
     setDragState({
       isDragging: true,
