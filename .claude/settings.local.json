@@ -5,7 +5,8 @@
       "WebFetch(domain:platform.openai.com)",
       "Bash(bunx:*)",
       "Bash(bun run:*)",
-      "Bash(php:*)"
+      "Bash(php:*)",
+      "Bash(composer run:*)"
     ]
   },
   "enableAllProjectMcpServers": false

@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Models\Prompt;
+use App\Services\ImageConverterService;
 use App\Services\OpenAiService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -13,7 +14,10 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ImageController
 {
-    public function __construct(private OpenAiService $openAiService) {}
+    public function __construct(
+        private OpenAiService $openAiService,
+        private ImageConverterService $imageConverter
+    ) {}
 
     public function store(Request $request): JsonResponse
     {
@@ -38,11 +42,11 @@ class ImageController
             if ($storeImages) {
                 $filename = Str::uuid().'.'.$image->getClientOriginalExtension();
                 $path = $image->storeAs('images', $filename, 'local');
-                $pngPath = $this->convertToPng($path);
+                $pngPath = $this->imageConverter->convertToPng(Storage::disk('local')->path($path), true, $path);
                 $fullPath = Storage::disk('local')->path($pngPath);
             } else {
                 $tempPath = $image->getPathName();
-                $fullPath = $this->convertTempToPng($tempPath);
+                $fullPath = $this->imageConverter->convertToPng($tempPath, false);
             }
 
             $prompt = Prompt::whereActive(true)->find($request->prompt_id)?->prompt;
@@ -114,94 +118,4 @@ class ImageController
         ]);
     }
 
-    /**
-     * Convert an image to PNG format if it's not already PNG.
-     *
-     * @param  string  $imagePath  The path to the stored image file
-     * @return string The path to the PNG image (original if already PNG, converted if not)
-     */
-    private function convertToPng(string $imagePath): string
-    {
-        $fullPath = Storage::disk('local')->path($imagePath);
-        $imageInfo = getimagesize($fullPath);
-
-        if (! $imageInfo) {
-            throw new \Exception('Invalid image file');
-        }
-
-        if ($imageInfo[2] === IMAGETYPE_PNG) {
-            return $imagePath;
-        }
-
-        $image = match ($imageInfo[2]) {
-            IMAGETYPE_JPEG => imagecreatefromjpeg($fullPath),
-            IMAGETYPE_GIF => imagecreatefromgif($fullPath),
-            IMAGETYPE_WEBP => imagecreatefromwebp($fullPath),
-            default => throw new \Exception('Unsupported image format')
-        };
-
-        if (! $image) {
-            throw new \Exception('Failed to create image resource');
-        }
-
-        $originalFilename = pathinfo($imagePath, PATHINFO_FILENAME);
-        $pngFilename = $originalFilename.'.png';
-        $pngPath = 'images/'.$pngFilename;
-        $pngFullPath = Storage::disk('local')->path($pngPath);
-
-        $directory = dirname($pngFullPath);
-        if (! is_dir($directory)) {
-            mkdir($directory, 0755, true);
-        }
-
-        if (! imagepng($image, $pngFullPath)) {
-            imagedestroy($image);
-            throw new \Exception('Failed to convert image to PNG');
-        }
-
-        imagedestroy($image);
-
-        return $pngPath;
-    }
-
-    /**
-     * Convert a temporary uploaded file to PNG format without storing it permanently.
-     *
-     * @param  string  $tempPath  The temporary file path
-     * @return string The path to the temporary PNG file
-     */
-    private function convertTempToPng(string $tempPath): string
-    {
-        $imageInfo = getimagesize($tempPath);
-
-        if (! $imageInfo) {
-            throw new \Exception('Invalid image file');
-        }
-
-        if ($imageInfo[2] === IMAGETYPE_PNG) {
-            return $tempPath;
-        }
-
-        $image = match ($imageInfo[2]) {
-            IMAGETYPE_JPEG => imagecreatefromjpeg($tempPath),
-            IMAGETYPE_GIF => imagecreatefromgif($tempPath),
-            IMAGETYPE_WEBP => imagecreatefromwebp($tempPath),
-            default => throw new \Exception('Unsupported image format')
-        };
-
-        if (! $image) {
-            throw new \Exception('Failed to create image resource');
-        }
-
-        $tempPngPath = sys_get_temp_dir().'/'.uniqid('img_', true).'.png';
-
-        if (! imagepng($image, $tempPngPath)) {
-            imagedestroy($image);
-            throw new \Exception('Failed to convert image to PNG');
-        }
-
-        imagedestroy($image);
-
-        return $tempPngPath;
-    }
 }
