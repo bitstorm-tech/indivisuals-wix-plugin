@@ -11,7 +11,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `composer run test` - Run PHP tests (uses Pest)
 - `php artisan serve` - Start Laravel server only
 - `php artisan queue:listen --tries=1` - Start queue worker
-- `php artisan pail --timeout=0` - Start log viewer
+- `php artisan pail -vv --timeout=0` - Start log viewer
 - `php artisan migrate` - Run database migrations
 - `php artisan tinker` - Laravel REPL
 
@@ -92,3 +92,4 @@ This is a Laravel + Inertia.js + React application focused on AI-powered image p
 - Use as much Laravel functionallity in the backend as possible
 - Use Inertia functionallity whereever possible
 - Use `git mv` to move files that are under version control
+- Use PHP nullsafe syntax (`?->`) whereever it is usefull

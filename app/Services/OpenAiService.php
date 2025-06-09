@@ -4,6 +4,7 @@ namespace App\Services;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
+use Illuminate\Support\Facades\Log;
 
 class OpenAiService
 {
@@ -28,6 +29,9 @@ class OpenAiService
                 throw new \InvalidArgumentException("Image file is not accessible: {$imagePath}");
             }
 
+            $prompt = "{$this->systemPrompt} {$prompt}";
+            Log::debug('Prompt: '.$prompt);
+
             $response = $this->httpClient->post($this->baseUrl, [
                 'headers' => [
                     'Authorization' => 'Bearer '.$this->apiKey,
@@ -44,7 +48,7 @@ class OpenAiService
                     ],
                     [
                         'name' => 'prompt',
-                        'contents' => "{$this->systemPrompt} {$prompt}",
+                        'contents' => $prompt,
                     ],
                     [
                         'name' => 'model',

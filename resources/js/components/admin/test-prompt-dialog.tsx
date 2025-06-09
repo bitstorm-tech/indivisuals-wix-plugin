@@ -15,7 +15,7 @@ export default function TestPromptDialog({ isOpen, testingPromptId, onClose }: T
         <DialogHeader>
           <DialogTitle>Test Prompt</DialogTitle>
         </DialogHeader>
-        <ImagePicker defaultPromptId={testingPromptId} />
+        <ImagePicker defaultPromptId={testingPromptId} storeImages={false} />
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>
             Close

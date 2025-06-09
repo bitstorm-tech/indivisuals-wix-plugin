@@ -7,9 +7,10 @@ import PromptSelector from './prompt-selector';
 
 interface ImagePickerProps {
   defaultPromptId?: number;
+  storeImages?: boolean;
 }
 
-export default function ImagePicker({ defaultPromptId }: ImagePickerProps) {
+export default function ImagePicker({ defaultPromptId, storeImages = true }: ImagePickerProps) {
   const [selectedFile, setSelectedFile] = useState<File | undefined>(undefined);
   const [previewImage, setPreviewImage] = useState<string | undefined>(undefined);
   const [generatedImage, setGeneratedImage] = useState<string | undefined>(undefined);
@@ -54,21 +55,38 @@ export default function ImagePicker({ defaultPromptId }: ImagePickerProps) {
         formData.append('prompt_id', selectedPromptId.toString());
       }
 
+      formData.append('store_images', storeImages.toString());
+
+      const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+      
+      if (!csrfToken) {
+        throw new Error('CSRF token not found');
+      }
+
       const response = await fetch('/upload-image', {
         method: 'POST',
         body: formData,
         headers: {
           'X-Requested-With': 'XMLHttpRequest',
-          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+          'X-CSRF-TOKEN': csrfToken,
         },
       });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
       const result: UploadResponse = await response.json();
 
       if (result.success && result.generated_image_url) {
         setGeneratedImage(result.generated_image_url);
         setSelectedFile(undefined);
+      } else {
+        throw new Error(result.message || 'Upload failed');
       }
+    } catch (error) {
+      console.error('Upload error:', error);
+      alert(`Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setIsProcessing(false);
     }

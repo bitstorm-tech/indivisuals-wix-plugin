@@ -13,15 +13,14 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ImageController
 {
-    private $systemPrompt = 'Change the image to a pencil sketch';
-
     public function __construct(private OpenAiService $openAiService) {}
 
     public function store(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:4096',
-            'prompt_id' => 'nullable|exists:prompts,id',
+            'prompt_id' => 'required|exists:prompts,id',
+            'store_images' => 'nullable|in:true,false,1,0',
         ]);
 
         if ($validator->fails()) {
@@ -34,19 +33,20 @@ class ImageController
 
         try {
             $image = $request->file('image');
-            $filename = Str::uuid().'.'.$image->getClientOriginalExtension();
-            $path = $image->storeAs('images', $filename, 'local');
-            $pngPath = $this->convertToPng($path);
+            $storeImages = $request->boolean('store_images', true);
 
-            $prompt = $this->systemPrompt;
-            if ($request->has('prompt_id')) {
-                $promptModel = Prompt::find($request->prompt_id);
-                if ($promptModel && $promptModel->active) {
-                    $prompt = $promptModel->prompt;
-                }
+            if ($storeImages) {
+                $filename = Str::uuid().'.'.$image->getClientOriginalExtension();
+                $path = $image->storeAs('images', $filename, 'local');
+                $pngPath = $this->convertToPng($path);
+                $fullPath = Storage::disk('local')->path($pngPath);
+            } else {
+                $tempPath = $image->getPathName();
+                $fullPath = $this->convertTempToPng($tempPath);
             }
 
-            $fullPath = Storage::disk('local')->path($pngPath);
+            $prompt = Prompt::whereActive(true)->find($request->prompt_id)?->prompt;
+
             $base64Json = $this->openAiService->generateImage($fullPath, $prompt);
 
             if (! empty($base64Json)) {
@@ -56,17 +56,18 @@ class ImageController
                     throw new \Exception('Failed to decode base64 image data');
                 }
 
-                Storage::disk('local')->put("generated/$filename.png", $imageContent);
-
-                // Return the image as base64 data URL for immediate display
-                $base64Image = 'data:image/png;base64,' . base64_encode($imageContent);
-
-                return response()->json([
+                $responseData = [
                     'success' => true,
                     'message' => 'Image uploaded and generated successfully',
-                    'generated_image_path' => "generated/$filename.png",
-                    'generated_image_url' => $base64Image,
-                ], 200);
+                    'generated_image_url' => 'data:image/png;base64,'.base64_encode($imageContent),
+                ];
+
+                if ($storeImages) {
+                    Storage::disk('local')->put("generated/$filename.png", $imageContent);
+                    $responseData['generated_image_path'] = "generated/$filename.png";
+                }
+
+                return response()->json($responseData, 200);
             } else {
                 return response()->json([
                     'success' => false,
@@ -161,5 +162,46 @@ class ImageController
         imagedestroy($image);
 
         return $pngPath;
+    }
+
+    /**
+     * Convert a temporary uploaded file to PNG format without storing it permanently.
+     *
+     * @param  string  $tempPath  The temporary file path
+     * @return string The path to the temporary PNG file
+     */
+    private function convertTempToPng(string $tempPath): string
+    {
+        $imageInfo = getimagesize($tempPath);
+
+        if (! $imageInfo) {
+            throw new \Exception('Invalid image file');
+        }
+
+        if ($imageInfo[2] === IMAGETYPE_PNG) {
+            return $tempPath;
+        }
+
+        $image = match ($imageInfo[2]) {
+            IMAGETYPE_JPEG => imagecreatefromjpeg($tempPath),
+            IMAGETYPE_GIF => imagecreatefromgif($tempPath),
+            IMAGETYPE_WEBP => imagecreatefromwebp($tempPath),
+            default => throw new \Exception('Unsupported image format')
+        };
+
+        if (! $image) {
+            throw new \Exception('Failed to create image resource');
+        }
+
+        $tempPngPath = sys_get_temp_dir().'/'.uniqid('img_', true).'.png';
+
+        if (! imagepng($image, $tempPngPath)) {
+            imagedestroy($image);
+            throw new \Exception('Failed to convert image to PNG');
+        }
+
+        imagedestroy($image);
+
+        return $tempPngPath;
     }
 }
