@@ -178,13 +178,119 @@ export default function TemplateEditor({ canvasSize = DEFAULT_CANVAS_SIZE, maxIm
   }, []);
 
   const handleExport = useCallback(() => {
-    const exportData = { images: state.images, texts: state.texts };
+    // Call the onExport callback if provided
     if (onExport) {
-      onExport(exportData);
-    } else {
-      console.log('Template Export:', exportData);
+      onExport({ images: state.images, texts: state.texts });
     }
-  }, [state.images, state.texts, onExport]);
+
+    // Create an offscreen canvas
+    const canvas = document.createElement('canvas');
+    canvas.width = canvasSize.width;
+    canvas.height = canvasSize.height;
+    const ctx = canvas.getContext('2d');
+
+    if (!ctx) {
+      console.error('Could not get canvas context');
+      return;
+    }
+
+    // Set white background
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Combine all elements and sort by zIndex
+    const allElements = [
+      ...state.images.map((img) => ({ ...img, type: 'image' as const })),
+      ...state.texts.map((text) => ({ ...text, type: 'text' as const })),
+    ].sort((a, b) => a.zIndex - b.zIndex);
+
+    // Track loading of images
+    let imagesLoaded = 0;
+    const totalImages = state.images.length;
+
+    // Function to render after all images are loaded
+    const renderCanvas = () => {
+      // Clear canvas with white background
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Render all elements in order
+      allElements.forEach((element) => {
+        if (element.type === 'image') {
+          const img = new Image();
+          img.src = element.url;
+          ctx.drawImage(img, element.position.x, element.position.y, element.size.width, element.size.height);
+        } else if (element.type === 'text') {
+          ctx.save();
+
+          // Set text properties
+          ctx.font = `${element.style.fontStyle === 'italic' ? 'italic ' : ''}${
+            element.style.fontWeight === 'bold' ? 'bold ' : ''
+          }${element.style.fontSize}px ${element.style.fontFamily}`;
+          ctx.fillStyle = element.style.color;
+          ctx.textAlign = element.style.textAlign as CanvasTextAlign;
+          ctx.textBaseline = 'top';
+
+          // Calculate text position based on alignment
+          let textX = element.position.x;
+          if (element.style.textAlign === 'center') {
+            textX += element.size.width / 2;
+          } else if (element.style.textAlign === 'right') {
+            textX += element.size.width;
+          }
+
+          // Split text into lines and render
+          const lines = element.content.split('\n');
+          const lineHeight = element.style.fontSize * 1.2;
+
+          lines.forEach((line, index) => {
+            ctx.fillText(line, textX, element.position.y + index * lineHeight);
+          });
+
+          ctx.restore();
+        }
+      });
+
+      // Convert to blob and download
+      canvas.toBlob((blob) => {
+        if (blob) {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `template-export-${Date.now()}.png`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        }
+      }, 'image/png');
+    };
+
+    // If no images, render immediately
+    if (totalImages === 0) {
+      renderCanvas();
+      return;
+    }
+
+    // Preload all images before rendering
+    state.images.forEach((imageElement) => {
+      const img = new Image();
+      img.onload = () => {
+        imagesLoaded++;
+        if (imagesLoaded === totalImages) {
+          renderCanvas();
+        }
+      };
+      img.onerror = () => {
+        console.error('Failed to load image:', imageElement.url);
+        imagesLoaded++;
+        if (imagesLoaded === totalImages) {
+          renderCanvas();
+        }
+      };
+      img.src = imageElement.url;
+    });
+  }, [state.images, state.texts, canvasSize, onExport]);
 
   const handleCanvasDrop = useCallback(
     (e: React.DragEvent) => {
