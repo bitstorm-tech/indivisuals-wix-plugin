@@ -8,7 +8,8 @@
       "Bash(php:*)",
       "Bash(composer run:*)",
       "Bash(mkdir:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(ls:*)"
     ]
   },
   "enableAllProjectMcpServers": false

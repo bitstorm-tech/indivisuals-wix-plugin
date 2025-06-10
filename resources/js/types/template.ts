@@ -76,6 +76,61 @@ export interface TemplateCanvasProps {
   canvasSize: TemplateSize;
 }
 
+export interface ExportResolution {
+  id: string;
+  name: string;
+  width: number;
+  height: number;
+  description?: string;
+}
+
+export const EXPORT_RESOLUTIONS: readonly ExportResolution[] = [
+  {
+    id: 'original',
+    name: 'Original (800×600)',
+    width: 800,
+    height: 600,
+    description: 'Gleiche Größe wie Editor',
+  },
+  {
+    id: 'hd',
+    name: 'HD (1280×720)',
+    width: 1280,
+    height: 720,
+    description: 'High Definition',
+  },
+  {
+    id: 'fullhd',
+    name: 'Full HD (1920×1080)',
+    width: 1920,
+    height: 1080,
+    description: 'Full High Definition',
+  },
+  {
+    id: '2k',
+    name: '2K (2560×1440)',
+    width: 2560,
+    height: 1440,
+    description: 'Quad HD',
+  },
+  {
+    id: '4k',
+    name: '4K (3840×2160)',
+    width: 3840,
+    height: 2160,
+    description: 'Ultra High Definition',
+  },
+] as const;
+
+export type ExportResolutionId = (typeof EXPORT_RESOLUTIONS)[number]['id'];
+
+export interface ExportSettings {
+  resolution: ExportResolutionId;
+  quality: number; // 0-1 for JPEG quality
+  format: 'png' | 'jpeg' | 'webp';
+  pixelRatio?: number; // For retina displays
+}
+
 export interface TemplateEditorState {
   images: TemplateImage[];
   texts: TemplateText[];
@@ -83,4 +138,5 @@ export interface TemplateEditorState {
   selectedElementType: 'image' | 'text' | null;
   maxImages: number;
   backgroundColor: string;
+  exportSettings: ExportSettings;
 }

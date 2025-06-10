@@ -1,7 +1,17 @@
 import React, { useCallback, useState } from 'react';
-import { TemplateEditorState, TemplateImage, TemplateSize, TemplateText } from '../../types/template';
+import {
+  EXPORT_RESOLUTIONS,
+  ExportResolutionId,
+  ExportSettings,
+  TemplateEditorState,
+  TemplateImage,
+  TemplateSize,
+  TemplateText,
+} from '../../types/template';
 import { Button } from '../ui/button';
 import { Card } from '../ui/card';
+import { Label } from '../ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import TemplateCanvas from './template-canvas';
 import TemplateImageUploader from './template-image-uploader';
 import TextAdder from './text-adder';
@@ -33,9 +43,15 @@ export default function TemplateEditor({ canvasSize = DEFAULT_CANVAS_SIZE, maxIm
     selectedElementType: null,
     maxImages,
     backgroundColor: DEFAULT_BACKGROUND_COLOR,
+    exportSettings: {
+      resolution: 'fullhd',
+      quality: 0.95,
+      format: 'png',
+      pixelRatio: window.devicePixelRatio || 1,
+    },
   });
 
-  const generateId = (type: 'img' | 'txt') => `${type}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  const generateId = (type: 'img' | 'txt') => `${type}_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
 
   const findAvailablePosition = useCallback((existingElements: Array<{ position: { x: number; y: number } }>): { x: number; y: number } => {
     const positions = [
@@ -187,22 +203,58 @@ export default function TemplateEditor({ canvasSize = DEFAULT_CANVAS_SIZE, maxIm
     }));
   }, []);
 
+  const handleExportSettingsChange = useCallback((updates: Partial<ExportSettings>) => {
+    setState((prevState) => ({
+      ...prevState,
+      exportSettings: {
+        ...prevState.exportSettings,
+        ...updates,
+      },
+    }));
+  }, []);
+
   const handleExport = useCallback(() => {
     // Call the onExport callback if provided
     if (onExport) {
       onExport({ images: state.images, texts: state.texts });
     }
 
-    // Create an offscreen canvas
+    // Get selected resolution
+    const selectedResolution = EXPORT_RESOLUTIONS.find((res) => res.id === state.exportSettings.resolution);
+    if (!selectedResolution) {
+      console.error('Invalid resolution selected');
+      return;
+    }
+
+    // Calculate scaling factor
+    const scaleX = selectedResolution.width / canvasSize.width;
+    const scaleY = selectedResolution.height / canvasSize.height;
+    const scale = Math.min(scaleX, scaleY); // Maintain aspect ratio
+
+    // Calculate centered offset if aspect ratios don't match
+    const scaledWidth = canvasSize.width * scale;
+    const scaledHeight = canvasSize.height * scale;
+    const offsetX = (selectedResolution.width - scaledWidth) / 2;
+    const offsetY = (selectedResolution.height - scaledHeight) / 2;
+
+    // Create an offscreen canvas with export resolution
     const canvas = document.createElement('canvas');
-    canvas.width = canvasSize.width;
-    canvas.height = canvasSize.height;
-    const ctx = canvas.getContext('2d');
+    canvas.width = selectedResolution.width;
+    canvas.height = selectedResolution.height;
+    const ctx = canvas.getContext('2d', {
+      alpha: state.exportSettings.format === 'png',
+      willReadFrequently: false,
+      desynchronized: true,
+    });
 
     if (!ctx) {
       console.error('Could not get canvas context');
       return;
     }
+
+    // Enable high-quality rendering
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
 
     // Set background color
     ctx.fillStyle = state.backgroundColor;
@@ -224,6 +276,11 @@ export default function TemplateEditor({ canvasSize = DEFAULT_CANVAS_SIZE, maxIm
       ctx.fillStyle = state.backgroundColor;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+      // Apply transformation for centering and scaling
+      ctx.save();
+      ctx.translate(offsetX, offsetY);
+      ctx.scale(scale, scale);
+
       // Render all elements in order
       allElements.forEach((element) => {
         if (element.type === 'image') {
@@ -233,10 +290,11 @@ export default function TemplateEditor({ canvasSize = DEFAULT_CANVAS_SIZE, maxIm
         } else if (element.type === 'text') {
           ctx.save();
 
-          // Set text properties
+          // Set text properties with scaled font size
+          const scaledFontSize = element.style.fontSize;
           ctx.font = `${element.style.fontStyle === 'italic' ? 'italic ' : ''}${
             element.style.fontWeight === 'bold' ? 'bold ' : ''
-          }${element.style.fontSize}px ${element.style.fontFamily}`;
+          }${scaledFontSize}px ${element.style.fontFamily}`;
           ctx.fillStyle = element.style.color;
           ctx.textAlign = element.style.textAlign as CanvasTextAlign;
           ctx.textBaseline = 'top';
@@ -337,19 +395,29 @@ export default function TemplateEditor({ canvasSize = DEFAULT_CANVAS_SIZE, maxIm
         }
       });
 
+      // Restore canvas transformation
+      ctx.restore();
+
       // Convert to blob and download
-      canvas.toBlob((blob) => {
-        if (blob) {
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `template-export-${Date.now()}.png`;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          URL.revokeObjectURL(url);
-        }
-      }, 'image/png');
+      const mimeType = state.exportSettings.format === 'jpeg' ? 'image/jpeg' : state.exportSettings.format === 'webp' ? 'image/webp' : 'image/png';
+      const quality = state.exportSettings.format === 'png' ? undefined : state.exportSettings.quality;
+
+      canvas.toBlob(
+        (blob) => {
+          if (blob) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `template-export-${Date.now()}.${state.exportSettings.format}`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+          }
+        },
+        mimeType,
+        quality,
+      );
     };
 
     // If no images, render immediately
@@ -376,7 +444,7 @@ export default function TemplateEditor({ canvasSize = DEFAULT_CANVAS_SIZE, maxIm
       };
       img.src = imageElement.url;
     });
-  }, [state.images, state.texts, state.backgroundColor, canvasSize, onExport]);
+  }, [state.images, state.texts, state.backgroundColor, state.exportSettings, canvasSize, onExport]);
 
   const handleCanvasDrop = useCallback(
     (e: React.DragEvent) => {
@@ -451,6 +519,71 @@ export default function TemplateEditor({ canvasSize = DEFAULT_CANVAS_SIZE, maxIm
                   className="h-10 w-20 cursor-pointer rounded border border-gray-300"
                 />
                 <span className="text-sm text-gray-600">{state.backgroundColor.toUpperCase()}</span>
+              </div>
+            </Card>
+
+            <Card className="p-4">
+              <h4 className="mb-3 font-medium">Export Einstellungen</h4>
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="export-resolution" className="mb-2 block text-sm font-medium">
+                    Auflösung
+                  </Label>
+                  <Select
+                    value={state.exportSettings.resolution}
+                    onValueChange={(value: ExportResolutionId) => handleExportSettingsChange({ resolution: value })}
+                  >
+                    <SelectTrigger id="export-resolution" className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {EXPORT_RESOLUTIONS.map((res) => (
+                        <SelectItem key={res.id} value={res.id}>
+                          <div className="flex flex-col">
+                            <span>{res.name}</span>
+                            {res.description && <span className="text-xs text-gray-500">{res.description}</span>}
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label htmlFor="export-format" className="mb-2 block text-sm font-medium">
+                    Format
+                  </Label>
+                  <Select
+                    value={state.exportSettings.format}
+                    onValueChange={(value: 'png' | 'jpeg' | 'webp') => handleExportSettingsChange({ format: value })}
+                  >
+                    <SelectTrigger id="export-format" className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="png">PNG (verlustfrei)</SelectItem>
+                      <SelectItem value="jpeg">JPEG (komprimiert)</SelectItem>
+                      <SelectItem value="webp">WebP (modern)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {state.exportSettings.format !== 'png' && (
+                  <div>
+                    <Label htmlFor="export-quality" className="mb-2 block text-sm font-medium">
+                      Qualität: {Math.round(state.exportSettings.quality * 100)}%
+                    </Label>
+                    <input
+                      id="export-quality"
+                      type="range"
+                      min="10"
+                      max="100"
+                      value={state.exportSettings.quality * 100}
+                      onChange={(e) => handleExportSettingsChange({ quality: parseInt(e.target.value) / 100 })}
+                      className="w-full"
+                    />
+                  </div>
+                )}
               </div>
             </Card>
 
