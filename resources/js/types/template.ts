@@ -17,6 +17,41 @@ export interface TemplateImage {
   zIndex: number;
 }
 
+export interface TextStyle {
+  fontFamily: string;
+  fontSize: number;
+  color: string;
+  fontWeight: 'normal' | 'bold';
+  fontStyle: 'normal' | 'italic';
+  textAlign: 'left' | 'center' | 'right';
+}
+
+export interface TemplateText {
+  id: string;
+  content: string;
+  position: TemplatePosition;
+  size: TemplateSize;
+  style: TextStyle;
+  zIndex: number;
+}
+
+export type TemplateElement = TemplateImage | TemplateText;
+
+export const POPULAR_FONTS = [
+  'Arial',
+  'Helvetica',
+  'Times New Roman',
+  'Georgia',
+  'Verdana',
+  'Courier New',
+  'Impact',
+  'Comic Sans MS',
+  'Trebuchet MS',
+  'Palatino'
+] as const;
+
+export type PopularFont = typeof POPULAR_FONTS[number];
+
 export interface DragState {
   isDragging: boolean;
   dragType: 'move' | 'resize';
@@ -33,13 +68,18 @@ export interface ResizeHandle {
 
 export interface TemplateCanvasProps {
   images: TemplateImage[];
+  texts: TemplateText[];
   onImageUpdate: (id: string, updates: Partial<TemplateImage>) => void;
   onImageDelete: (id: string) => void;
+  onTextUpdate: (id: string, updates: Partial<TemplateText>) => void;
+  onTextDelete: (id: string) => void;
   canvasSize: TemplateSize;
 }
 
 export interface TemplateEditorState {
   images: TemplateImage[];
-  selectedImageId: string | null;
+  texts: TemplateText[];
+  selectedElementId: string | null;
+  selectedElementType: 'image' | 'text' | null;
   maxImages: number;
 }

@@ -1,11 +1,11 @@
 import TemplateEditor from '@/components/template/template-editor';
-import { TemplateImage } from '@/types/template';
+import { TemplateImage, TemplateText } from '@/types/template';
 import { Head } from '@inertiajs/react';
 
 export default function Template() {
-  const handleExport = (images: TemplateImage[]) => {
-    console.log('Exporting template with images:', images);
-    alert(`Template exportiert mit ${images.length} Bildern!`);
+  const handleExport = (data: { images: TemplateImage[]; texts: TemplateText[] }) => {
+    console.log('Exporting template:', data);
+    alert(`Template exportiert mit ${data.images.length} Bildern und ${data.texts.length} Texten!`);
   };
 
   return (

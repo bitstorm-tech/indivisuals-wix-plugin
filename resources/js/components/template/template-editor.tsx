@@ -1,14 +1,16 @@
 import React, { useState, useCallback } from 'react';
-import { TemplateImage, TemplateEditorState, TemplateSize } from '../../types/template';
+import { TemplateImage, TemplateText, TemplateEditorState, TemplateSize } from '../../types/template';
 import TemplateCanvas from './template-canvas';
 import TemplateImageUploader from './template-image-uploader';
+import TextAdder from './text-adder';
+import TextPropertiesPanel from './text-properties-panel';
 import { Button } from '../ui/button';
 import { Card } from '../ui/card';
 
 interface TemplateEditorProps {
   canvasSize?: TemplateSize;
   maxImages?: number;
-  onExport?: (images: TemplateImage[]) => void;
+  onExport?: (data: { images: TemplateImage[]; texts: TemplateText[] }) => void;
 }
 
 const DEFAULT_CANVAS_SIZE: TemplateSize = {
@@ -28,13 +30,15 @@ export default function TemplateEditor({
 }: TemplateEditorProps) {
   const [state, setState] = useState<TemplateEditorState>({
     images: [],
-    selectedImageId: null,
+    texts: [],
+    selectedElementId: null,
+    selectedElementType: null,
     maxImages
   });
 
-  const generateImageId = () => `img_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  const generateId = (type: 'img' | 'txt') => `${type}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
-  const findAvailablePosition = useCallback((existingImages: TemplateImage[]): { x: number; y: number } => {
+  const findAvailablePosition = useCallback((existingElements: Array<{ position: { x: number; y: number } }>): { x: number; y: number } => {
     const positions = [
       { x: 50, y: 50 },
       { x: 300, y: 50 },
@@ -48,14 +52,14 @@ export default function TemplateEditor({
     ];
 
     for (const pos of positions) {
-      const occupied = existingImages.some(img => 
-        Math.abs(img.position.x - pos.x) < 100 && 
-        Math.abs(img.position.y - pos.y) < 100
+      const occupied = existingElements.some(element => 
+        Math.abs(element.position.x - pos.x) < 100 && 
+        Math.abs(element.position.y - pos.y) < 100
       );
       if (!occupied) return pos;
     }
 
-    return { x: 50 + (existingImages.length * 30), y: 50 + (existingImages.length * 30) };
+    return { x: 50 + (existingElements.length * 30), y: 50 + (existingElements.length * 30) };
   }, []);
 
   const handleFileSelect = useCallback((files: File[]) => {
@@ -64,10 +68,10 @@ export default function TemplateEditor({
       const filesToAdd = files.slice(0, remainingSlots);
       
       const newImages: TemplateImage[] = filesToAdd.map((file, index) => {
-        const position = findAvailablePosition([...prevState.images]);
+        const position = findAvailablePosition([...prevState.images, ...prevState.texts]);
         
         return {
-          id: generateImageId(),
+          id: generateId('img'),
           file,
           url: URL.createObjectURL(file),
           position: {
@@ -75,14 +79,15 @@ export default function TemplateEditor({
             y: position.y + (index * 30)
           },
           size: { ...DEFAULT_IMAGE_SIZE },
-          zIndex: prevState.images.length + index + 1
+          zIndex: (prevState.images.length + prevState.texts.length) + index + 1
         };
       });
 
       return {
         ...prevState,
         images: [...prevState.images, ...newImages],
-        selectedImageId: newImages.length > 0 ? newImages[0].id : prevState.selectedImageId
+        selectedElementId: newImages.length > 0 ? newImages[0].id : prevState.selectedElementId,
+        selectedElementType: newImages.length > 0 ? 'image' : prevState.selectedElementType
       };
     });
   }, [findAvailablePosition]);
@@ -106,17 +111,66 @@ export default function TemplateEditor({
       return {
         ...prevState,
         images: prevState.images.filter(img => img.id !== id),
-        selectedImageId: prevState.selectedImageId === id ? null : prevState.selectedImageId
+        selectedElementId: prevState.selectedElementId === id ? null : prevState.selectedElementId,
+        selectedElementType: prevState.selectedElementId === id ? null : prevState.selectedElementType
       };
     });
   }, []);
 
-  const handleImageSelect = useCallback((id: string | null) => {
+  const handleTextUpdate = useCallback((id: string, updates: Partial<TemplateText>) => {
     setState(prevState => ({
       ...prevState,
-      selectedImageId: id
+      texts: prevState.texts.map(text =>
+        text.id === id ? { ...text, ...updates } : text
+      )
     }));
   }, []);
+
+  const handleTextDelete = useCallback((id: string) => {
+    setState(prevState => ({
+      ...prevState,
+      texts: prevState.texts.filter(text => text.id !== id),
+      selectedElementId: prevState.selectedElementId === id ? null : prevState.selectedElementId,
+      selectedElementType: prevState.selectedElementId === id ? null : prevState.selectedElementType
+    }));
+  }, []);
+
+  const handleElementSelect = useCallback((id: string | null, type: 'image' | 'text' | null) => {
+    setState(prevState => ({
+      ...prevState,
+      selectedElementId: id,
+      selectedElementType: type
+    }));
+  }, []);
+
+  const handleAddText = useCallback(() => {
+    setState(prevState => {
+      const position = findAvailablePosition([...prevState.images, ...prevState.texts]);
+      
+      const newText: TemplateText = {
+        id: generateId('txt'),
+        content: 'Neuer Text',
+        position,
+        size: { width: 200, height: 60 },
+        style: {
+          fontFamily: 'Arial',
+          fontSize: 24,
+          color: '#000000',
+          fontWeight: 'normal',
+          fontStyle: 'normal',
+          textAlign: 'left'
+        },
+        zIndex: (prevState.images.length + prevState.texts.length) + 1
+      };
+
+      return {
+        ...prevState,
+        texts: [...prevState.texts, newText],
+        selectedElementId: newText.id,
+        selectedElementType: 'text'
+      };
+    });
+  }, [findAvailablePosition]);
 
   const handleClearAll = useCallback(() => {
     setState(prevState => {
@@ -124,18 +178,21 @@ export default function TemplateEditor({
       return {
         ...prevState,
         images: [],
-        selectedImageId: null
+        texts: [],
+        selectedElementId: null,
+        selectedElementType: null
       };
     });
   }, []);
 
   const handleExport = useCallback(() => {
+    const exportData = { images: state.images, texts: state.texts };
     if (onExport) {
-      onExport(state.images);
+      onExport(exportData);
     } else {
-      console.log('Template Export:', state.images);
+      console.log('Template Export:', exportData);
     }
-  }, [state.images, onExport]);
+  }, [state.images, state.texts, onExport]);
 
   const handleCanvasDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -160,7 +217,7 @@ export default function TemplateEditor({
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-bold">Template Editor</h2>
           <div className="flex gap-2">
-            {state.images.length > 0 && (
+            {(state.images.length > 0 || state.texts.length > 0) && (
               <>
                 <Button
                   variant="outline"
@@ -184,10 +241,14 @@ export default function TemplateEditor({
           <div className="lg:col-span-2">
             <TemplateCanvas
               images={state.images}
+              texts={state.texts}
               onImageUpdate={handleImageUpdate}
               onImageDelete={handleImageDelete}
-              onImageSelect={handleImageSelect}
-              selectedImageId={state.selectedImageId}
+              onTextUpdate={handleTextUpdate}
+              onTextDelete={handleTextDelete}
+              onElementSelect={handleElementSelect}
+              selectedElementId={state.selectedElementId}
+              selectedElementType={state.selectedElementType}
               canvasSize={canvasSize}
               onDrop={handleCanvasDrop}
               onDragOver={handleCanvasDragOver}
@@ -201,12 +262,14 @@ export default function TemplateEditor({
               currentCount={state.images.length}
             />
             
-            {state.selectedImageId && (
+            <TextAdder onAddText={handleAddText} />
+            
+            {state.selectedElementId && state.selectedElementType === 'image' && (
               <Card className="p-4">
                 <h4 className="font-medium mb-3">Bild Eigenschaften</h4>
                 <div className="space-y-2 text-sm">
                   {(() => {
-                    const selectedImage = state.images.find(img => img.id === state.selectedImageId);
+                    const selectedImage = state.images.find(img => img.id === state.selectedElementId);
                     if (!selectedImage) return null;
                     
                     return (
@@ -221,13 +284,27 @@ export default function TemplateEditor({
               </Card>
             )}
             
+            {state.selectedElementId && state.selectedElementType === 'text' && (
+              (() => {
+                const selectedText = state.texts.find(text => text.id === state.selectedElementId);
+                return selectedText ? (
+                  <TextPropertiesPanel
+                    text={selectedText}
+                    onUpdate={(updates) => handleTextUpdate(selectedText.id, updates)}
+                  />
+                ) : null;
+              })()
+            )}
+            
             <Card className="p-4">
               <h4 className="font-medium mb-3">Anleitung</h4>
               <div className="text-sm space-y-1 text-gray-600">
                 <div>1. Bilder per Drag & Drop oder Upload hinzufügen</div>
-                <div>2. Bilder durch Anklicken auswählen</div>
-                <div>3. Ausgewählte Bilder verschieben und skalieren</div>
-                <div>4. Mit Exportieren das Ergebnis speichern</div>
+                <div>2. Text mit dem "Text erstellen" Button hinzufügen</div>
+                <div>3. Elemente durch Anklicken auswählen</div>
+                <div>4. Ausgewählte Elemente verschieben und skalieren</div>
+                <div>5. Text per Doppelklick bearbeiten</div>
+                <div>6. Mit Exportieren das Ergebnis speichern</div>
               </div>
             </Card>
           </div>
