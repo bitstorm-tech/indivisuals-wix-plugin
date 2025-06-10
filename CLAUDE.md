@@ -93,4 +93,4 @@ This is a Laravel + Inertia.js + React application focused on AI-powered image p
 - Use Inertia functionallity whereever possible
 - Use `git mv` to move files that are under version control
 - Use PHP nullsafe syntax (`?->`) whereever it is usefull
-- Format all changed files with `prettier` at the end
+- Format all files with `prettier` at the very end

@@ -241,20 +241,96 @@ export default function TemplateEditor({ canvasSize = DEFAULT_CANVAS_SIZE, maxIm
           ctx.textAlign = element.style.textAlign as CanvasTextAlign;
           ctx.textBaseline = 'top';
 
-          // Calculate text position based on alignment
-          let textX = element.position.x;
-          if (element.style.textAlign === 'center') {
-            textX += element.size.width / 2;
-          } else if (element.style.textAlign === 'right') {
-            textX += element.size.width;
-          }
+          // Helper function to wrap text using DOM measurement for accuracy
+          const wrapText = (text: string, maxWidth: number, style: typeof element.style): string[] => {
+            // Create a temporary div to measure text exactly as the browser would
+            const tempDiv = document.createElement('div');
+            tempDiv.style.position = 'absolute';
+            tempDiv.style.visibility = 'hidden';
+            tempDiv.style.whiteSpace = 'nowrap';
+            tempDiv.style.fontFamily = style.fontFamily;
+            tempDiv.style.fontSize = `${style.fontSize}px`;
+            tempDiv.style.fontWeight = style.fontWeight;
+            tempDiv.style.fontStyle = style.fontStyle;
+            tempDiv.style.lineHeight = '1.2';
+            document.body.appendChild(tempDiv);
 
-          // Split text into lines and render
-          const lines = element.content.split('\n');
+            const lines: string[] = [];
+            // First split by explicit line breaks
+            const paragraphs = text.split('\n');
+
+            paragraphs.forEach((paragraph) => {
+              if (paragraph === '') {
+                lines.push(''); // Preserve empty lines
+                return;
+              }
+
+              const words = paragraph.split(' ');
+              let currentLine = '';
+
+              words.forEach((word) => {
+                const testLine = currentLine ? `${currentLine} ${word}` : word;
+                tempDiv.textContent = testLine;
+                const width = tempDiv.offsetWidth;
+
+                if (width > maxWidth && currentLine) {
+                  // Current line is too long, push it and start new line
+                  lines.push(currentLine);
+                  currentLine = word;
+
+                  // Check if the single word is too long
+                  tempDiv.textContent = word;
+                  if (tempDiv.offsetWidth > maxWidth) {
+                    // Break the word into smaller parts
+                    let tempWord = '';
+                    for (let i = 0; i < word.length; i++) {
+                      const char = word[i];
+                      tempDiv.textContent = tempWord + char;
+                      if (tempDiv.offsetWidth > maxWidth && tempWord) {
+                        lines.push(tempWord);
+                        tempWord = char;
+                      } else {
+                        tempWord += char;
+                      }
+                    }
+                    currentLine = tempWord;
+                  }
+                } else {
+                  currentLine = testLine;
+                }
+              });
+
+              if (currentLine) {
+                lines.push(currentLine);
+              }
+            });
+
+            // Clean up
+            document.body.removeChild(tempDiv);
+            return lines;
+          };
+
+          // Calculate padding and effective width
+          const padding = 4; // 4px padding to match p-2 class
+          const effectiveWidth = element.size.width - padding * 2;
+
+          // Wrap text
+          const wrappedLines = wrapText(element.content, effectiveWidth, element.style);
           const lineHeight = element.style.fontSize * 1.2;
 
-          lines.forEach((line, index) => {
-            ctx.fillText(line, textX, element.position.y + index * lineHeight);
+          // Calculate text position based on alignment
+          let textX = element.position.x;
+          if (element.style.textAlign === 'left') {
+            textX += padding;
+          } else if (element.style.textAlign === 'center') {
+            textX += element.size.width / 2;
+          } else if (element.style.textAlign === 'right') {
+            textX += element.size.width - padding;
+          }
+
+          // Render each wrapped line
+          wrappedLines.forEach((line, index) => {
+            ctx.fillText(line, textX, element.position.y + padding + index * lineHeight);
           });
 
           ctx.restore();

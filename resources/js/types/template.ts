@@ -84,4 +84,3 @@ export interface TemplateEditorState {
   maxImages: number;
   backgroundColor: string;
 }
-

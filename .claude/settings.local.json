@@ -7,7 +7,8 @@
       "Bash(bun run:*)",
       "Bash(php:*)",
       "Bash(composer run:*)",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "Bash(grep:*)"
     ]
   },
   "enableAllProjectMcpServers": false
