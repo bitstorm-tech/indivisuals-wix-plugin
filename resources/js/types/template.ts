@@ -47,10 +47,10 @@ export const POPULAR_FONTS = [
   'Impact',
   'Comic Sans MS',
   'Trebuchet MS',
-  'Palatino'
+  'Palatino',
 ] as const;
 
-export type PopularFont = typeof POPULAR_FONTS[number];
+export type PopularFont = (typeof POPULAR_FONTS)[number];
 
 export interface DragState {
   isDragging: boolean;
@@ -82,4 +82,6 @@ export interface TemplateEditorState {
   selectedElementId: string | null;
   selectedElementType: 'image' | 'text' | null;
   maxImages: number;
+  backgroundColor: string;
 }
+

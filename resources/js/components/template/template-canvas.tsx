@@ -9,6 +9,7 @@ interface TemplateCanvasExtendedProps extends TemplateCanvasProps {
   onElementSelect: (id: string | null, type: 'image' | 'text' | null) => void;
   onDrop: (e: React.DragEvent) => void;
   onDragOver: (e: React.DragEvent) => void;
+  backgroundColor: string;
 }
 
 export default function TemplateCanvas({
@@ -24,6 +25,7 @@ export default function TemplateCanvas({
   canvasSize,
   onDrop,
   onDragOver,
+  backgroundColor,
 }: TemplateCanvasExtendedProps) {
   const handleCanvasClick = useCallback(
     (e: React.MouseEvent) => {
@@ -92,15 +94,11 @@ export default function TemplateCanvas({
       </div>
 
       <div
-        className="relative overflow-hidden rounded-lg border-2 border-dashed border-gray-300 bg-gray-50"
+        className="relative overflow-hidden rounded-lg border-2 border-dashed border-gray-300"
         style={{
           width: canvasSize.width,
           height: canvasSize.height,
-          backgroundImage: `
-            linear-gradient(rgba(0,0,0,0.1) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(0,0,0,0.1) 1px, transparent 1px)
-          `,
-          backgroundSize: '20px 20px',
+          backgroundColor,
         }}
         onClick={handleCanvasClick}
         onDrop={onDrop}

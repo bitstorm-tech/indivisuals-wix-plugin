@@ -12,7 +12,7 @@ export default function Template() {
     <>
       <Head title="Template Editor - TheIndivisuals" />
       <div className="min-h-screen bg-gray-50 p-4">
-        <div className="max-w-7xl mx-auto">
+        <div className="mx-auto max-w-7xl">
           <TemplateEditor onExport={handleExport} />
         </div>
       </div>

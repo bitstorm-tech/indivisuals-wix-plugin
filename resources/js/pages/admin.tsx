@@ -1,8 +1,8 @@
 import AdminHeader from '@/components/admin/admin-header';
-import PromptTableHeader from '@/components/admin/prompt-table-header';
 import DeleteConfirmationDialog from '@/components/admin/delete-confirmation-dialog';
 import NewPromptDialog from '@/components/admin/new-prompt-dialog';
 import PromptTable from '@/components/admin/prompt-table';
+import PromptTableHeader from '@/components/admin/prompt-table-header';
 import TestPromptDialog from '@/components/admin/test-prompt-dialog';
 import { Head, router } from '@inertiajs/react';
 import { useEffect, useState } from 'react';

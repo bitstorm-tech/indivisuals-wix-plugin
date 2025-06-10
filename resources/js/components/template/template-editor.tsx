@@ -23,6 +23,8 @@ const DEFAULT_IMAGE_SIZE: TemplateSize = {
   height: 150,
 };
 
+const DEFAULT_BACKGROUND_COLOR = '#ffffff';
+
 export default function TemplateEditor({ canvasSize = DEFAULT_CANVAS_SIZE, maxImages = 3, onExport }: TemplateEditorProps) {
   const [state, setState] = useState<TemplateEditorState>({
     images: [],
@@ -30,6 +32,7 @@ export default function TemplateEditor({ canvasSize = DEFAULT_CANVAS_SIZE, maxIm
     selectedElementId: null,
     selectedElementType: null,
     maxImages,
+    backgroundColor: DEFAULT_BACKGROUND_COLOR,
   });
 
   const generateId = (type: 'img' | 'txt') => `${type}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -177,6 +180,13 @@ export default function TemplateEditor({ canvasSize = DEFAULT_CANVAS_SIZE, maxIm
     });
   }, []);
 
+  const handleBackgroundColorChange = useCallback((color: string) => {
+    setState((prevState) => ({
+      ...prevState,
+      backgroundColor: color,
+    }));
+  }, []);
+
   const handleExport = useCallback(() => {
     // Call the onExport callback if provided
     if (onExport) {
@@ -194,8 +204,8 @@ export default function TemplateEditor({ canvasSize = DEFAULT_CANVAS_SIZE, maxIm
       return;
     }
 
-    // Set white background
-    ctx.fillStyle = '#ffffff';
+    // Set background color
+    ctx.fillStyle = state.backgroundColor;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // Combine all elements and sort by zIndex
@@ -210,8 +220,8 @@ export default function TemplateEditor({ canvasSize = DEFAULT_CANVAS_SIZE, maxIm
 
     // Function to render after all images are loaded
     const renderCanvas = () => {
-      // Clear canvas with white background
-      ctx.fillStyle = '#ffffff';
+      // Clear canvas with background color
+      ctx.fillStyle = state.backgroundColor;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       // Render all elements in order
@@ -290,7 +300,7 @@ export default function TemplateEditor({ canvasSize = DEFAULT_CANVAS_SIZE, maxIm
       };
       img.src = imageElement.url;
     });
-  }, [state.images, state.texts, canvasSize, onExport]);
+  }, [state.images, state.texts, state.backgroundColor, canvasSize, onExport]);
 
   const handleCanvasDrop = useCallback(
     (e: React.DragEvent) => {
@@ -346,6 +356,7 @@ export default function TemplateEditor({ canvasSize = DEFAULT_CANVAS_SIZE, maxIm
               canvasSize={canvasSize}
               onDrop={handleCanvasDrop}
               onDragOver={handleCanvasDragOver}
+              backgroundColor={state.backgroundColor}
             />
           </div>
 
@@ -353,6 +364,19 @@ export default function TemplateEditor({ canvasSize = DEFAULT_CANVAS_SIZE, maxIm
             <TemplateImageUploader onFileSelect={handleFileSelect} maxFiles={state.maxImages} currentCount={state.images.length} />
 
             <TextAdder onAddText={handleAddText} />
+
+            <Card className="p-4">
+              <h4 className="mb-3 font-medium">Hintergrundfarbe</h4>
+              <div className="flex items-center gap-3">
+                <input
+                  type="color"
+                  value={state.backgroundColor}
+                  onChange={(e) => handleBackgroundColorChange(e.target.value)}
+                  className="h-10 w-20 cursor-pointer rounded border border-gray-300"
+                />
+                <span className="text-sm text-gray-600">{state.backgroundColor.toUpperCase()}</span>
+              </div>
+            </Card>
 
             {state.selectedElementId && state.selectedElementType === 'image' && (
               <Card className="p-4">

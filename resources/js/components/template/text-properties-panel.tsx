@@ -1,9 +1,9 @@
 import React from 'react';
-import { TemplateText, POPULAR_FONTS, PopularFont } from '../../types/template';
-import { Card } from '../ui/card';
-import { Label } from '../ui/label';
-import { Input } from '../ui/input';
+import { POPULAR_FONTS, PopularFont, TemplateText } from '../../types/template';
 import { Button } from '../ui/button';
+import { Card } from '../ui/card';
+import { Input } from '../ui/input';
+import { Label } from '../ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 
 interface TextPropertiesPanelProps {
@@ -19,8 +19,8 @@ export default function TextPropertiesPanel({ text, onUpdate }: TextPropertiesPa
     onUpdate({
       style: {
         ...text.style,
-        ...styleUpdates
-      }
+        ...styleUpdates,
+      },
     });
   };
 
@@ -30,27 +30,19 @@ export default function TextPropertiesPanel({ text, onUpdate }: TextPropertiesPa
 
   return (
     <Card className="p-4">
-      <h4 className="font-medium mb-4">Text Eigenschaften</h4>
-      
+      <h4 className="mb-4 font-medium">Text Eigenschaften</h4>
+
       <div className="space-y-4">
         {/* Text Content */}
         <div className="space-y-2">
           <Label htmlFor="text-content">Text</Label>
-          <Input
-            id="text-content"
-            value={text.content}
-            onChange={handleContentChange}
-            placeholder="Text eingeben..."
-          />
+          <Input id="text-content" value={text.content} onChange={handleContentChange} placeholder="Text eingeben..." />
         </div>
 
         {/* Font Family */}
         <div className="space-y-2">
           <Label>Schriftart</Label>
-          <Select
-            value={text.style.fontFamily}
-            onValueChange={(value: PopularFont) => handleStyleChange({ fontFamily: value })}
-          >
+          <Select value={text.style.fontFamily} onValueChange={(value: PopularFont) => handleStyleChange({ fontFamily: value })}>
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
@@ -67,10 +59,7 @@ export default function TextPropertiesPanel({ text, onUpdate }: TextPropertiesPa
         {/* Font Size */}
         <div className="space-y-2">
           <Label>Schriftgröße</Label>
-          <Select
-            value={text.style.fontSize.toString()}
-            onValueChange={(value) => handleStyleChange({ fontSize: parseInt(value) })}
-          >
+          <Select value={text.style.fontSize.toString()} onValueChange={(value) => handleStyleChange({ fontSize: parseInt(value) })}>
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
@@ -91,8 +80,8 @@ export default function TextPropertiesPanel({ text, onUpdate }: TextPropertiesPa
             {TEXT_COLORS.map((color) => (
               <button
                 key={color}
-                className={`w-8 h-8 rounded border-2 transition-all ${
-                  text.style.color === color ? 'border-blue-500 scale-110' : 'border-gray-300 hover:border-gray-400'
+                className={`h-8 w-8 rounded border-2 transition-all ${
+                  text.style.color === color ? 'scale-110 border-blue-500' : 'border-gray-300 hover:border-gray-400'
                 }`}
                 style={{ backgroundColor: color }}
                 onClick={() => handleStyleChange({ color })}
@@ -100,22 +89,14 @@ export default function TextPropertiesPanel({ text, onUpdate }: TextPropertiesPa
               />
             ))}
           </div>
-          <Input
-            type="color"
-            value={text.style.color}
-            onChange={(e) => handleStyleChange({ color: e.target.value })}
-            className="w-full h-10"
-          />
+          <Input type="color" value={text.style.color} onChange={(e) => handleStyleChange({ color: e.target.value })} className="h-10 w-full" />
         </div>
 
         {/* Font Weight and Style */}
         <div className="grid grid-cols-2 gap-2">
           <div className="space-y-2">
             <Label>Gewicht</Label>
-            <Select
-              value={text.style.fontWeight}
-              onValueChange={(value: 'normal' | 'bold') => handleStyleChange({ fontWeight: value })}
-            >
+            <Select value={text.style.fontWeight} onValueChange={(value: 'normal' | 'bold') => handleStyleChange({ fontWeight: value })}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
@@ -125,13 +106,10 @@ export default function TextPropertiesPanel({ text, onUpdate }: TextPropertiesPa
               </SelectContent>
             </Select>
           </div>
-          
+
           <div className="space-y-2">
             <Label>Stil</Label>
-            <Select
-              value={text.style.fontStyle}
-              onValueChange={(value: 'normal' | 'italic') => handleStyleChange({ fontStyle: value })}
-            >
+            <Select value={text.style.fontStyle} onValueChange={(value: 'normal' | 'italic') => handleStyleChange({ fontStyle: value })}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
@@ -175,10 +153,14 @@ export default function TextPropertiesPanel({ text, onUpdate }: TextPropertiesPa
         </div>
 
         {/* Position and Size Info */}
-        <div className="pt-2 border-t">
-          <div className="text-sm space-y-1 text-gray-600">
-            <div>Position: {Math.round(text.position.x)}, {Math.round(text.position.y)}</div>
-            <div>Größe: {Math.round(text.size.width)} × {Math.round(text.size.height)}</div>
+        <div className="border-t pt-2">
+          <div className="space-y-1 text-sm text-gray-600">
+            <div>
+              Position: {Math.round(text.position.x)}, {Math.round(text.position.y)}
+            </div>
+            <div>
+              Größe: {Math.round(text.size.width)} × {Math.round(text.size.height)}
+            </div>
           </div>
         </div>
       </div>

@@ -85,33 +85,36 @@ export default function DraggableText({ text, isSelected, onUpdate, onSelect, on
     [text.position, onSelect, isEditing],
   );
 
-  const handleDoubleClick = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsEditing(true);
-    setTimeout(() => {
-      if (editRef.current) {
-        // Set initial content directly on the DOM element
-        editRef.current.textContent = text.content;
-        editRef.current.focus();
-        const range = document.createRange();
-        range.selectNodeContents(editRef.current);
-        const selection = window.getSelection();
-        selection?.removeAllRanges();
-        selection?.addRange(range);
-      }
-    }, 0);
-  }, [text.content]);
+  const handleDoubleClick = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setIsEditing(true);
+      setTimeout(() => {
+        if (editRef.current) {
+          // Set initial content directly on the DOM element
+          editRef.current.textContent = text.content;
+          editRef.current.focus();
+          const range = document.createRange();
+          range.selectNodeContents(editRef.current);
+          const selection = window.getSelection();
+          selection?.removeAllRanges();
+          selection?.addRange(range);
+        }
+      }, 0);
+    },
+    [text.content],
+  );
 
   const handleTextEdit = useCallback(
     (e: React.FormEvent<HTMLDivElement>) => {
       const newContent = e.currentTarget.textContent || '';
-      
+
       // Clear existing timeout
       if (updateTimeoutRef.current) {
         clearTimeout(updateTimeoutRef.current);
       }
-      
+
       // Debounce the update to prevent rapid re-renders
       updateTimeoutRef.current = setTimeout(() => {
         onUpdate({ content: newContent });
@@ -131,26 +134,29 @@ export default function DraggableText({ text, isSelected, onUpdate, onSelect, on
     setIsEditing(false);
   }, [onUpdate]);
 
-  const handleEditKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      // Clear timeout and immediately update on Enter
-      if (updateTimeoutRef.current) {
-        clearTimeout(updateTimeoutRef.current);
+  const handleEditKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        // Clear timeout and immediately update on Enter
+        if (updateTimeoutRef.current) {
+          clearTimeout(updateTimeoutRef.current);
+        }
+        if (editRef.current) {
+          onUpdate({ content: editRef.current.textContent || '' });
+        }
+        setIsEditing(false);
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        // Clear timeout and revert on Escape
+        if (updateTimeoutRef.current) {
+          clearTimeout(updateTimeoutRef.current);
+        }
+        setIsEditing(false);
       }
-      if (editRef.current) {
-        onUpdate({ content: editRef.current.textContent || '' });
-      }
-      setIsEditing(false);
-    } else if (e.key === 'Escape') {
-      e.preventDefault();
-      // Clear timeout and revert on Escape
-      if (updateTimeoutRef.current) {
-        clearTimeout(updateTimeoutRef.current);
-      }
-      setIsEditing(false);
-    }
-  }, [onUpdate]);
+    },
+    [onUpdate],
+  );
 
   const handleResizeStart = useCallback(
     (handle: ResizeHandle, e: React.MouseEvent) => {

@@ -58,7 +58,7 @@ export default function ImagePicker({ defaultPromptId, storeImages = true }: Ima
       formData.append('store_images', storeImages.toString());
 
       const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-      
+
       if (!csrfToken) {
         throw new Error('CSRF token not found');
       }
