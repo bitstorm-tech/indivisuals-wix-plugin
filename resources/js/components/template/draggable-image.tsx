@@ -103,6 +103,7 @@ export default function DraggableImage({ image, isSelected, onUpdate, onSelect, 
         startSize: image.size,
         offset: { x: e.clientX, y: e.clientY },
         resizeHandle: handle,
+        aspectRatio: image.size.width / image.size.height,
       });
     },
     [image.position, image.size, onSelect],
@@ -141,16 +142,61 @@ export default function DraggableImage({ image, isSelected, onUpdate, onSelect, 
           let newPosition = { ...dragState.startPosition };
 
           const handle = dragState.resizeHandle.type;
+          const isCornerHandle = ['nw', 'ne', 'sw', 'se'].includes(handle);
 
-          if (handle.includes('e')) newSize.width += deltaX;
-          if (handle.includes('w')) {
-            newSize.width -= deltaX;
-            newPosition.x += deltaX;
-          }
-          if (handle.includes('s')) newSize.height += deltaY;
-          if (handle.includes('n')) {
-            newSize.height -= deltaY;
-            newPosition.y += deltaY;
+          if (isCornerHandle && dragState.aspectRatio) {
+            // For corner handles, maintain aspect ratio
+            const absDeltaX = Math.abs(deltaX);
+            const absDeltaY = Math.abs(deltaY);
+
+            // Determine which axis moved more
+            const useXAxis = absDeltaX > absDeltaY;
+
+            if (useXAxis) {
+              // Use X movement as primary
+              if (handle.includes('e')) {
+                newSize.width += deltaX;
+              } else if (handle.includes('w')) {
+                newSize.width -= deltaX;
+                newPosition.x += deltaX;
+              }
+              // Calculate height based on aspect ratio
+              newSize.height = newSize.width / dragState.aspectRatio;
+
+              // Adjust Y position for north handles
+              if (handle.includes('n')) {
+                const heightDiff = newSize.height - dragState.startSize.height;
+                newPosition.y = dragState.startPosition.y - heightDiff;
+              }
+            } else {
+              // Use Y movement as primary
+              if (handle.includes('s')) {
+                newSize.height += deltaY;
+              } else if (handle.includes('n')) {
+                newSize.height -= deltaY;
+                newPosition.y += deltaY;
+              }
+              // Calculate width based on aspect ratio
+              newSize.width = newSize.height * dragState.aspectRatio;
+
+              // Adjust X position for west handles
+              if (handle.includes('w')) {
+                const widthDiff = newSize.width - dragState.startSize.width;
+                newPosition.x = dragState.startPosition.x - widthDiff;
+              }
+            }
+          } else {
+            // For edge handles, resize only one dimension
+            if (handle.includes('e')) newSize.width += deltaX;
+            if (handle.includes('w')) {
+              newSize.width -= deltaX;
+              newPosition.x += deltaX;
+            }
+            if (handle.includes('s')) newSize.height += deltaY;
+            if (handle.includes('n')) {
+              newSize.height -= deltaY;
+              newPosition.y += deltaY;
+            }
           }
 
           newSize = constrainSize(newSize);
@@ -216,7 +262,7 @@ export default function DraggableImage({ image, isSelected, onUpdate, onSelect, 
       onMouseDown={handleMouseDown}
       onClick={onSelect}
     >
-      <img src={image.url} alt="Template Bild" className="image-content pointer-events-none h-full w-full object-contain" draggable={false} />
+      <img src={image.url} alt="Template Bild" className="image-content pointer-events-none h-full w-full object-fill" draggable={false} />
 
       {isSelected && (
         <>

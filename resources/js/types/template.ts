@@ -59,6 +59,7 @@ export interface DragState {
   startSize?: TemplateSize;
   offset: TemplatePosition;
   resizeHandle?: ResizeHandle;
+  aspectRatio?: number;
 }
 
 export interface ResizeHandle {
