@@ -95,3 +95,4 @@ This is a Laravel + Inertia.js + React application focused on AI-powered image p
 - Use `git mv` to move files that are under version control
 - Use PHP nullsafe syntax (`?->`) whereever it is usefull
 - Format all files with `prettier` at the very end
+- Use `PascalCase` for react components file names
