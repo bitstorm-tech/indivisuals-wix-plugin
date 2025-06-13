@@ -86,13 +86,6 @@ export default function EditorCanvas({
 
   return (
     <div className="flex flex-col space-y-4">
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">Editor Bearbeitung</h3>
-        <div className="text-sm text-gray-500">
-          {images.length}/3 Bilder • {texts.length} Texte
-        </div>
-      </div>
-
       <div
         className="relative overflow-hidden rounded-lg border-2 border-dashed border-gray-300"
         style={{

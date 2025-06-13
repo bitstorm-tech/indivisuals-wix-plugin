@@ -463,22 +463,6 @@ export default function Editor({ canvasSize = DEFAULT_CANVAS_SIZE, maxImages = 3
   return (
     <div className="space-y-6">
       <Card className="p-6">
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-xl font-bold">Editor</h2>
-          <div className="flex gap-2">
-            {(state.images.length > 0 || state.texts.length > 0) && (
-              <>
-                <Button variant="outline" size="sm" onClick={handleClearAll}>
-                  Alle löschen
-                </Button>
-                <Button size="sm" onClick={handleExport}>
-                  Exportieren
-                </Button>
-              </>
-            )}
-          </div>
-        </div>
-
         <div className="space-y-6">
           <div className="flex flex-wrap gap-2">
             <DropdownMenu>
@@ -633,6 +617,22 @@ export default function Editor({ canvasSize = DEFAULT_CANVAS_SIZE, maxImages = 3
                 </div>
               </DropdownMenuContent>
             </DropdownMenu>
+
+            <div className="ml-auto flex items-center gap-2">
+              <span className="text-sm text-gray-500">
+                {state.images.length}/{state.maxImages} Bilder • {state.texts.length} Texte
+              </span>
+              {(state.images.length > 0 || state.texts.length > 0) && (
+                <>
+                  <Button variant="outline" size="sm" onClick={handleClearAll}>
+                    Alle löschen
+                  </Button>
+                  <Button size="sm" onClick={handleExport}>
+                    Exportieren
+                  </Button>
+                </>
+              )}
+            </div>
           </div>
 
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
