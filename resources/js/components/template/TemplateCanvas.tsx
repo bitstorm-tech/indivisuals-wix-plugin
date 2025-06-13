@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { TemplateCanvasProps, TemplateImage, TemplateText } from '../../types/template';
-import DraggableImage from './draggable-image';
-import DraggableText from './draggable-text';
+import DraggableImage from './DraggableImage';
+import DraggableText from './DraggableText';
 
 interface TemplateCanvasExtendedProps extends TemplateCanvasProps {
   selectedElementId: string | null;

@@ -1,7 +1,7 @@
 import React, { useCallback, useRef, useState } from 'react';
 import { DragState, ResizeHandle, TemplatePosition, TemplateSize, TemplateText } from '../../types/template';
-import { Button } from '../ui/button';
-import ResizeHandles from './resize-handles';
+import { Button } from '../ui/Button';
+import ResizeHandles from './ResizeHandles';
 
 interface DraggableTextProps {
   text: TemplateText;

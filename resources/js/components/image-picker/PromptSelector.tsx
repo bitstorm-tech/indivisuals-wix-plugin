@@ -1,5 +1,5 @@
 import { Prompt } from '../../types/image-picker';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/Select';
 
 interface PromptSelectorProps {
   prompts: Prompt[];

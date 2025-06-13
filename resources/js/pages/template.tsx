@@ -1,4 +1,4 @@
-import TemplateEditor from '@/components/template/template-editor';
+import TemplateEditor from '@/components/template/TemplateEditor';
 import { TemplateImage, TemplateText } from '@/types/template';
 import { Head } from '@inertiajs/react';
 

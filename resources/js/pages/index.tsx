@@ -1,4 +1,4 @@
-import ImagePicker from '@/components/image-picker/image-picker';
+import ImagePicker from '@/components/image-picker/ImagePicker';
 import { Head } from '@inertiajs/react';
 
 export default function Welcome() {

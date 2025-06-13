@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Prompt, UploadResponse } from '../../types/image-picker';
-import FileUploader from './file-uploader';
-import ImageDisplay from './image-display';
-import ProcessingIndicator from './processing-indicator';
-import PromptSelector from './prompt-selector';
+import FileUploader from './FileUploader';
+import ImageDisplay from './ImageDisplay';
+import ProcessingIndicator from './ProcessingIndicator';
+import PromptSelector from './PromptSelector';
 
 interface ImagePickerProps {
   defaultPromptId?: number;

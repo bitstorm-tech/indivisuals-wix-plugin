@@ -8,14 +8,14 @@ import {
   TemplateSize,
   TemplateText,
 } from '../../types/template';
-import { Button } from '../ui/button';
-import { Card } from '../ui/card';
-import { Label } from '../ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import TemplateCanvas from './template-canvas';
-import TemplateImageUploader from './template-image-uploader';
-import TextAdder from './text-adder';
-import TextPropertiesPanel from './text-properties-panel';
+import { Button } from '../ui/Button';
+import { Card } from '../ui/Card';
+import { Label } from '../ui/Label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/Select';
+import TemplateCanvas from './TemplateCanvas';
+import TemplateImageUploader from './TemplateImageUploader';
+import TextAdder from './TextAdder';
+import TextPropertiesPanel from './TextPropertiesPanel';
 
 interface TemplateEditorProps {
   canvasSize?: TemplateSize;

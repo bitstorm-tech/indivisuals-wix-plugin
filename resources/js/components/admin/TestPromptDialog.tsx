@@ -1,6 +1,6 @@
-import ImagePicker from '@/components/image-picker/image-picker';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import ImagePicker from '@/components/image-picker/ImagePicker';
+import { Button } from '@/components/ui/Button';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
 
 interface TestPromptDialogProps {
   isOpen: boolean;

@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
-import { Button } from '../ui/button';
-import { Card } from '../ui/card';
+import { Button } from '../ui/Button';
+import { Card } from '../ui/Card';
 
 interface TemplateImageUploaderProps {
   onFileSelect: (files: File[]) => void;

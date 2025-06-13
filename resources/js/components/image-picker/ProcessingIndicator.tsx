@@ -1,4 +1,4 @@
-import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
+import { Alert, AlertDescription, AlertTitle } from '../ui/Alert';
 
 interface ProcessingIndicatorProps {
   isVisible: boolean;

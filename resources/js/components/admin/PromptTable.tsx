@@ -1,5 +1,5 @@
-import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import PromptTableRow from './prompt-table-row';
+import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/Table';
+import PromptTableRow from './PromptTableRow';
 
 interface Prompt {
   id: number;
