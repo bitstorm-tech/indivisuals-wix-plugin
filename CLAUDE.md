@@ -83,6 +83,7 @@ This is a Laravel + Inertia.js + React application focused on AI-powered image p
 
 ### Development Notes
 
+- Use context7 to get the latest documentation
 - Uses SQLite for simplicity in development
 - German UI text in image picker component
 - Concurrent development setup runs all services simultaneously

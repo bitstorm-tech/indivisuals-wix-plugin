@@ -7,8 +7,6 @@ interface EditorCanvasExtendedProps extends EditorCanvasProps {
   selectedElementId: string | null;
   selectedElementType: 'image' | 'text' | null;
   onElementSelect: (id: string | null, type: 'image' | 'text' | null) => void;
-  onDrop: (e: React.DragEvent) => void;
-  onDragOver: (e: React.DragEvent) => void;
   backgroundColor: string;
 }
 
@@ -23,8 +21,6 @@ export default function EditorCanvas({
   selectedElementId,
   selectedElementType,
   canvasSize,
-  onDrop,
-  onDragOver,
   backgroundColor,
 }: EditorCanvasExtendedProps) {
   const handleCanvasClick = useCallback(
@@ -94,15 +90,12 @@ export default function EditorCanvas({
           backgroundColor,
         }}
         onClick={handleCanvasClick}
-        onDrop={onDrop}
-        onDragOver={onDragOver}
       >
         {images.length === 0 && texts.length === 0 && (
           <div className="absolute inset-0 flex items-center justify-center text-center text-gray-400">
             <div>
               <div className="mb-2 text-4xl">📷📝</div>
-              <div>Ziehen Sie Bilder hierher oder</div>
-              <div>fügen Sie Text hinzu</div>
+              <div>Fügen Sie Bilder und Text hinzu</div>
               <div className="mt-2 text-sm">(Maximal 3 Bilder + unbegrenzt Text)</div>
             </div>
           </div>

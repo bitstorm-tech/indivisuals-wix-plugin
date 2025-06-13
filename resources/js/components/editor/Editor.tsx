@@ -1,5 +1,5 @@
-import { ChevronDown, Download, Image, Info, Palette, Type } from 'lucide-react';
-import React, { useCallback, useState } from 'react';
+import { ChevronDown, Download, Image, Info, Palette } from 'lucide-react';
+import { useCallback, useState } from 'react';
 import { EditorImage, EditorSize, EditorState, EditorText, EXPORT_RESOLUTIONS, ExportResolutionId, ExportSettings } from '../../types/editor';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
@@ -427,60 +427,13 @@ export default function Editor({ canvasSize = DEFAULT_CANVAS_SIZE, maxImages = 3
     });
   }, [state.images, state.texts, state.backgroundColor, state.exportSettings, canvasSize, onExport]);
 
-  const handleCanvasDrop = useCallback(
-    (e: React.DragEvent) => {
-      e.preventDefault();
-
-      if (state.images.length >= state.maxImages) return;
-
-      const files = Array.from(e.dataTransfer.files);
-      const validFiles = files.filter((file) => file.type.startsWith('image/'));
-
-      if (validFiles.length > 0) {
-        handleFileSelect(validFiles);
-      }
-    },
-    [state.images.length, state.maxImages, handleFileSelect],
-  );
-
-  const handleCanvasDragOver = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-  }, []);
-
   return (
     <div className="space-y-6">
       <Card className="p-6">
         <div className="space-y-6">
           <div className="flex flex-wrap items-center gap-2">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm">
-                  <Image className="mr-2 h-4 w-4" />
-                  Bilder hinzufügen
-                  <ChevronDown className="ml-2 h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-80" align="start">
-                <div className="p-2">
-                  <EditorImageUploader onFileSelect={handleFileSelect} maxFiles={state.maxImages} currentCount={state.images.length} />
-                </div>
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm">
-                  <Type className="mr-2 h-4 w-4" />
-                  Text hinzufügen
-                  <ChevronDown className="ml-2 h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-80" align="start">
-                <div className="p-2">
-                  <TextAdder onAddText={handleAddText} />
-                </div>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <EditorImageUploader onFileSelect={handleFileSelect} maxFiles={state.maxImages} currentCount={state.images.length} />
+            <TextAdder onAddText={handleAddText} />
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -636,37 +589,11 @@ export default function Editor({ canvasSize = DEFAULT_CANVAS_SIZE, maxImages = 3
                 selectedElementId={state.selectedElementId}
                 selectedElementType={state.selectedElementType}
                 canvasSize={canvasSize}
-                onDrop={handleCanvasDrop}
-                onDragOver={handleCanvasDragOver}
                 backgroundColor={state.backgroundColor}
               />
             </div>
 
             <div className="space-y-4">
-              {state.selectedElementId && state.selectedElementType === 'image' && (
-                <Card className="p-4">
-                  <h4 className="mb-3 font-medium">Bild Eigenschaften</h4>
-                  <div className="space-y-2 text-sm">
-                    {(() => {
-                      const selectedImage = state.images.find((img) => img.id === state.selectedElementId);
-                      if (!selectedImage) return null;
-
-                      return (
-                        <div className="space-y-1">
-                          <div>
-                            Position: {Math.round(selectedImage.position.x)}, {Math.round(selectedImage.position.y)}
-                          </div>
-                          <div>
-                            Größe: {Math.round(selectedImage.size.width)} × {Math.round(selectedImage.size.height)}
-                          </div>
-                          <div>Datei: {selectedImage.file.name}</div>
-                        </div>
-                      );
-                    })()}
-                  </div>
-                </Card>
-              )}
-
               {state.selectedElementId &&
                 state.selectedElementType === 'text' &&
                 (() => {
