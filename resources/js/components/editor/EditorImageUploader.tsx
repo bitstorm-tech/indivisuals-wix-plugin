@@ -7,9 +7,10 @@ interface EditorImageUploaderProps {
   maxFiles: number;
   currentCount: number;
   disabled?: boolean;
+  onButtonClick?: () => void;
 }
 
-export default function EditorImageUploader({ onFileSelect, maxFiles, currentCount, disabled = false }: EditorImageUploaderProps) {
+export default function EditorImageUploader({ onFileSelect, maxFiles, currentCount, disabled = false, onButtonClick }: EditorImageUploaderProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const remainingSlots = maxFiles - currentCount;
 
@@ -27,11 +28,19 @@ export default function EditorImageUploader({ onFileSelect, maxFiles, currentCou
     }
   };
 
+  const handleButtonClick = () => {
+    if (onButtonClick) {
+      onButtonClick();
+    } else {
+      inputRef.current?.click();
+    }
+  };
+
   const isDisabled = disabled || remainingSlots <= 0;
 
   return (
     <>
-      <Button variant="outline" size="sm" onClick={() => inputRef.current?.click()} disabled={isDisabled}>
+      <Button variant="outline" size="sm" onClick={handleButtonClick} disabled={isDisabled}>
         <Image className="mr-2 h-4 w-4" />
         Bild auswählen ({currentCount}/{maxFiles})
       </Button>

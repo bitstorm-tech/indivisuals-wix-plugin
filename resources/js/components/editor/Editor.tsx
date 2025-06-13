@@ -1,6 +1,7 @@
 import { ChevronDown, Download, Image, Info, Palette } from 'lucide-react';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { EditorImage, EditorSize, EditorState, EditorText, EXPORT_RESOLUTIONS, ExportResolutionId, ExportSettings } from '../../types/editor';
+import ImageWizardDialog from '../ImageWizardDialog';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
 import { Label } from '../ui/Label';
@@ -44,6 +45,16 @@ export default function Editor({ canvasSize = DEFAULT_CANVAS_SIZE, maxImages = 3
       pixelRatio: window.devicePixelRatio || 1,
     },
   });
+
+  const [isWizardOpen, setIsWizardOpen] = useState(false);
+  const [prompts, setPrompts] = useState<Array<{ id: number; name: string; prompt: string }>>([]);
+
+  useEffect(() => {
+    fetch('/prompts')
+      .then((response) => response.json())
+      .then((data) => setPrompts(data))
+      .catch((error) => console.error('Failed to fetch prompts:', error));
+  }, []);
 
   const generateId = (type: 'img' | 'txt') => `${type}_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
 
@@ -432,7 +443,12 @@ export default function Editor({ canvasSize = DEFAULT_CANVAS_SIZE, maxImages = 3
       <Card className="p-6">
         <div className="space-y-6">
           <div className="flex flex-wrap items-center gap-2">
-            <EditorImageUploader onFileSelect={handleFileSelect} maxFiles={state.maxImages} currentCount={state.images.length} />
+            <EditorImageUploader
+              onFileSelect={handleFileSelect}
+              maxFiles={state.maxImages}
+              currentCount={state.images.length}
+              onButtonClick={() => setIsWizardOpen(true)}
+            />
             <TextAdder onAddText={handleAddText} />
 
             <DropdownMenu>
@@ -606,6 +622,26 @@ export default function Editor({ canvasSize = DEFAULT_CANVAS_SIZE, maxImages = 3
           </div>
         </div>
       </Card>
+
+      <ImageWizardDialog
+        isOpen={isWizardOpen}
+        onClose={() => setIsWizardOpen(false)}
+        prompts={prompts}
+        onImageGenerated={async (imageUrl, originalFile) => {
+          try {
+            // Fetch the generated image as a file
+            const response = await fetch(imageUrl);
+            const blob = await response.blob();
+            const file = new File([blob], `generated-${Date.now()}.png`, { type: 'image/png' });
+
+            // Add the generated image to the editor
+            handleFileSelect([file]);
+            setIsWizardOpen(false);
+          } catch (error) {
+            console.error('Failed to load generated image:', error);
+          }
+        }}
+      />
     </div>
   );
 }
