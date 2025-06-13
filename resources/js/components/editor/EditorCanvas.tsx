@@ -1,9 +1,9 @@
 import React, { useCallback } from 'react';
-import { TemplateCanvasProps, TemplateImage, TemplateText } from '../../types/template';
+import { EditorCanvasProps, EditorImage, EditorText } from '../../types/editor';
 import DraggableImage from './DraggableImage';
 import DraggableText from './DraggableText';
 
-interface TemplateCanvasExtendedProps extends TemplateCanvasProps {
+interface EditorCanvasExtendedProps extends EditorCanvasProps {
   selectedElementId: string | null;
   selectedElementType: 'image' | 'text' | null;
   onElementSelect: (id: string | null, type: 'image' | 'text' | null) => void;
@@ -12,7 +12,7 @@ interface TemplateCanvasExtendedProps extends TemplateCanvasProps {
   backgroundColor: string;
 }
 
-export default function TemplateCanvas({
+export default function EditorCanvas({
   images,
   texts,
   onImageUpdate,
@@ -26,7 +26,7 @@ export default function TemplateCanvas({
   onDrop,
   onDragOver,
   backgroundColor,
-}: TemplateCanvasExtendedProps) {
+}: EditorCanvasExtendedProps) {
   const handleCanvasClick = useCallback(
     (e: React.MouseEvent) => {
       if (e.target === e.currentTarget) {
@@ -37,7 +37,7 @@ export default function TemplateCanvas({
   );
 
   const handleImageUpdate = useCallback(
-    (id: string, updates: Partial<TemplateImage>) => {
+    (id: string, updates: Partial<EditorImage>) => {
       onImageUpdate(id, updates);
     },
     [onImageUpdate],
@@ -61,7 +61,7 @@ export default function TemplateCanvas({
   );
 
   const handleTextUpdate = useCallback(
-    (id: string, updates: Partial<TemplateText>) => {
+    (id: string, updates: Partial<EditorText>) => {
       onTextUpdate(id, updates);
     },
     [onTextUpdate],
@@ -87,7 +87,7 @@ export default function TemplateCanvas({
   return (
     <div className="flex flex-col space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">Template Bearbeitung</h3>
+        <h3 className="text-lg font-semibold">Editor Bearbeitung</h3>
         <div className="text-sm text-gray-500">
           {images.length}/3 Bilder • {texts.length} Texte
         </div>

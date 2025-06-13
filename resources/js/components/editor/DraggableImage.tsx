@@ -1,15 +1,15 @@
 import React, { useCallback, useRef, useState } from 'react';
-import { DragState, ResizeHandle, TemplateImage, TemplatePosition, TemplateSize } from '../../types/template';
+import { DragState, EditorImage, EditorPosition, EditorSize, ResizeHandle } from '../../types/editor';
 import { Button } from '../ui/Button';
 import ResizeHandles from './ResizeHandles';
 
 interface DraggableImageProps {
-  image: TemplateImage;
+  image: EditorImage;
   isSelected: boolean;
-  onUpdate: (updates: Partial<TemplateImage>) => void;
+  onUpdate: (updates: Partial<EditorImage>) => void;
   onSelect: () => void;
   onDelete: () => void;
-  canvasSize: TemplateSize;
+  canvasSize: EditorSize;
 }
 
 export default function DraggableImage({ image, isSelected, onUpdate, onSelect, onDelete, canvasSize }: DraggableImageProps) {
@@ -20,7 +20,7 @@ export default function DraggableImage({ image, isSelected, onUpdate, onSelect, 
   const canvasRectRef = useRef<DOMRect | null>(null);
 
   const constrainPosition = useCallback(
-    (pos: TemplatePosition): TemplatePosition => {
+    (pos: EditorPosition): EditorPosition => {
       const maxX = canvasSize.width - image.size.width;
       const maxY = canvasSize.height - image.size.height;
 
@@ -33,7 +33,7 @@ export default function DraggableImage({ image, isSelected, onUpdate, onSelect, 
   );
 
   const constrainSize = useCallback(
-    (size: TemplateSize): TemplateSize => {
+    (size: EditorSize): EditorSize => {
       const minSize = 50;
       const maxWidth = canvasSize.width - image.position.x;
       const maxHeight = canvasSize.height - image.position.y;
@@ -262,7 +262,7 @@ export default function DraggableImage({ image, isSelected, onUpdate, onSelect, 
       onMouseDown={handleMouseDown}
       onClick={onSelect}
     >
-      <img src={image.url} alt="Template Bild" className="image-content pointer-events-none h-full w-full object-fill" draggable={false} />
+      <img src={image.url} alt="Editor Bild" className="image-content pointer-events-none h-full w-full object-fill" draggable={false} />
 
       {isSelected && (
         <>

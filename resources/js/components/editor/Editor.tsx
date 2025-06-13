@@ -1,42 +1,34 @@
 import React, { useCallback, useState } from 'react';
-import {
-  EXPORT_RESOLUTIONS,
-  ExportResolutionId,
-  ExportSettings,
-  TemplateEditorState,
-  TemplateImage,
-  TemplateSize,
-  TemplateText,
-} from '../../types/template';
+import { EditorImage, EditorSize, EditorState, EditorText, EXPORT_RESOLUTIONS, ExportResolutionId, ExportSettings } from '../../types/editor';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
 import { Label } from '../ui/Label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/Select';
-import TemplateCanvas from './TemplateCanvas';
-import TemplateImageUploader from './TemplateImageUploader';
+import EditorCanvas from './EditorCanvas';
+import EditorImageUploader from './EditorImageUploader';
 import TextAdder from './TextAdder';
 import TextPropertiesPanel from './TextPropertiesPanel';
 
-interface TemplateEditorProps {
-  canvasSize?: TemplateSize;
+interface EditorProps {
+  canvasSize?: EditorSize;
   maxImages?: number;
-  onExport?: (data: { images: TemplateImage[]; texts: TemplateText[] }) => void;
+  onExport?: (data: { images: EditorImage[]; texts: EditorText[] }) => void;
 }
 
-const DEFAULT_CANVAS_SIZE: TemplateSize = {
+const DEFAULT_CANVAS_SIZE: EditorSize = {
   width: 800,
   height: 600,
 };
 
-const DEFAULT_IMAGE_SIZE: TemplateSize = {
+const DEFAULT_IMAGE_SIZE: EditorSize = {
   width: 200,
   height: 150,
 };
 
 const DEFAULT_BACKGROUND_COLOR = '#ffffff';
 
-export default function TemplateEditor({ canvasSize = DEFAULT_CANVAS_SIZE, maxImages = 3, onExport }: TemplateEditorProps) {
-  const [state, setState] = useState<TemplateEditorState>({
+export default function Editor({ canvasSize = DEFAULT_CANVAS_SIZE, maxImages = 3, onExport }: EditorProps) {
+  const [state, setState] = useState<EditorState>({
     images: [],
     texts: [],
     selectedElementId: null,
@@ -80,7 +72,7 @@ export default function TemplateEditor({ canvasSize = DEFAULT_CANVAS_SIZE, maxIm
         const remainingSlots = prevState.maxImages - prevState.images.length;
         const filesToAdd = files.slice(0, remainingSlots);
 
-        const newImages: TemplateImage[] = filesToAdd.map((file, index) => {
+        const newImages: EditorImage[] = filesToAdd.map((file, index) => {
           const position = findAvailablePosition([...prevState.images, ...prevState.texts]);
 
           return {
@@ -107,7 +99,7 @@ export default function TemplateEditor({ canvasSize = DEFAULT_CANVAS_SIZE, maxIm
     [findAvailablePosition],
   );
 
-  const handleImageUpdate = useCallback((id: string, updates: Partial<TemplateImage>) => {
+  const handleImageUpdate = useCallback((id: string, updates: Partial<EditorImage>) => {
     setState((prevState) => ({
       ...prevState,
       images: prevState.images.map((img) => (img.id === id ? { ...img, ...updates } : img)),
@@ -130,7 +122,7 @@ export default function TemplateEditor({ canvasSize = DEFAULT_CANVAS_SIZE, maxIm
     });
   }, []);
 
-  const handleTextUpdate = useCallback((id: string, updates: Partial<TemplateText>) => {
+  const handleTextUpdate = useCallback((id: string, updates: Partial<EditorText>) => {
     setState((prevState) => ({
       ...prevState,
       texts: prevState.texts.map((text) => (text.id === id ? { ...text, ...updates } : text)),
@@ -158,7 +150,7 @@ export default function TemplateEditor({ canvasSize = DEFAULT_CANVAS_SIZE, maxIm
     setState((prevState) => {
       const position = findAvailablePosition([...prevState.images, ...prevState.texts]);
 
-      const newText: TemplateText = {
+      const newText: EditorText = {
         id: generateId('txt'),
         content: 'Neuer Text',
         position,
@@ -408,7 +400,7 @@ export default function TemplateEditor({ canvasSize = DEFAULT_CANVAS_SIZE, maxIm
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `template-export-${Date.now()}.${state.exportSettings.format}`;
+            a.download = `editor-export-${Date.now()}.${state.exportSettings.format}`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -470,7 +462,7 @@ export default function TemplateEditor({ canvasSize = DEFAULT_CANVAS_SIZE, maxIm
     <div className="space-y-6">
       <Card className="p-6">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-xl font-bold">Template Editor</h2>
+          <h2 className="text-xl font-bold">Editor</h2>
           <div className="flex gap-2">
             {(state.images.length > 0 || state.texts.length > 0) && (
               <>
@@ -487,7 +479,7 @@ export default function TemplateEditor({ canvasSize = DEFAULT_CANVAS_SIZE, maxIm
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           <div className="lg:col-span-2">
-            <TemplateCanvas
+            <EditorCanvas
               images={state.images}
               texts={state.texts}
               onImageUpdate={handleImageUpdate}
@@ -505,7 +497,7 @@ export default function TemplateEditor({ canvasSize = DEFAULT_CANVAS_SIZE, maxIm
           </div>
 
           <div className="space-y-4">
-            <TemplateImageUploader onFileSelect={handleFileSelect} maxFiles={state.maxImages} currentCount={state.images.length} />
+            <EditorImageUploader onFileSelect={handleFileSelect} maxFiles={state.maxImages} currentCount={state.images.length} />
 
             <TextAdder onAddText={handleAddText} />
 

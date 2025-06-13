@@ -2,14 +2,14 @@ import React, { useRef } from 'react';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
 
-interface TemplateImageUploaderProps {
+interface EditorImageUploaderProps {
   onFileSelect: (files: File[]) => void;
   maxFiles: number;
   currentCount: number;
   disabled?: boolean;
 }
 
-export default function TemplateImageUploader({ onFileSelect, maxFiles, currentCount, disabled = false }: TemplateImageUploaderProps) {
+export default function EditorImageUploader({ onFileSelect, maxFiles, currentCount, disabled = false }: EditorImageUploaderProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const remainingSlots = maxFiles - currentCount;
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { POPULAR_FONTS, PopularFont, TemplateText } from '../../types/template';
+import { EditorText, POPULAR_FONTS, PopularFont } from '../../types/editor';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
 import { Input } from '../ui/Input';
@@ -7,15 +7,15 @@ import { Label } from '../ui/Label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/Select';
 
 interface TextPropertiesPanelProps {
-  text: TemplateText;
-  onUpdate: (updates: Partial<TemplateText>) => void;
+  text: EditorText;
+  onUpdate: (updates: Partial<EditorText>) => void;
 }
 
 const FONT_SIZES = [12, 14, 16, 18, 20, 24, 28, 32, 36, 42, 48, 56, 64, 72];
 const TEXT_COLORS = ['#000000', '#333333', '#666666', '#999999', '#FFFFFF', '#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF'];
 
 export default function TextPropertiesPanel({ text, onUpdate }: TextPropertiesPanelProps) {
-  const handleStyleChange = (styleUpdates: Partial<TemplateText['style']>) => {
+  const handleStyleChange = (styleUpdates: Partial<EditorText['style']>) => {
     onUpdate({
       style: {
         ...text.style,

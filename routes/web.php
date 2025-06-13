@@ -7,7 +7,7 @@ use App\Http\Controllers\PromptController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'index')->name('home');
-Route::inertia('/template', 'template')->name('template');
+Route::inertia('/editor', 'editor')->name('editor');
 
 Route::post('/upload-image', [ImageController::class, 'store'])->middleware('auth')->name('image.upload');
 Route::get('/images/{filename}', [ImageController::class, 'show'])->name('image.show');

@@ -1,15 +1,15 @@
 import React, { useCallback, useRef, useState } from 'react';
-import { DragState, ResizeHandle, TemplatePosition, TemplateSize, TemplateText } from '../../types/template';
+import { DragState, EditorPosition, EditorSize, EditorText, ResizeHandle } from '../../types/editor';
 import { Button } from '../ui/Button';
 import ResizeHandles from './ResizeHandles';
 
 interface DraggableTextProps {
-  text: TemplateText;
+  text: EditorText;
   isSelected: boolean;
-  onUpdate: (updates: Partial<TemplateText>) => void;
+  onUpdate: (updates: Partial<EditorText>) => void;
   onSelect: () => void;
   onDelete: () => void;
-  canvasSize: TemplateSize;
+  canvasSize: EditorSize;
 }
 
 export default function DraggableText({ text, isSelected, onUpdate, onSelect, onDelete, canvasSize }: DraggableTextProps) {
@@ -23,7 +23,7 @@ export default function DraggableText({ text, isSelected, onUpdate, onSelect, on
   const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const constrainPosition = useCallback(
-    (pos: TemplatePosition): TemplatePosition => {
+    (pos: EditorPosition): EditorPosition => {
       const maxX = canvasSize.width - text.size.width;
       const maxY = canvasSize.height - text.size.height;
 
@@ -36,7 +36,7 @@ export default function DraggableText({ text, isSelected, onUpdate, onSelect, on
   );
 
   const constrainSize = useCallback(
-    (size: TemplateSize): TemplateSize => {
+    (size: EditorSize): EditorSize => {
       const minSize = 50;
       const maxWidth = canvasSize.width - text.position.x;
       const maxHeight = canvasSize.height - text.position.y;

@@ -1,19 +1,19 @@
-export interface TemplatePosition {
+export interface EditorPosition {
   x: number;
   y: number;
 }
 
-export interface TemplateSize {
+export interface EditorSize {
   width: number;
   height: number;
 }
 
-export interface TemplateImage {
+export interface EditorImage {
   id: string;
   file: File;
   url: string;
-  position: TemplatePosition;
-  size: TemplateSize;
+  position: EditorPosition;
+  size: EditorSize;
   zIndex: number;
 }
 
@@ -26,16 +26,16 @@ export interface TextStyle {
   textAlign: 'left' | 'center' | 'right';
 }
 
-export interface TemplateText {
+export interface EditorText {
   id: string;
   content: string;
-  position: TemplatePosition;
-  size: TemplateSize;
+  position: EditorPosition;
+  size: EditorSize;
   style: TextStyle;
   zIndex: number;
 }
 
-export type TemplateElement = TemplateImage | TemplateText;
+export type EditorElement = EditorImage | EditorText;
 
 export const POPULAR_FONTS = [
   'Arial',
@@ -55,9 +55,9 @@ export type PopularFont = (typeof POPULAR_FONTS)[number];
 export interface DragState {
   isDragging: boolean;
   dragType: 'move' | 'resize';
-  startPosition: TemplatePosition;
-  startSize?: TemplateSize;
-  offset: TemplatePosition;
+  startPosition: EditorPosition;
+  startSize?: EditorSize;
+  offset: EditorPosition;
   resizeHandle?: ResizeHandle;
   aspectRatio?: number;
 }
@@ -67,14 +67,14 @@ export interface ResizeHandle {
   cursor: string;
 }
 
-export interface TemplateCanvasProps {
-  images: TemplateImage[];
-  texts: TemplateText[];
-  onImageUpdate: (id: string, updates: Partial<TemplateImage>) => void;
+export interface EditorCanvasProps {
+  images: EditorImage[];
+  texts: EditorText[];
+  onImageUpdate: (id: string, updates: Partial<EditorImage>) => void;
   onImageDelete: (id: string) => void;
-  onTextUpdate: (id: string, updates: Partial<TemplateText>) => void;
+  onTextUpdate: (id: string, updates: Partial<EditorText>) => void;
   onTextDelete: (id: string) => void;
-  canvasSize: TemplateSize;
+  canvasSize: EditorSize;
 }
 
 export interface ExportResolution {
@@ -132,9 +132,9 @@ export interface ExportSettings {
   pixelRatio?: number; // For retina displays
 }
 
-export interface TemplateEditorState {
-  images: TemplateImage[];
-  texts: TemplateText[];
+export interface EditorState {
+  images: EditorImage[];
+  texts: EditorText[];
   selectedElementId: string | null;
   selectedElementType: 'image' | 'text' | null;
   maxImages: number;

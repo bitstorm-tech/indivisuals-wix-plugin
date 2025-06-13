@@ -1,4 +1,4 @@
-import { ResizeHandle } from '../../types/template';
+import { ResizeHandle } from '../../types/editor';
 
 interface ResizeHandlesProps {
   onResizeStart: (handle: ResizeHandle, event: React.MouseEvent) => void;
