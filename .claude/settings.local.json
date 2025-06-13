@@ -12,7 +12,8 @@
       "Bash(ls:*)",
       "Bash(git mv:*)",
       "Bash(find:*)",
-      "Bash(true)"
+      "Bash(true)",
+      "Bash(bun add:*)"
     ]
   },
   "enableAllProjectMcpServers": false

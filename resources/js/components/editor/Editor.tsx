@@ -1,9 +1,11 @@
+import { ChevronDown, Download, Image, Info, Palette, Type } from 'lucide-react';
 import React, { useCallback, useState } from 'react';
 import { EditorImage, EditorSize, EditorState, EditorText, EXPORT_RESOLUTIONS, ExportResolutionId, ExportSettings } from '../../types/editor';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
 import { Label } from '../ui/Label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/Select';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '../ui/dropdown-menu';
 import EditorCanvas from './EditorCanvas';
 import EditorImageUploader from './EditorImageUploader';
 import TextAdder from './TextAdder';
@@ -477,152 +479,215 @@ export default function Editor({ canvasSize = DEFAULT_CANVAS_SIZE, maxImages = 3
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-2">
-            <EditorCanvas
-              images={state.images}
-              texts={state.texts}
-              onImageUpdate={handleImageUpdate}
-              onImageDelete={handleImageDelete}
-              onTextUpdate={handleTextUpdate}
-              onTextDelete={handleTextDelete}
-              onElementSelect={handleElementSelect}
-              selectedElementId={state.selectedElementId}
-              selectedElementType={state.selectedElementType}
-              canvasSize={canvasSize}
-              onDrop={handleCanvasDrop}
-              onDragOver={handleCanvasDragOver}
-              backgroundColor={state.backgroundColor}
-            />
+        <div className="space-y-6">
+          <div className="flex flex-wrap gap-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <Image className="mr-2 h-4 w-4" />
+                  Bilder hinzufügen
+                  <ChevronDown className="ml-2 h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-80" align="start">
+                <div className="p-2">
+                  <EditorImageUploader onFileSelect={handleFileSelect} maxFiles={state.maxImages} currentCount={state.images.length} />
+                </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <Type className="mr-2 h-4 w-4" />
+                  Text hinzufügen
+                  <ChevronDown className="ml-2 h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-80" align="start">
+                <div className="p-2">
+                  <TextAdder onAddText={handleAddText} />
+                </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <Palette className="mr-2 h-4 w-4" />
+                  Hintergrundfarbe
+                  <ChevronDown className="ml-2 h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-80" align="start">
+                <div className="p-4">
+                  <h4 className="mb-3 font-medium">Hintergrundfarbe</h4>
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="color"
+                      value={state.backgroundColor}
+                      onChange={(e) => handleBackgroundColorChange(e.target.value)}
+                      className="h-10 w-20 cursor-pointer rounded border border-gray-300"
+                    />
+                    <span className="text-sm text-gray-600">{state.backgroundColor.toUpperCase()}</span>
+                  </div>
+                </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <Download className="mr-2 h-4 w-4" />
+                  Export Einstellungen
+                  <ChevronDown className="ml-2 h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-80" align="start">
+                <div className="p-4">
+                  <h4 className="mb-3 font-medium">Export Einstellungen</h4>
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="export-resolution" className="mb-2 block text-sm font-medium">
+                        Auflösung
+                      </Label>
+                      <Select
+                        value={state.exportSettings.resolution}
+                        onValueChange={(value: ExportResolutionId) => handleExportSettingsChange({ resolution: value })}
+                      >
+                        <SelectTrigger id="export-resolution" className="w-full">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {EXPORT_RESOLUTIONS.map((res) => (
+                            <SelectItem key={res.id} value={res.id}>
+                              <div className="flex flex-col">
+                                <span>{res.name}</span>
+                                {res.description && <span className="text-xs text-gray-500">{res.description}</span>}
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="export-format" className="mb-2 block text-sm font-medium">
+                        Format
+                      </Label>
+                      <Select
+                        value={state.exportSettings.format}
+                        onValueChange={(value: 'png' | 'jpeg' | 'webp') => handleExportSettingsChange({ format: value })}
+                      >
+                        <SelectTrigger id="export-format" className="w-full">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="png">PNG (verlustfrei)</SelectItem>
+                          <SelectItem value="jpeg">JPEG (komprimiert)</SelectItem>
+                          <SelectItem value="webp">WebP (modern)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {state.exportSettings.format !== 'png' && (
+                      <div>
+                        <Label htmlFor="export-quality" className="mb-2 block text-sm font-medium">
+                          Qualität: {Math.round(state.exportSettings.quality * 100)}%
+                        </Label>
+                        <input
+                          id="export-quality"
+                          type="range"
+                          min="10"
+                          max="100"
+                          value={state.exportSettings.quality * 100}
+                          onChange={(e) => handleExportSettingsChange({ quality: parseInt(e.target.value) / 100 })}
+                          className="w-full"
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <Info className="mr-2 h-4 w-4" />
+                  Anleitung
+                  <ChevronDown className="ml-2 h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-80" align="start">
+                <div className="p-4">
+                  <h4 className="mb-3 font-medium">Anleitung</h4>
+                  <div className="space-y-1 text-sm text-gray-600">
+                    <div>1. Bilder per Drag & Drop oder Upload hinzufügen</div>
+                    <div>2. Text mit dem "Text erstellen" Button hinzufügen</div>
+                    <div>3. Elemente durch Anklicken auswählen</div>
+                    <div>4. Ausgewählte Elemente verschieben und skalieren</div>
+                    <div>5. Text per Doppelklick bearbeiten</div>
+                    <div>6. Mit Exportieren das Ergebnis speichern</div>
+                  </div>
+                </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
-          <div className="space-y-4">
-            <EditorImageUploader onFileSelect={handleFileSelect} maxFiles={state.maxImages} currentCount={state.images.length} />
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+            <div className="lg:col-span-2">
+              <EditorCanvas
+                images={state.images}
+                texts={state.texts}
+                onImageUpdate={handleImageUpdate}
+                onImageDelete={handleImageDelete}
+                onTextUpdate={handleTextUpdate}
+                onTextDelete={handleTextDelete}
+                onElementSelect={handleElementSelect}
+                selectedElementId={state.selectedElementId}
+                selectedElementType={state.selectedElementType}
+                canvasSize={canvasSize}
+                onDrop={handleCanvasDrop}
+                onDragOver={handleCanvasDragOver}
+                backgroundColor={state.backgroundColor}
+              />
+            </div>
 
-            <TextAdder onAddText={handleAddText} />
+            <div className="space-y-4">
+              {state.selectedElementId && state.selectedElementType === 'image' && (
+                <Card className="p-4">
+                  <h4 className="mb-3 font-medium">Bild Eigenschaften</h4>
+                  <div className="space-y-2 text-sm">
+                    {(() => {
+                      const selectedImage = state.images.find((img) => img.id === state.selectedElementId);
+                      if (!selectedImage) return null;
 
-            <Card className="p-4">
-              <h4 className="mb-3 font-medium">Hintergrundfarbe</h4>
-              <div className="flex items-center gap-3">
-                <input
-                  type="color"
-                  value={state.backgroundColor}
-                  onChange={(e) => handleBackgroundColorChange(e.target.value)}
-                  className="h-10 w-20 cursor-pointer rounded border border-gray-300"
-                />
-                <span className="text-sm text-gray-600">{state.backgroundColor.toUpperCase()}</span>
-              </div>
-            </Card>
-
-            <Card className="p-4">
-              <h4 className="mb-3 font-medium">Export Einstellungen</h4>
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="export-resolution" className="mb-2 block text-sm font-medium">
-                    Auflösung
-                  </Label>
-                  <Select
-                    value={state.exportSettings.resolution}
-                    onValueChange={(value: ExportResolutionId) => handleExportSettingsChange({ resolution: value })}
-                  >
-                    <SelectTrigger id="export-resolution" className="w-full">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {EXPORT_RESOLUTIONS.map((res) => (
-                        <SelectItem key={res.id} value={res.id}>
-                          <div className="flex flex-col">
-                            <span>{res.name}</span>
-                            {res.description && <span className="text-xs text-gray-500">{res.description}</span>}
+                      return (
+                        <div className="space-y-1">
+                          <div>
+                            Position: {Math.round(selectedImage.position.x)}, {Math.round(selectedImage.position.y)}
                           </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <Label htmlFor="export-format" className="mb-2 block text-sm font-medium">
-                    Format
-                  </Label>
-                  <Select
-                    value={state.exportSettings.format}
-                    onValueChange={(value: 'png' | 'jpeg' | 'webp') => handleExportSettingsChange({ format: value })}
-                  >
-                    <SelectTrigger id="export-format" className="w-full">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="png">PNG (verlustfrei)</SelectItem>
-                      <SelectItem value="jpeg">JPEG (komprimiert)</SelectItem>
-                      <SelectItem value="webp">WebP (modern)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {state.exportSettings.format !== 'png' && (
-                  <div>
-                    <Label htmlFor="export-quality" className="mb-2 block text-sm font-medium">
-                      Qualität: {Math.round(state.exportSettings.quality * 100)}%
-                    </Label>
-                    <input
-                      id="export-quality"
-                      type="range"
-                      min="10"
-                      max="100"
-                      value={state.exportSettings.quality * 100}
-                      onChange={(e) => handleExportSettingsChange({ quality: parseInt(e.target.value) / 100 })}
-                      className="w-full"
-                    />
+                          <div>
+                            Größe: {Math.round(selectedImage.size.width)} × {Math.round(selectedImage.size.height)}
+                          </div>
+                          <div>Datei: {selectedImage.file.name}</div>
+                        </div>
+                      );
+                    })()}
                   </div>
-                )}
-              </div>
-            </Card>
+                </Card>
+              )}
 
-            {state.selectedElementId && state.selectedElementType === 'image' && (
-              <Card className="p-4">
-                <h4 className="mb-3 font-medium">Bild Eigenschaften</h4>
-                <div className="space-y-2 text-sm">
-                  {(() => {
-                    const selectedImage = state.images.find((img) => img.id === state.selectedElementId);
-                    if (!selectedImage) return null;
-
-                    return (
-                      <div className="space-y-1">
-                        <div>
-                          Position: {Math.round(selectedImage.position.x)}, {Math.round(selectedImage.position.y)}
-                        </div>
-                        <div>
-                          Größe: {Math.round(selectedImage.size.width)} × {Math.round(selectedImage.size.height)}
-                        </div>
-                        <div>Datei: {selectedImage.file.name}</div>
-                      </div>
-                    );
-                  })()}
-                </div>
-              </Card>
-            )}
-
-            {state.selectedElementId &&
-              state.selectedElementType === 'text' &&
-              (() => {
-                const selectedText = state.texts.find((text) => text.id === state.selectedElementId);
-                return selectedText ? (
-                  <TextPropertiesPanel text={selectedText} onUpdate={(updates) => handleTextUpdate(selectedText.id, updates)} />
-                ) : null;
-              })()}
-
-            <Card className="p-4">
-              <h4 className="mb-3 font-medium">Anleitung</h4>
-              <div className="space-y-1 text-sm text-gray-600">
-                <div>1. Bilder per Drag & Drop oder Upload hinzufügen</div>
-                <div>2. Text mit dem "Text erstellen" Button hinzufügen</div>
-                <div>3. Elemente durch Anklicken auswählen</div>
-                <div>4. Ausgewählte Elemente verschieben und skalieren</div>
-                <div>5. Text per Doppelklick bearbeiten</div>
-                <div>6. Mit Exportieren das Ergebnis speichern</div>
-              </div>
-            </Card>
+              {state.selectedElementId &&
+                state.selectedElementType === 'text' &&
+                (() => {
+                  const selectedText = state.texts.find((text) => text.id === state.selectedElementId);
+                  return selectedText ? (
+                    <TextPropertiesPanel text={selectedText} onUpdate={(updates) => handleTextUpdate(selectedText.id, updates)} />
+                  ) : null;
+                })()}
+            </div>
           </div>
         </div>
       </Card>
