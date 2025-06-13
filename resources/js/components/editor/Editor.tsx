@@ -6,7 +6,7 @@ import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
 import { Label } from '../ui/Label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/Select';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '../ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '../ui/DropdownMenu';
 import EditorCanvas from './EditorCanvas';
 import EditorImageUploader from './EditorImageUploader';
 import TextAdder from './TextAdder';

@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/Button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
-import { Progress } from '@/components/ui/progress';
+import { Progress } from '@/components/ui/Progress';
 import { useWizardSounds } from '@/hooks/useWizardSounds';
 import { cn } from '@/lib/utils';
 import { AnimatePresence, motion } from 'framer-motion';
