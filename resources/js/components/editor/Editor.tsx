@@ -177,19 +177,6 @@ export default function Editor({ canvasSize = DEFAULT_CANVAS_SIZE, maxImages = 3
     });
   }, [findAvailablePosition]);
 
-  const handleClearAll = useCallback(() => {
-    setState((prevState) => {
-      prevState.images.forEach((img) => URL.revokeObjectURL(img.url));
-      return {
-        ...prevState,
-        images: [],
-        texts: [],
-        selectedElementId: null,
-        selectedElementType: null,
-      };
-    });
-  }, []);
-
   const handleBackgroundColorChange = useCallback((color: string) => {
     setState((prevState) => ({
       ...prevState,
@@ -464,7 +451,7 @@ export default function Editor({ canvasSize = DEFAULT_CANVAS_SIZE, maxImages = 3
     <div className="space-y-6">
       <Card className="p-6">
         <div className="space-y-6">
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm">
@@ -591,6 +578,10 @@ export default function Editor({ canvasSize = DEFAULT_CANVAS_SIZE, maxImages = 3
                       </div>
                     )}
                   </div>
+
+                  <Button className="mt-4 w-full" onClick={handleExport} disabled={state.images.length === 0 && state.texts.length === 0}>
+                    Exportieren
+                  </Button>
                 </div>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -612,26 +603,23 @@ export default function Editor({ canvasSize = DEFAULT_CANVAS_SIZE, maxImages = 3
                     <div>3. Elemente durch Anklicken auswählen</div>
                     <div>4. Ausgewählte Elemente verschieben und skalieren</div>
                     <div>5. Text per Doppelklick bearbeiten</div>
-                    <div>6. Mit Exportieren das Ergebnis speichern</div>
+                    <div>6. Export über "Export Einstellungen" → "Exportieren"</div>
+                  </div>
+
+                  <div className="mt-4 space-y-1 text-sm text-gray-600">
+                    <div className="font-medium">💡 Tipps:</div>
+                    <div>• Klicken Sie auf Elemente zum Auswählen</div>
+                    <div>• Ziehen Sie Elemente zum Verschieben</div>
+                    <div>• Ziehen Sie an den Ecken zum Größe ändern</div>
+                    <div>• Doppelklick auf Text zum Bearbeiten</div>
+                    <div>• Klicken Sie auf × zum Löschen</div>
                   </div>
                 </div>
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <div className="ml-auto flex items-center gap-2">
-              <span className="text-sm text-gray-500">
-                {state.images.length}/{state.maxImages} Bilder • {state.texts.length} Texte
-              </span>
-              {(state.images.length > 0 || state.texts.length > 0) && (
-                <>
-                  <Button variant="outline" size="sm" onClick={handleClearAll}>
-                    Alle löschen
-                  </Button>
-                  <Button size="sm" onClick={handleExport}>
-                    Exportieren
-                  </Button>
-                </>
-              )}
+            <div className="ml-auto text-sm text-gray-500">
+              {state.images.length}/{state.maxImages} Bilder • {state.texts.length} Texte
             </div>
           </div>
 

@@ -132,17 +132,6 @@ export default function EditorCanvas({
           />
         ))}
       </div>
-
-      {(images.length > 0 || texts.length > 0) && (
-        <div className="space-y-1 text-xs text-gray-500">
-          <div>💡 Tipps:</div>
-          <div>• Klicken Sie auf Elemente zum Auswählen</div>
-          <div>• Ziehen Sie Elemente zum Verschieben</div>
-          <div>• Ziehen Sie an den Ecken zum Größe ändern</div>
-          <div>• Doppelklick auf Text zum Bearbeiten</div>
-          <div>• Klicken Sie auf × zum Löschen</div>
-        </div>
-      )}
     </div>
   );
 }
