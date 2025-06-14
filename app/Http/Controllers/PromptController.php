@@ -122,13 +122,10 @@ class PromptController extends Controller
             'all_data' => $request->all(),
         ]);
 
-        // Handle removal of example image
         if ($request->boolean('remove_example_image')) {
             $prompt->example_image = null;
             $prompt->example_image_mime_type = null;
-        }
-        // Handle new example image upload
-        elseif ($request->hasFile('example_image')) {
+        } elseif ($request->hasFile('example_image')) {
             Log::info('Uploading example image', [
                 'prompt_id' => $prompt->id,
                 'file_size' => $request->file('example_image')->getSize(),
@@ -178,7 +175,6 @@ class PromptController extends Controller
         }
 
         return response($prompt->example_image)
-            ->header('Content-Type', $prompt->example_image_mime_type)
-            ->header('Cache-Control', 'public, max-age=86400'); // Cache for 1 day
+            ->header('Content-Type', $prompt->example_image_mime_type);
     }
 }
