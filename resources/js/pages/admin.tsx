@@ -13,6 +13,7 @@ interface Prompt {
   category: string;
   prompt: string;
   active: boolean;
+  has_example_image?: boolean;
 }
 
 interface User {
@@ -37,11 +38,12 @@ export default function Admin({ prompts, auth }: AdminProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const [promptToDelete, setPromptToDelete] = useState<number | undefined>(undefined);
   const [isNewPromptDialogOpen, setIsNewPromptDialogOpen] = useState<boolean>(false);
-  const [newPrompt, setNewPrompt] = useState<{ name: string; category: string; prompt: string; active: boolean }>({
+  const [newPrompt, setNewPrompt] = useState<{ name: string; category: string; prompt: string; active: boolean; example_image?: File | null }>({
     name: '',
     category: '',
     prompt: '',
     active: true,
+    example_image: null,
   });
 
   useEffect(() => {
@@ -161,7 +163,7 @@ export default function Admin({ prompts, auth }: AdminProps) {
     setIsNewPromptDialogOpen(true);
   };
 
-  const handleNewPromptInputChange = (field: keyof typeof newPrompt, value: string | boolean) => {
+  const handleNewPromptInputChange = (field: keyof typeof newPrompt, value: string | boolean | File | null) => {
     setNewPrompt((prev) => ({
       ...prev,
       [field]: value,
@@ -174,23 +176,34 @@ export default function Admin({ prompts, auth }: AdminProps) {
     }
 
     try {
-      await fetch('/admin/prompts', {
+      const formData = new FormData();
+      formData.append('name', newPrompt.name);
+      formData.append('category', newPrompt.category);
+      formData.append('prompt', newPrompt.prompt);
+      formData.append('active', newPrompt.active.toString());
+
+      if (newPrompt.example_image) {
+        formData.append('example_image', newPrompt.example_image);
+      }
+
+      const response = await fetch('/admin/prompts', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
           'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
         },
-        body: JSON.stringify({
-          name: newPrompt.name,
-          category: newPrompt.category,
-          prompt: newPrompt.prompt,
-          active: newPrompt.active,
-        }),
+        body: formData,
       });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Server error:', errorData);
+        alert('Error creating prompt: ' + (errorData.message || 'Unknown error'));
+        return;
+      }
 
       router.reload({ only: ['prompts'] });
       setIsNewPromptDialogOpen(false);
-      setNewPrompt({ name: '', category: '', prompt: '', active: true });
+      setNewPrompt({ name: '', category: '', prompt: '', active: true, example_image: null });
     } catch (error) {
       console.error('Error creating prompt:', error);
     }
@@ -198,7 +211,7 @@ export default function Admin({ prompts, auth }: AdminProps) {
 
   const handleCancelNewPrompt = () => {
     setIsNewPromptDialogOpen(false);
-    setNewPrompt({ name: '', category: '', prompt: '', active: true });
+    setNewPrompt({ name: '', category: '', prompt: '', active: true, example_image: null });
   };
 
   return (

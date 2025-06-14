@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Prompt;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 
 class PromptController extends Controller
 {
@@ -22,6 +23,11 @@ class PromptController extends Controller
 
         $prompts = $query->orderBy('category')->orderBy('name')->get();
 
+        // Add virtual field to indicate if prompt has example image
+        $prompts->each(function ($prompt) {
+            $prompt->has_example_image = $prompt->hasExampleImage();
+        });
+
         return response()->json($prompts);
     }
 
@@ -31,16 +37,30 @@ class PromptController extends Controller
             'name' => 'required|string|max:255',
             'category' => 'required|string|max:255',
             'prompt' => 'required|string',
-            'active' => 'boolean',
+            'active' => 'required|in:true,false',
+            'example_image' => 'nullable|image|max:5120', // 5MB max
         ]);
+        
+        // Convert active string to boolean
+        $validated['active'] = $validated['active'] === 'true';
 
-        $prompt = Prompt::create($validated);
+        // Don't pass the file to the constructor
+        $promptData = collect($validated)->except('example_image')->toArray();
+        $prompt = new Prompt($promptData);
+
+        if ($request->hasFile('example_image')) {
+            $prompt->setExampleImageFromFile($request->file('example_image'));
+        }
+
+        $prompt->save();
+        $prompt->has_example_image = $prompt->hasExampleImage();
 
         return response()->json($prompt, 201);
     }
 
     public function show(Prompt $prompt): JsonResponse
     {
+        $prompt->has_example_image = $prompt->hasExampleImage();
         return response()->json($prompt);
     }
 
@@ -51,9 +71,25 @@ class PromptController extends Controller
             'category' => 'sometimes|string|max:255',
             'prompt' => 'sometimes|string',
             'active' => 'boolean',
+            'example_image' => 'nullable|image|max:5120', // 5MB max
+            'remove_example_image' => 'boolean',
         ]);
 
-        $prompt->update($validated);
+        // Handle removal of example image
+        if ($request->boolean('remove_example_image')) {
+            $prompt->example_image = null;
+            $prompt->example_image_mime_type = null;
+        }
+        // Handle new example image upload
+        elseif ($request->hasFile('example_image')) {
+            $prompt->setExampleImageFromFile($request->file('example_image'));
+        }
+
+        // Update other fields
+        $prompt->fill($validated);
+        $prompt->save();
+
+        $prompt->has_example_image = $prompt->hasExampleImage();
 
         return response()->json($prompt);
     }
@@ -73,5 +109,16 @@ class PromptController extends Controller
             ->pluck('category');
 
         return response()->json($categories);
+    }
+
+    public function exampleImage(Prompt $prompt): Response
+    {
+        if (!$prompt->hasExampleImage()) {
+            abort(404, 'Prompt has no example image');
+        }
+
+        return response($prompt->example_image)
+            ->header('Content-Type', $prompt->example_image_mime_type)
+            ->header('Cache-Control', 'public, max-age=86400'); // Cache for 1 day
     }
 }

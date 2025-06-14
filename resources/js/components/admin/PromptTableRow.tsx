@@ -11,6 +11,7 @@ interface Prompt {
   category: string;
   prompt: string;
   active: boolean;
+  has_example_image?: boolean;
 }
 
 interface PromptTableRowProps {
@@ -78,6 +79,13 @@ export default function PromptTableRow({
           </Select>
         ) : (
           <span>{prompt.category}</span>
+        )}
+      </TableCell>
+      <TableCell>
+        {prompt.has_example_image ? (
+          <img src={`/prompts/${prompt.id}/example-image`} alt="Example" className="h-16 w-16 rounded object-cover" loading="lazy" />
+        ) : (
+          <span className="text-sm text-gray-500">None</span>
         )}
       </TableCell>
       <TableCell>

@@ -7,6 +7,7 @@ interface Prompt {
   category: string;
   prompt: string;
   active: boolean;
+  has_example_image?: boolean;
 }
 
 interface PromptTableProps {
@@ -44,6 +45,7 @@ export default function PromptTable({
             <TableHead>Active</TableHead>
             <TableHead>Name</TableHead>
             <TableHead>Category</TableHead>
+            <TableHead>Example</TableHead>
             <TableHead>Prompt</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>

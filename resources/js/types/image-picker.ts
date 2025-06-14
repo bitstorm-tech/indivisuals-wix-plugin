@@ -11,4 +11,6 @@ export interface Prompt {
   category: string;
   prompt: string;
   active: boolean;
+  has_example_image?: boolean;
+  example_image_mime_type?: string;
 }
