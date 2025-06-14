@@ -13,13 +13,12 @@ const WizardProgress: React.FC<WizardProgressProps> = ({ currentStep, progress }
   const steps = Object.entries(STEP_LABELS) as Array<[WizardStep, string]>;
 
   return (
-    <div className="relative">
-      <Progress value={progress} className="h-2" />
-      <div className="absolute -top-1 flex w-full justify-between">
+    <div className="relative space-y-3">
+      <div className="flex w-full justify-between px-1">
         {steps.map(([step, label]) => (
           <motion.div
             key={step}
-            className={cn('text-xs font-medium', STEP_INDEX[currentStep] >= STEP_INDEX[step] ? 'text-purple-600' : 'text-gray-400')}
+            className={cn('text-sm font-medium whitespace-nowrap', STEP_INDEX[currentStep] >= STEP_INDEX[step] ? 'text-purple-600' : 'text-gray-400')}
             initial={{ scale: 0.8 }}
             animate={{ scale: STEP_INDEX[currentStep] >= STEP_INDEX[step] ? 1.1 : 0.9 }}
           >
@@ -27,6 +26,7 @@ const WizardProgress: React.FC<WizardProgressProps> = ({ currentStep, progress }
           </motion.div>
         ))}
       </div>
+      <Progress value={progress} className="h-3" />
     </div>
   );
 };
