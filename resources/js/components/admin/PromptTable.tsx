@@ -12,31 +12,12 @@ interface Prompt {
 
 interface PromptTableProps {
   prompts: Prompt[];
-  editingPrompts: Record<number, Prompt>;
-  categories: string[];
-  isEditing: (promptId: number) => boolean;
-  hasChanges: (prompt: Prompt) => boolean;
   onEdit: (prompt: Prompt) => void;
-  onCancel: (promptId: number) => void;
-  onSave: (promptId: number) => void;
   onDelete: (promptId: number) => void;
   onTest: (promptId: number) => void;
-  onInputChange: (promptId: number, field: keyof Prompt, value: string | boolean) => void;
 }
 
-export default function PromptTable({
-  prompts,
-  editingPrompts,
-  categories,
-  isEditing,
-  hasChanges,
-  onEdit,
-  onCancel,
-  onSave,
-  onDelete,
-  onTest,
-  onInputChange,
-}: PromptTableProps) {
+export default function PromptTable({ prompts, onEdit, onDelete, onTest }: PromptTableProps) {
   return (
     <div className="rounded-md border">
       <Table>
@@ -52,20 +33,7 @@ export default function PromptTable({
         </TableHeader>
         <TableBody>
           {prompts.map((prompt) => (
-            <PromptTableRow
-              key={prompt.id}
-              prompt={prompt}
-              isEditing={isEditing(prompt.id)}
-              hasChanges={hasChanges(prompt)}
-              editedPrompt={editingPrompts[prompt.id]}
-              categories={categories}
-              onEdit={onEdit}
-              onCancel={onCancel}
-              onSave={onSave}
-              onDelete={onDelete}
-              onTest={onTest}
-              onInputChange={onInputChange}
-            />
+            <PromptTableRow key={prompt.id} prompt={prompt} onEdit={onEdit} onDelete={onDelete} onTest={onTest} />
           ))}
         </TableBody>
       </Table>

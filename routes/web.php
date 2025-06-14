@@ -28,7 +28,4 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 // Protected admin routes
 Route::middleware('auth')->group(function () {
     Route::get('/admin', [AdminController::class, 'dashboard'])->name('admin.dashboard');
-    Route::post('/admin/prompts', [PromptController::class, 'store'])->name('admin.prompts.store');
-    Route::put('/admin/prompts/{prompt}', [AdminController::class, 'updatePrompt'])->name('admin.prompts.update');
-    Route::delete('/admin/prompts/{prompt}', [AdminController::class, 'deletePrompt'])->name('admin.prompts.delete');
 });

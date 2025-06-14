@@ -83,9 +83,8 @@ This is a Laravel + Inertia.js + React application focused on AI-powered image p
 
 ### Development Notes
 
-- Use context7 to get the latest documentation
+- ALWAYS read the latest documentation from context7
 - Uses SQLite for simplicity in development
-- German UI text in image picker component
 - Concurrent development setup runs all services simultaneously
 - Private image storage requires route-based access control
 - Use shadcn-ui and Tailwind CSS for the styling in the frontend
@@ -96,5 +95,6 @@ This is a Laravel + Inertia.js + React application focused on AI-powered image p
 - Use PHP nullsafe syntax (`?->`) whereever it is usefull
 - Check for compiler errors with `bun run types` at the end
 - Check for linter errors with `bun run lint` at the end
-- Format all files with `prettier` at the very end
+- Format all changed files (except php) with `prettier` at the very end
+- Use `Laravel Pint` after changing php files
 - Use `PascalCase` for react components file names
