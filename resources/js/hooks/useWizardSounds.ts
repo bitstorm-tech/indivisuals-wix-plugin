@@ -11,7 +11,7 @@ export function useWizardSounds(): SoundEffects {
   const audioContext = useRef<AudioContext | null>(null);
 
   useEffect(() => {
-    audioContext.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+    audioContext.current = new (window.AudioContext || (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext)();
 
     return () => {
       audioContext.current?.close();

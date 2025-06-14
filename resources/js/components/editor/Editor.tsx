@@ -1,12 +1,12 @@
-import { ChevronDown, Download, Image, Info, Palette } from 'lucide-react';
+import { ChevronDown, Download, Info, Palette } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { EditorImage, EditorSize, EditorState, EditorText, EXPORT_RESOLUTIONS, ExportResolutionId, ExportSettings } from '../../types/editor';
-import ImageWizardDialog from '../ImageWizardDialog';
+import ImageWizardDialog from '../image-wizard-dialog/ImageWizardDialog';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '../ui/DropdownMenu';
 import { Label } from '../ui/Label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/Select';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '../ui/DropdownMenu';
 import EditorCanvas from './EditorCanvas';
 import EditorImageUploader from './EditorImageUploader';
 import TextAdder from './TextAdder';
@@ -627,7 +627,7 @@ export default function Editor({ canvasSize = DEFAULT_CANVAS_SIZE, maxImages = 3
         isOpen={isWizardOpen}
         onClose={() => setIsWizardOpen(false)}
         prompts={prompts}
-        onImageGenerated={async (imageUrl, originalFile) => {
+        onImageGenerated={async (imageUrl) => {
           try {
             // Fetch the generated image as a file
             const response = await fetch(imageUrl);
