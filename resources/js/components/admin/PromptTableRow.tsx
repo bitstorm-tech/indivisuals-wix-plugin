@@ -31,7 +31,7 @@ export default function PromptTableRow({ prompt, onEdit, onDelete, onTest }: Pro
       </TableCell>
       <TableCell>
         {prompt.has_example_image ? (
-          <img src={`/prompts/${prompt.id}/example-image`} alt="Example" className="h-16 w-16 rounded object-cover" loading="lazy" />
+          <img src={`/prompts/${prompt.id}/example-image?t=${Date.now()}`} alt="Example" className="h-16 w-16 rounded object-cover" loading="lazy" />
         ) : (
           <span className="text-sm text-gray-500">None</span>
         )}
