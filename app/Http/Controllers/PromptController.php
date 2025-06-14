@@ -76,34 +76,14 @@ class PromptController extends Controller
 
     public function update(Request $request, Prompt $prompt): JsonResponse|RedirectResponse
     {
-        try {
-            // Log request details before validation
-            Log::info('Update request before validation', [
-                'prompt_id' => $prompt->id,
-                'method' => $request->method(),
-                'content_type' => $request->header('Content-Type'),
-                'has_file' => $request->hasFile('example_image'),
-                'all_data' => $request->all(),
-                'files' => $request->allFiles(),
-            ]);
-
-            $validated = $request->validate([
-                'name' => 'sometimes|required|string|max:255',
-                'category' => 'sometimes|required|string|max:255',
-                'prompt' => 'sometimes|required|string',
-                'active' => 'sometimes|required|boolean',
-                'example_image' => 'nullable|image|max:5120', // 5MB max
-                'remove_example_image' => 'sometimes|boolean',
-            ]);
-
-            Log::info('Validation passed: '.print_r($request->all(), true));
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            Log::error('Validation failed', [
-                'errors' => $e->errors(),
-                'message' => $e->getMessage(),
-            ]);
-            throw $e;
-        }
+        $validated = $request->validate([
+            'name' => 'sometimes|required|string|max:255',
+            'category' => 'sometimes|required|string|max:255',
+            'prompt' => 'sometimes|required|string',
+            'active' => 'sometimes|required|boolean',
+            'example_image' => 'nullable|image|max:5120', // 5MB max
+            'remove_example_image' => 'sometimes|boolean',
+        ]);
 
         // Convert string boolean to actual boolean only if it's a string (from FormData)
         if (isset($validated['active']) && is_string($validated['active'])) {
@@ -113,14 +93,6 @@ class PromptController extends Controller
         // Update other fields (except example_image which is handled separately)
         $dataToUpdate = collect($validated)->except(['example_image', 'remove_example_image'])->toArray();
         $prompt->fill($dataToUpdate);
-
-        // Debug: Log all request data
-        Log::info('Update request data', [
-            'prompt_id' => $prompt->id,
-            'has_file' => $request->hasFile('example_image'),
-            'files' => $request->allFiles(),
-            'all_data' => $request->all(),
-        ]);
 
         if ($request->boolean('remove_example_image')) {
             $prompt->example_image = null;
