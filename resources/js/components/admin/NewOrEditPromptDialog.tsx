@@ -304,8 +304,8 @@ export default function NewOrEditPromptDialog({ isOpen, editingPrompt, categorie
                       </div>
                     </>
                   ) : (
-                    <div className="relative h-32 w-32">
-                      <img src={imagePreview} alt="Preview" className="h-full w-full rounded object-cover" />
+                    <div className="relative">
+                      <img src={imagePreview} alt="Preview" className="h-32 w-auto rounded object-cover" style={{ aspectRatio: '16/9' }} />
                       {editingPrompt && editingPrompt.has_example_image && <p className="mt-1 text-xs text-gray-500">Current image</p>}
                     </div>
                   )}
