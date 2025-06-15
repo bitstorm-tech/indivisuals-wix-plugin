@@ -1,7 +1,7 @@
 import { ChevronDown, Download, Info, Palette } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { EditorImage, EditorSize, EditorState, EditorText, EXPORT_RESOLUTIONS, ExportResolutionId, ExportSettings } from '../../types/editor';
-import { Prompt } from '../image-wizard-dialog/constants';
+import { Prompt } from '../../types/prompt';
 import ImageWizardDialog from '../image-wizard-dialog/ImageWizardDialog';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';

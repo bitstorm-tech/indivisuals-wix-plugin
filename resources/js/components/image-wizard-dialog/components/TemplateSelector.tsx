@@ -1,14 +1,7 @@
+import { Prompt } from '@/types/prompt';
 import { motion } from 'framer-motion';
 import { Sparkles } from 'lucide-react';
 import React from 'react';
-
-interface Prompt {
-  id: number;
-  name: string;
-  category: string;
-  prompt: string;
-  example_image_url?: string;
-}
 
 interface TemplateSelectorProps {
   onSelectTemplate: (templateId: number) => void;

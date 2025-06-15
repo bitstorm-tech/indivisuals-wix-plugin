@@ -17,13 +17,7 @@ import WizardMascot from './components/WizardMascot';
 import WizardProgress from './components/WizardProgress';
 
 // Types
-interface Prompt {
-  id: number;
-  name: string;
-  category: string;
-  prompt: string;
-  example_image_url?: string;
-}
+import { Prompt } from '@/types/prompt';
 
 interface ImageWizardDialogProps {
   isOpen: boolean;

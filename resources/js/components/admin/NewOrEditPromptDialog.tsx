@@ -4,19 +4,11 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '
 import { Input } from '@/components/ui/Input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
 import { Textarea } from '@/components/ui/Textarea';
+import { Prompt } from '@/types/prompt';
 import { router, useForm } from '@inertiajs/react';
 import { useEffect, useRef, useState } from 'react';
 import ReactCrop, { Crop, PixelCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
-
-interface Prompt {
-  id: number;
-  name: string;
-  category: string;
-  prompt: string;
-  active: boolean;
-  example_image_url?: string;
-}
 
 interface NewOrEditPromptDialogProps {
   isOpen: boolean;
@@ -74,7 +66,7 @@ export default function NewOrEditPromptDialog({ isOpen, editingPrompt, categorie
           name: editingPrompt.name,
           category: editingPrompt.category,
           prompt: editingPrompt.prompt,
-          active: editingPrompt.active,
+          active: editingPrompt.active ?? true,
           example_image: null,
         });
         if (editingPrompt.example_image_url) {

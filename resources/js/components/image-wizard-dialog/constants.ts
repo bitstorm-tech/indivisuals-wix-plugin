@@ -6,12 +6,6 @@ export interface PredefinedImage {
   alt: string;
 }
 
-export interface Prompt {
-  id: number;
-  name: string;
-  prompt: string;
-}
-
 export const PREDEFINED_IMAGES: PredefinedImage[] = [
   { id: 1, src: '/api/placeholder/300/300', alt: 'Mystical Forest' },
   { id: 2, src: '/api/placeholder/300/300', alt: 'Ocean Waves' },

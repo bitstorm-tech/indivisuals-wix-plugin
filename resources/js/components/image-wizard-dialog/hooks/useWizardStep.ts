@@ -1,5 +1,6 @@
+import { Prompt } from '@/types/prompt';
 import { useCallback, useState } from 'react';
-import { Prompt, STEP_INDEX, WizardStep } from '../constants';
+import { STEP_INDEX, WizardStep } from '../constants';
 
 interface UseWizardStepReturn {
   currentStep: WizardStep;

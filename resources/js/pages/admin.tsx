@@ -4,17 +4,9 @@ import NewOrEditPromptDialog from '@/components/admin/NewOrEditPromptDialog';
 import PromptTable from '@/components/admin/PromptTable';
 import PromptTableHeader from '@/components/admin/PromptTableHeader';
 import TestPromptDialog from '@/components/admin/TestPromptDialog';
+import { Prompt } from '@/types/prompt';
 import { Head, router } from '@inertiajs/react';
 import { useState } from 'react';
-
-interface Prompt {
-  id: number;
-  name: string;
-  category: string;
-  prompt: string;
-  active: boolean;
-  example_image_url?: string;
-}
 
 interface User {
   id: number;

@@ -1,14 +1,6 @@
 import { Button } from '@/components/ui/Button';
 import { TableCell, TableRow } from '@/components/ui/Table';
-
-interface Prompt {
-  id: number;
-  name: string;
-  category: string;
-  prompt: string;
-  active: boolean;
-  example_image_url?: string;
-}
+import { Prompt } from '@/types/prompt';
 
 interface PromptTableRowProps {
   prompt: Prompt;

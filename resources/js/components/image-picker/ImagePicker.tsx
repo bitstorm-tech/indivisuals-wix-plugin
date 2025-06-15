@@ -1,5 +1,6 @@
+import { Prompt } from '@/types/prompt';
 import React, { useEffect, useState } from 'react';
-import { Prompt, UploadResponse } from '../../types/image-picker';
+import { UploadResponse } from '../../types/image-picker';
 import FileUploader from './FileUploader';
 import ImageDisplay from './ImageDisplay';
 import ProcessingIndicator from './ProcessingIndicator';

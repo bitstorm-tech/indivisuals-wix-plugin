@@ -1,14 +1,6 @@
 import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/Table';
+import { Prompt } from '@/types/prompt';
 import PromptTableRow from './PromptTableRow';
-
-interface Prompt {
-  id: number;
-  name: string;
-  category: string;
-  prompt: string;
-  active: boolean;
-  example_image_url?: string;
-}
 
 interface PromptTableProps {
   prompts: Prompt[];
