@@ -35,16 +35,17 @@ class Prompt extends Model
 
     public function hasExampleImage(): bool
     {
-        return !empty($this->example_image);
+        return ! empty($this->example_image);
     }
 
     public function getExampleImageDataUri(): ?string
     {
-        if (!$this->hasExampleImage()) {
+        if (! $this->hasExampleImage()) {
             return null;
         }
 
         $base64 = base64_encode($this->example_image);
+
         return "data:{$this->example_image_mime_type};base64,{$base64}";
     }
 
@@ -57,5 +58,11 @@ class Prompt extends Model
             $this->example_image = null;
             $this->example_image_mime_type = null;
         }
+    }
+
+    public function setExampleImageFromData(string $imageData, string $mimeType): void
+    {
+        $this->example_image = $imageData;
+        $this->example_image_mime_type = $mimeType;
     }
 }

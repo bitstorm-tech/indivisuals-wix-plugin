@@ -20,7 +20,9 @@
       "mcp__context7__get-library-docs",
       "WebFetch(domain:inertiajs.com)",
       "Bash(./vendor/bin/pint:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(bun list:*)",
+      "Bash(code:*)"
     ]
   },
   "enableAllProjectMcpServers": false

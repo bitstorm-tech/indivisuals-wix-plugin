@@ -6,6 +6,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/Textarea';
 import { router, useForm } from '@inertiajs/react';
 import { useEffect, useRef, useState } from 'react';
+import ReactCrop, { Crop, PixelCrop } from 'react-image-crop';
+import 'react-image-crop/dist/ReactCrop.css';
 
 interface Prompt {
   id: number;
@@ -30,6 +32,13 @@ export default function NewOrEditPromptDialog({ isOpen, editingPrompt, categorie
     prompt: string;
     active: boolean;
     example_image: File | null;
+    crop_data?: {
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+      unit: '%' | 'px';
+    };
   }>({
     name: '',
     category: '',
@@ -40,13 +49,20 @@ export default function NewOrEditPromptDialog({ isOpen, editingPrompt, categorie
   const [useCustomCategory, setUseCustomCategory] = useState(false);
   const [customCategory, setCustomCategory] = useState('');
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [crop, setCrop] = useState<Crop>();
+  const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
+  const [imageNaturalSize, setImageNaturalSize] = useState<{ width: number; height: number }>();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const imgRef = useRef<HTMLImageElement>(null);
 
   useEffect(() => {
     if (!isOpen) {
       setUseCustomCategory(false);
       setCustomCategory('');
       setImagePreview(null);
+      setCrop(undefined);
+      setCompletedCrop(undefined);
+      setImageNaturalSize(undefined);
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
@@ -84,17 +100,57 @@ export default function NewOrEditPromptDialog({ isOpen, editingPrompt, categorie
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result as string);
+        setCrop(undefined);
+        setCompletedCrop(undefined);
       };
       reader.readAsDataURL(file);
     } else {
       form.setData('example_image', null);
       setImagePreview(null);
+      setCrop(undefined);
+      setCompletedCrop(undefined);
     }
+  };
+
+  const onImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const { width, height } = e.currentTarget;
+    setImageNaturalSize({ width, height });
+
+    // Set initial crop to center with 16:9 aspect ratio for 1080p
+    const aspectRatio = 16 / 9;
+    let cropWidth = width * 0.8;
+    let cropHeight = cropWidth / aspectRatio;
+
+    if (cropHeight > height * 0.8) {
+      cropHeight = height * 0.8;
+      cropWidth = cropHeight * aspectRatio;
+    }
+
+    const crop: Crop = {
+      unit: '%',
+      x: ((width - cropWidth) / width) * 50,
+      y: ((height - cropHeight) / height) * 50,
+      width: (cropWidth / width) * 100,
+      height: (cropHeight / height) * 100,
+    };
+
+    setCrop(crop);
   };
 
   const handleSave = () => {
     if (!form.data.name || !form.data.category || !form.data.prompt) {
       return;
+    }
+
+    // Add crop data if image is being uploaded
+    if (form.data.example_image && completedCrop && imageNaturalSize) {
+      form.setData('crop_data', {
+        x: (completedCrop.x / imageNaturalSize.width) * 100,
+        y: (completedCrop.y / imageNaturalSize.height) * 100,
+        width: (completedCrop.width / imageNaturalSize.width) * 100,
+        height: (completedCrop.height / imageNaturalSize.height) * 100,
+        unit: '%',
+      });
     }
 
     // Debug: Log form data before submission
@@ -103,6 +159,7 @@ export default function NewOrEditPromptDialog({ isOpen, editingPrompt, categorie
       hasFile: !!form.data.example_image,
       fileName: form.data.example_image?.name,
       fileSize: form.data.example_image?.size,
+      cropData: form.data.crop_data,
     });
 
     if (editingPrompt) {
@@ -230,9 +287,28 @@ export default function NewOrEditPromptDialog({ isOpen, editingPrompt, categorie
             <div className="mt-1 space-y-2">
               <Input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp" onChange={handleImageChange} />
               {imagePreview && (
-                <div className="relative h-32 w-32">
-                  <img src={imagePreview} alt="Preview" className="h-full w-full rounded object-cover" />
-                  {editingPrompt && editingPrompt.has_example_image && <p className="mt-1 text-xs text-gray-500">Current image</p>}
+                <div className="space-y-2">
+                  {form.data.example_image ? (
+                    <>
+                      <p className="text-sm text-gray-600">Select the area to crop for 1080p (1920x1080) display:</p>
+                      <div className="max-h-96 overflow-auto rounded border">
+                        <ReactCrop
+                          crop={crop}
+                          onChange={(_, percentCrop) => setCrop(percentCrop)}
+                          onComplete={(c) => setCompletedCrop(c)}
+                          aspect={16 / 9}
+                          keepSelection
+                        >
+                          <img ref={imgRef} src={imagePreview} alt="Crop preview" onLoad={onImageLoad} style={{ maxWidth: '100%', height: 'auto' }} />
+                        </ReactCrop>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="relative h-32 w-32">
+                      <img src={imagePreview} alt="Preview" className="h-full w-full rounded object-cover" />
+                      {editingPrompt && editingPrompt.has_example_image && <p className="mt-1 text-xs text-gray-500">Current image</p>}
+                    </div>
+                  )}
                 </div>
               )}
             </div>
