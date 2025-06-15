@@ -16,8 +16,14 @@ class AdminController extends Controller
             $prompt->has_example_image = $prompt->hasExampleImage();
         });
 
+        $categories = Prompt::select('category')
+            ->distinct()
+            ->orderBy('category')
+            ->pluck('category');
+
         return Inertia::render('admin', [
             'prompts' => $prompts,
+            'categories' => $categories,
         ]);
     }
 }

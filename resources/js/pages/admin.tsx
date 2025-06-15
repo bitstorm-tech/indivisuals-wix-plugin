@@ -5,7 +5,7 @@ import PromptTable from '@/components/admin/PromptTable';
 import PromptTableHeader from '@/components/admin/PromptTableHeader';
 import TestPromptDialog from '@/components/admin/TestPromptDialog';
 import { Head, router } from '@inertiajs/react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 interface Prompt {
   id: number;
@@ -24,13 +24,13 @@ interface User {
 
 interface AdminProps {
   prompts: Prompt[];
+  categories: string[];
   auth: {
     user: User;
   };
 }
 
-export default function Admin({ prompts, auth }: AdminProps) {
-  const [categories, setCategories] = useState<string[]>([]);
+export default function Admin({ prompts, categories, auth }: AdminProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [testingPromptId, setTestingPromptId] = useState<number | undefined>(undefined);
@@ -38,15 +38,6 @@ export default function Admin({ prompts, auth }: AdminProps) {
   const [promptToDelete, setPromptToDelete] = useState<number | undefined>(undefined);
   const [isPromptDialogOpen, setIsPromptDialogOpen] = useState<boolean>(false);
   const [editingPrompt, setEditingPrompt] = useState<Prompt | undefined>(undefined);
-
-  useEffect(() => {
-    fetch('/prompt-categories')
-      .then((response) => response.json())
-      .then((data) => setCategories(data))
-      .catch((error) => {
-        console.error('Error fetching categories:', error);
-      });
-  }, []);
 
   // Filter prompts based on selected category
   const filteredPrompts = selectedCategory === 'all' ? prompts : prompts.filter((prompt) => prompt.category === selectedCategory);
