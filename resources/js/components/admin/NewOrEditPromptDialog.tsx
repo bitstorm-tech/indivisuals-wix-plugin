@@ -277,9 +277,11 @@ export default function NewOrEditPromptDialog({ isOpen, editingPrompt, categorie
             {form.errors.prompt && <p className="mt-1 text-sm text-red-500">{form.errors.prompt}</p>}
           </div>
           <div>
-            <label className="text-sm font-medium">Example Image</label>
             <div className="mt-1 space-y-2">
-              <Input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp" onChange={handleImageChange} />
+              <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp" onChange={handleImageChange} className="hidden" />
+              <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>
+                Choose Example Image
+              </Button>
               {imagePreview && (
                 <div className="space-y-2">
                   {form.data.example_image ? (
