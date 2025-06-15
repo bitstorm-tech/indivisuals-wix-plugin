@@ -142,30 +142,23 @@ export default function NewOrEditPromptDialog({ isOpen, editingPrompt, categorie
       return;
     }
 
-    // Add crop data if image is being uploaded
+    // Prepare form data with crop data if image is being uploaded
+    const dataToSubmit = { ...form.data };
+
     if (form.data.example_image && completedCrop && imageNaturalSize) {
-      form.setData('crop_data', {
+      dataToSubmit.crop_data = {
         x: (completedCrop.x / imageNaturalSize.width) * 100,
         y: (completedCrop.y / imageNaturalSize.height) * 100,
         width: (completedCrop.width / imageNaturalSize.width) * 100,
         height: (completedCrop.height / imageNaturalSize.height) * 100,
         unit: '%',
-      });
+      };
     }
-
-    // Debug: Log form data before submission
-    console.log('Form data before save:', {
-      data: form.data,
-      hasFile: !!form.data.example_image,
-      fileName: form.data.example_image?.name,
-      fileSize: form.data.example_image?.size,
-      cropData: form.data.crop_data,
-    });
 
     if (editingPrompt) {
       // Update existing prompt - use router.post with method spoofing for file uploads
       const formData = {
-        ...form.data,
+        ...dataToSubmit,
         _method: 'put',
       };
 
@@ -187,14 +180,15 @@ export default function NewOrEditPromptDialog({ isOpen, editingPrompt, categorie
       });
     } else {
       // Create new prompt
-      form.post('/prompts', {
-        forceFormData: !!form.data.example_image, // Only use FormData if there's a file
+      router.post('/prompts', dataToSubmit, {
+        forceFormData: !!dataToSubmit.example_image, // Only use FormData if there's a file
+        preserveScroll: true,
         onSuccess: () => {
           onClose();
           form.reset();
         },
         onError: (errors: Record<string, string>) => {
-          console.error('Update validation errors:', errors);
+          console.error('Create validation errors:', errors);
           // Also log the full error response
           console.error('Full error response:', {
             errors: form.errors,
