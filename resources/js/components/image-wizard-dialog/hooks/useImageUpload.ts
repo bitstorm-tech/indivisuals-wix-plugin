@@ -68,10 +68,10 @@ export function useImageUpload({ onImageGenerated, onFileUploaded }: UseImageUpl
 
         if (response.ok) {
           const data = await response.json();
-          setGeneratedImageUrl(data.generatedImageUrl);
+          setGeneratedImageUrl(data.generated_image_url);
 
           if (onImageGenerated && uploadedImage) {
-            onImageGenerated(data.generatedImageUrl, uploadedImage);
+            onImageGenerated(data.generated_image_url, uploadedImage);
           }
         }
       } catch (error) {

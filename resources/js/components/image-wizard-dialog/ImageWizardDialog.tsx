@@ -129,41 +129,43 @@ export default function ImageWizardDialog({ isOpen, onClose, prompts, onImageGen
         <div className="space-y-6">
           <WizardProgress currentStep={currentStep} progress={progress} />
 
-          <AnimatePresence mode="wait">
-            {currentStep === 'template' && <TemplateSelector onSelectTemplate={handleTemplateSelect} prompts={prompts} />}
+          <div className="flex-1 overflow-hidden">
+            <AnimatePresence mode="wait">
+              {currentStep === 'template' && <TemplateSelector onSelectTemplate={handleTemplateSelect} prompts={prompts} />}
 
-            {currentStep === 'upload' && (
-              <ImageUploader
-                onFileUpload={handleFileUpload}
-                isDragging={isDragging}
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDrop}
-              />
-            )}
+              {currentStep === 'upload' && (
+                <ImageUploader
+                  onFileUpload={handleFileUpload}
+                  isDragging={isDragging}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                />
+              )}
 
-            {currentStep === 'result' && (
-              <motion.div
-                key="result"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                className="space-y-4"
-              >
-                {isProcessing ? (
-                  <ProcessingIndicator />
-                ) : (
-                  <ResultDisplay
-                    uploadedImageUrl={uploadedImageUrl}
-                    generatedImageUrl={generatedImageUrl}
-                    onDownload={handleCompleteDownload}
-                    onUseInEditor={onImageGenerated ? handleUseInEditor : undefined}
-                    onTryAgain={handleTryAgain}
-                  />
-                )}
-              </motion.div>
-            )}
-          </AnimatePresence>
+              {currentStep === 'result' && (
+                <motion.div
+                  key="result"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  className="h-full"
+                >
+                  {isProcessing ? (
+                    <ProcessingIndicator />
+                  ) : (
+                    <ResultDisplay
+                      uploadedImageUrl={uploadedImageUrl}
+                      generatedImageUrl={generatedImageUrl}
+                      onDownload={handleCompleteDownload}
+                      onUseInEditor={onImageGenerated ? handleUseInEditor : undefined}
+                      onTryAgain={handleTryAgain}
+                    />
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
       </DialogContent>
     </Dialog>

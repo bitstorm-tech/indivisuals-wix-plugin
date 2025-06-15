@@ -24,7 +24,8 @@
       "Bash(bun list:*)",
       "Bash(code:*)",
       "Bash(curl:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(prettier:*)"
     ]
   },
   "enableAllProjectMcpServers": false

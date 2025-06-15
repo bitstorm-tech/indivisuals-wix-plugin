@@ -12,7 +12,7 @@ interface ImageUploaderProps {
   onDrop: (e: React.DragEvent) => void;
 }
 
-const ImageUploader: React.FC<ImageUploaderProps> = ({ onFileUpload, isDragging, onDragOver, onDragLeave, onDrop }) => {
+const ImageUploader: React.FC = ({ onFileUpload, isDragging, onDragOver, onDragLeave, onDrop }) => {
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const handleChooseFile = () => {
@@ -20,7 +20,13 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onFileUpload, isDragging,
   };
 
   return (
-    <motion.div key="upload" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
+    <motion.div
+      key="upload"
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -20 }}
+      className="space-y-4"
+    >
       <p className="text-center text-lg font-medium">
         <Upload className="mr-2 inline h-5 w-5 text-blue-500" />
         Now add your photo to the cauldron!
