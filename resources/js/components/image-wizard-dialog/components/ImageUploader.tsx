@@ -13,6 +13,12 @@ interface ImageUploaderProps {
 }
 
 const ImageUploader: React.FC<ImageUploaderProps> = ({ onFileUpload, isDragging, onDragOver, onDragLeave, onDrop }) => {
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  const handleChooseFile = () => {
+    fileInputRef.current?.click();
+  };
+
   return (
     <motion.div key="upload" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
       <p className="text-center text-lg font-medium">
@@ -37,21 +43,19 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onFileUpload, isDragging,
           <ImageIcon className="mx-auto mb-4 h-16 w-16 text-gray-400" />
           <p className="mb-2 text-lg font-medium">{isDragging ? "Drop it like it's hot! 🔥" : 'Drag & drop your photo here'}</p>
           <p className="mb-4 text-sm text-gray-500">or</p>
-          <label htmlFor="file-upload">
-            <Button variant="outline" className="cursor-pointer">
-              Choose from device
-            </Button>
-            <input
-              id="file-upload"
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) onFileUpload(file);
-              }}
-            />
-          </label>
+          <Button variant="outline" onClick={handleChooseFile}>
+            Choose from device
+          </Button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) onFileUpload(file);
+            }}
+          />
         </motion.div>
       </div>
     </motion.div>
