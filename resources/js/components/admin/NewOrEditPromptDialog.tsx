@@ -15,7 +15,7 @@ interface Prompt {
   category: string;
   prompt: string;
   active: boolean;
-  has_example_image?: boolean;
+  example_image_url?: string;
 }
 
 interface NewOrEditPromptDialogProps {
@@ -77,8 +77,8 @@ export default function NewOrEditPromptDialog({ isOpen, editingPrompt, categorie
           active: editingPrompt.active,
           example_image: null,
         });
-        if (editingPrompt.has_example_image) {
-          setImagePreview(`/prompts/${editingPrompt.id}/example-image`);
+        if (editingPrompt.example_image_url) {
+          setImagePreview(editingPrompt.example_image_url);
         }
       } else {
         form.reset();
@@ -306,7 +306,6 @@ export default function NewOrEditPromptDialog({ isOpen, editingPrompt, categorie
                   ) : (
                     <div className="relative">
                       <img src={imagePreview} alt="Preview" className="h-32 w-auto rounded object-cover" style={{ aspectRatio: '16/9' }} />
-                      {editingPrompt && editingPrompt.has_example_image && <p className="mt-1 text-xs text-gray-500">Current image</p>}
                     </div>
                   )}
                 </div>

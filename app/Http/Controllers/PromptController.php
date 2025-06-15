@@ -7,8 +7,9 @@ use App\Services\ImageConverterService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class PromptController extends Controller
 {
@@ -30,9 +31,9 @@ class PromptController extends Controller
 
         $prompts = $query->orderBy('category')->orderBy('name')->get();
 
-        // Add virtual field to indicate if prompt has example image
+        // Add virtual field
         $prompts->each(function ($prompt) {
-            $prompt->has_example_image = $prompt->hasExampleImage();
+            $prompt->example_image_url = $prompt->getExampleImageUrl();
         });
 
         return response()->json($prompts);
@@ -75,11 +76,21 @@ class PromptController extends Controller
                 $webpData = $this->imageConverter->convertToWebp($file->getRealPath());
             }
 
-            $prompt->setExampleImageFromData($webpData, 'image/webp');
+            // Generate UUID filename
+            $filename = Str::uuid().'.webp';
+
+            // Ensure directory exists
+            Storage::disk('public')->makeDirectory('example-images');
+
+            // Save to storage
+            Storage::disk('public')->put('example-images/'.$filename, $webpData);
+
+            // Store filename in database
+            $prompt->example_image_filename = $filename;
         }
 
         $prompt->save();
-        $prompt->has_example_image = $prompt->hasExampleImage();
+        $prompt->example_image_url = $prompt->getExampleImageUrl();
 
         // Return redirect for Inertia requests
         if ($request->header('X-Inertia')) {
@@ -91,7 +102,7 @@ class PromptController extends Controller
 
     public function show(Prompt $prompt): JsonResponse
     {
-        $prompt->has_example_image = $prompt->hasExampleImage();
+        $prompt->example_image_url = $prompt->getExampleImageUrl();
 
         return response()->json($prompt);
     }
@@ -123,8 +134,9 @@ class PromptController extends Controller
         $prompt->fill($dataToUpdate);
 
         if ($request->boolean('remove_example_image')) {
-            $prompt->example_image = null;
-            $prompt->example_image_mime_type = null;
+            // Delete existing file if any
+            $prompt->deleteExampleImageFile();
+            $prompt->example_image_filename = null;
         } elseif ($request->hasFile('example_image')) {
             $file = $request->file('example_image');
             $cropData = $validated['crop_data'] ?? null;
@@ -144,12 +156,25 @@ class PromptController extends Controller
                 $webpData = $this->imageConverter->convertToWebp($file->getRealPath());
             }
 
-            $prompt->setExampleImageFromData($webpData, 'image/webp');
+            // Delete old file if exists
+            $prompt->deleteExampleImageFile();
+
+            // Generate UUID filename
+            $filename = Str::uuid().'.webp';
+
+            // Ensure directory exists
+            Storage::disk('public')->makeDirectory('example-images');
+
+            // Save to storage
+            Storage::disk('public')->put('example-images/'.$filename, $webpData);
+
+            // Store filename in database
+            $prompt->example_image_filename = $filename;
         }
 
         $prompt->save();
 
-        $prompt->has_example_image = $prompt->hasExampleImage();
+        $prompt->example_image_url = $prompt->getExampleImageUrl();
 
         // Return redirect for Inertia requests
         if ($request->header('X-Inertia')) {
@@ -161,6 +186,9 @@ class PromptController extends Controller
 
     public function destroy(Prompt $prompt): JsonResponse|RedirectResponse
     {
+        // Delete associated image file
+        $prompt->deleteExampleImageFile();
+
         $prompt->delete();
 
         // Return redirect for Inertia requests
@@ -179,15 +207,5 @@ class PromptController extends Controller
             ->pluck('category');
 
         return response()->json($categories);
-    }
-
-    public function exampleImage(Prompt $prompt): Response
-    {
-        if (! $prompt->hasExampleImage()) {
-            abort(404, 'Prompt has no example image');
-        }
-
-        return response($prompt->example_image)
-            ->header('Content-Type', $prompt->example_image_mime_type);
     }
 }

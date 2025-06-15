@@ -2,6 +2,19 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Initial Setup
+
+When setting up a new server or development environment, run these commands:
+
+```bash
+composer install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate
+php artisan storage:link  # IMPORTANT: Creates symlink for public file access
+bun install
+```
+
 ## Development Commands
 
 ### Backend Commands

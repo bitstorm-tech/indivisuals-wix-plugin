@@ -22,7 +22,9 @@
       "Bash(./vendor/bin/pint:*)",
       "Bash(git commit:*)",
       "Bash(bun list:*)",
-      "Bash(code:*)"
+      "Bash(code:*)",
+      "Bash(curl:*)",
+      "Bash(cat:*)"
     ]
   },
   "enableAllProjectMcpServers": false

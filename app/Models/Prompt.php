@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Prompt extends Model
 {
@@ -11,16 +12,11 @@ class Prompt extends Model
         'category',
         'prompt',
         'active',
-        'example_image',
-        'example_image_mime_type',
+        'example_image_filename',
     ];
 
     protected $casts = [
         'active' => 'boolean',
-    ];
-
-    protected $hidden = [
-        'example_image', // Hide binary data from JSON responses by default
     ];
 
     public function scopeActive($query)
@@ -33,36 +29,19 @@ class Prompt extends Model
         return $query->where('category', $category);
     }
 
-    public function hasExampleImage(): bool
+    public function getExampleImageUrl(): ?string
     {
-        return ! empty($this->example_image);
-    }
-
-    public function getExampleImageDataUri(): ?string
-    {
-        if (! $this->hasExampleImage()) {
+        if (! $this->example_image_filename) {
             return null;
         }
 
-        $base64 = base64_encode($this->example_image);
-
-        return "data:{$this->example_image_mime_type};base64,{$base64}";
+        return asset('storage/example-images/'.$this->example_image_filename);
     }
 
-    public function setExampleImageFromFile($file): void
+    public function deleteExampleImageFile(): void
     {
-        if ($file) {
-            $this->example_image = file_get_contents($file->getRealPath());
-            $this->example_image_mime_type = $file->getMimeType();
-        } else {
-            $this->example_image = null;
-            $this->example_image_mime_type = null;
+        if ($this->example_image_filename) {
+            Storage::disk('public')->delete('example-images/'.$this->example_image_filename);
         }
-    }
-
-    public function setExampleImageFromData(string $imageData, string $mimeType): void
-    {
-        $this->example_image = $imageData;
-        $this->example_image_mime_type = $mimeType;
     }
 }

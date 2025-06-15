@@ -11,9 +11,9 @@ class AdminController extends Controller
     {
         $prompts = Prompt::all();
 
-        // Add virtual field to indicate if prompt has example image
+        // Add virtual field for example image URL
         $prompts->each(function ($prompt) {
-            $prompt->has_example_image = $prompt->hasExampleImage();
+            $prompt->example_image_url = $prompt->getExampleImageUrl();
         });
 
         $categories = Prompt::select('category')

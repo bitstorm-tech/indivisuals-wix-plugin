@@ -15,7 +15,6 @@ Route::post('/generate-image', [ImageController::class, 'generateImage'])->name(
 
 Route::apiResource('prompts', PromptController::class);
 Route::get('/prompt-categories', [PromptController::class, 'categories'])->name('prompts.categories');
-Route::get('/prompts/{prompt}/example-image', [PromptController::class, 'exampleImage'])->name('prompts.example-image');
 
 // Authentication routes
 Route::middleware('guest')->group(function () {

@@ -7,7 +7,7 @@ interface Prompt {
   category: string;
   prompt: string;
   active: boolean;
-  has_example_image?: boolean;
+  example_image_url?: string;
 }
 
 interface PromptTableRowProps {
@@ -30,9 +30,9 @@ export default function PromptTableRow({ prompt, onEdit, onDelete, onTest }: Pro
         <span>{prompt.category}</span>
       </TableCell>
       <TableCell>
-        {prompt.has_example_image ? (
+        {prompt.example_image_url ? (
           <img
-            src={`/prompts/${prompt.id}/example-image?t=${Date.now()}`}
+            src={`${prompt.example_image_url}?t=${Date.now()}`}
             alt="Example"
             className="h-16 w-auto rounded object-cover"
             style={{ aspectRatio: '16/9' }}
