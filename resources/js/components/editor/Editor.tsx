@@ -1,6 +1,7 @@
 import { ChevronDown, Download, Info, Palette } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { EditorImage, EditorSize, EditorState, EditorText, EXPORT_RESOLUTIONS, ExportResolutionId, ExportSettings } from '../../types/editor';
+import { Prompt } from '../image-wizard-dialog/constants';
 import ImageWizardDialog from '../image-wizard-dialog/ImageWizardDialog';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
@@ -47,7 +48,7 @@ export default function Editor({ canvasSize = DEFAULT_CANVAS_SIZE, maxImages = 3
   });
 
   const [isWizardOpen, setIsWizardOpen] = useState(false);
-  const [prompts, setPrompts] = useState<Array<{ id: number; name: string; prompt: string }>>([]);
+  const [prompts, setPrompts] = useState<Prompt[]>([]);
 
   useEffect(() => {
     fetch('/prompts')

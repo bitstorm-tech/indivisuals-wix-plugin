@@ -17,7 +17,13 @@ import WizardMascot from './components/WizardMascot';
 import WizardProgress from './components/WizardProgress';
 
 // Types
-import { Prompt } from './constants';
+interface Prompt {
+  id: number;
+  name: string;
+  category: string;
+  prompt: string;
+  example_image_url?: string;
+}
 
 interface ImageWizardDialogProps {
   isOpen: boolean;
@@ -130,7 +136,7 @@ export default function ImageWizardDialog({ isOpen, onClose, prompts, onImageGen
           <WizardProgress currentStep={currentStep} progress={progress} />
 
           <AnimatePresence mode="wait">
-            {currentStep === 'template' && <TemplateSelector onSelectTemplate={handleTemplateSelect} />}
+            {currentStep === 'template' && <TemplateSelector onSelectTemplate={handleTemplateSelect} prompts={prompts} />}
 
             {currentStep === 'upload' && (
               <ImageUploader
