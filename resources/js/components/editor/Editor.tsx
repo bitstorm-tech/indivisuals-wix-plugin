@@ -51,10 +51,25 @@ export default function Editor({ canvasSize = DEFAULT_CANVAS_SIZE, maxImages = 3
   const [prompts, setPrompts] = useState<Prompt[]>([]);
 
   useEffect(() => {
-    fetch('/prompts')
-      .then((response) => response.json())
+    const controller = new AbortController();
+
+    fetch('/prompts', { signal: controller.signal })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch prompts');
+        }
+        return response.json();
+      })
       .then((data) => setPrompts(data))
-      .catch((error) => console.error('Failed to fetch prompts:', error));
+      .catch((error) => {
+        if (error.name !== 'AbortError') {
+          console.error('Failed to fetch prompts:', error);
+        }
+      });
+
+    return () => {
+      controller.abort();
+    };
   }, []);
 
   const generateId = (type: 'img' | 'txt') => `${type}_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;

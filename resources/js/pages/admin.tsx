@@ -6,7 +6,7 @@ import PromptTableHeader from '@/components/admin/PromptTableHeader';
 import TestPromptDialog from '@/components/admin/TestPromptDialog';
 import { Prompt } from '@/types/prompt';
 import { Head, router } from '@inertiajs/react';
-import { useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 interface User {
   id: number;
@@ -32,19 +32,22 @@ export default function Admin({ prompts, categories, auth }: AdminProps) {
   const [editingPrompt, setEditingPrompt] = useState<Prompt | undefined>(undefined);
 
   // Filter prompts based on selected category
-  const filteredPrompts = selectedCategory === 'all' ? prompts : prompts.filter((prompt) => prompt.category === selectedCategory);
+  const filteredPrompts = useMemo(
+    () => (selectedCategory === 'all' ? prompts : prompts.filter((prompt) => prompt.category === selectedCategory)),
+    [prompts, selectedCategory],
+  );
 
-  const handleEdit = (prompt: Prompt) => {
+  const handleEdit = useCallback((prompt: Prompt) => {
     setEditingPrompt(prompt);
     setIsPromptDialogOpen(true);
-  };
+  }, []);
 
-  const handleDelete = async (promptId: number) => {
+  const handleDelete = useCallback((promptId: number) => {
     setPromptToDelete(promptId);
     setIsDeleteDialogOpen(true);
-  };
+  }, []);
 
-  const confirmDelete = async () => {
+  const confirmDelete = useCallback(async () => {
     if (!promptToDelete) return;
 
     try {
@@ -62,32 +65,32 @@ export default function Admin({ prompts, categories, auth }: AdminProps) {
       setIsDeleteDialogOpen(false);
       setPromptToDelete(undefined);
     }
-  };
+  }, [promptToDelete]);
 
-  const cancelDelete = () => {
+  const cancelDelete = useCallback(() => {
     setIsDeleteDialogOpen(false);
     setPromptToDelete(undefined);
-  };
+  }, []);
 
-  const handleTest = (promptId: number) => {
+  const handleTest = useCallback((promptId: number) => {
     setTestingPromptId(promptId);
     setIsModalOpen(true);
-  };
+  }, []);
 
-  const closeModal = () => {
+  const closeModal = useCallback(() => {
     setIsModalOpen(false);
     setTestingPromptId(undefined);
-  };
+  }, []);
 
-  const handleNewPrompt = () => {
+  const handleNewPrompt = useCallback(() => {
     setEditingPrompt(undefined);
     setIsPromptDialogOpen(true);
-  };
+  }, []);
 
-  const handleClosePromptDialog = () => {
+  const handleClosePromptDialog = useCallback(() => {
     setIsPromptDialogOpen(false);
     setEditingPrompt(undefined);
-  };
+  }, []);
 
   return (
     <>

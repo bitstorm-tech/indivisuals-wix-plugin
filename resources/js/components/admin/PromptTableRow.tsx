@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/Button';
 import { TableCell, TableRow } from '@/components/ui/Table';
 import { Prompt } from '@/types/prompt';
+import React from 'react';
 
 interface PromptTableRowProps {
   prompt: Prompt;
@@ -9,7 +10,7 @@ interface PromptTableRowProps {
   onTest: (promptId: number) => void;
 }
 
-export default function PromptTableRow({ prompt, onEdit, onDelete, onTest }: PromptTableRowProps) {
+const PromptTableRow = React.memo(function PromptTableRow({ prompt, onEdit, onDelete, onTest }: PromptTableRowProps) {
   return (
     <TableRow>
       <TableCell>
@@ -54,4 +55,6 @@ export default function PromptTableRow({ prompt, onEdit, onDelete, onTest }: Pro
       </TableCell>
     </TableRow>
   );
-}
+});
+
+export default PromptTableRow;

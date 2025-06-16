@@ -1,5 +1,5 @@
 import { Prompt } from '@/types/prompt';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { UploadResponse } from '../../types/image-picker';
 import FileUploader from './FileUploader';
 import ImageDisplay from './ImageDisplay';
@@ -19,11 +19,7 @@ export default function ImagePicker({ defaultPromptId, storeImages = true }: Ima
   const [prompts, setPrompts] = useState<Prompt[]>([]);
   const [selectedPromptId, setSelectedPromptId] = useState<number | undefined>(defaultPromptId);
 
-  useEffect(() => {
-    fetchPrompts();
-  }, []);
-
-  async function fetchPrompts(): Promise<void> {
+  const fetchPrompts = useCallback(async (): Promise<void> => {
     try {
       const response = await fetch('/prompts?active_only=true', {
         headers: {
@@ -38,9 +34,9 @@ export default function ImagePicker({ defaultPromptId, storeImages = true }: Ima
     } catch (error) {
       console.error('Error fetching prompts:', error);
     }
-  }
+  }, []);
 
-  async function uploadImage(): Promise<void> {
+  const uploadImage = useCallback(async (): Promise<void> => {
     if (!selectedFile) {
       return;
     }
@@ -91,24 +87,40 @@ export default function ImagePicker({ defaultPromptId, storeImages = true }: Ima
     } finally {
       setIsProcessing(false);
     }
-  }
+  }, [selectedFile, selectedPromptId, storeImages]);
 
-  function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
+  const handleFileChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0];
 
-    if (previewImage) {
-      URL.revokeObjectURL(previewImage);
-    }
+      if (previewImage) {
+        URL.revokeObjectURL(previewImage);
+      }
 
-    if (file) {
-      setSelectedFile(file);
-      setPreviewImage(URL.createObjectURL(file));
-      setGeneratedImage(undefined);
-    } else {
-      setSelectedFile(undefined);
-      setPreviewImage(undefined);
-    }
-  }
+      if (file) {
+        setSelectedFile(file);
+        setPreviewImage(URL.createObjectURL(file));
+        setGeneratedImage(undefined);
+      } else {
+        setSelectedFile(undefined);
+        setPreviewImage(undefined);
+      }
+    },
+    [previewImage],
+  );
+
+  useEffect(() => {
+    fetchPrompts();
+  }, [fetchPrompts]);
+
+  // Cleanup preview URL on unmount
+  useEffect(() => {
+    return () => {
+      if (previewImage) {
+        URL.revokeObjectURL(previewImage);
+      }
+    };
+  }, [previewImage]);
 
   const canUpload = selectedFile && selectedPromptId && !isProcessing;
 
