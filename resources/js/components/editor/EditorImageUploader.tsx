@@ -40,7 +40,7 @@ export default function EditorImageUploader({ onFileSelect, maxFiles, currentCou
 
   return (
     <>
-      <Button variant="outline" size="sm" onClick={handleButtonClick} disabled={isDisabled}>
+      <Button onClick={handleButtonClick} disabled={isDisabled}>
         <Image className="mr-2 h-4 w-4" />
         Bild auswählen ({currentCount}/{maxFiles})
       </Button>
