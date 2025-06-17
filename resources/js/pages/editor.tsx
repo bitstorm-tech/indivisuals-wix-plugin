@@ -14,6 +14,7 @@ export default function EditorPage() {
   const [selectedPromptId, setSelectedPromptId] = useState<number | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [isImageSelectorOpen, setIsImageSelectorOpen] = useState(false);
+  const [selectedImages, setSelectedImages] = useState<{ url: string; file: File }[]>([]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -58,14 +59,18 @@ export default function EditorPage() {
     // you would need to communicate with the Editor component
     // to add the selected images
     console.log('Selected files:', files);
-    alert(`Selected ${files.length} image(s). This will be connected to the Editor.`);
   };
 
   const handleImageCropped = (croppedImageUrl: string, croppedFile: File) => {
-    // Handle the cropped image
-    console.log('Cropped image:', croppedImageUrl, croppedFile);
-    // You can now add this to the editor
-    handleFileSelect([croppedFile]);
+    // Add the cropped image to the selected images array
+    if (selectedImages.length < 3) {
+      setSelectedImages((prev) => [...prev, { url: croppedImageUrl, file: croppedFile }]);
+      handleFileSelect([croppedFile]);
+    }
+  };
+
+  const handleRemoveImage = (index: number) => {
+    setSelectedImages((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleImageButtonClick = () => {
@@ -90,7 +95,31 @@ export default function EditorPage() {
         {/* Sidebar */}
         <aside className="flex w-80 flex-col border-r border-gray-200 bg-white p-6">
           <nav className="flex flex-col gap-8">
-            <EditorImageUploader onFileSelect={handleFileSelect} maxFiles={3} currentCount={0} onButtonClick={handleImageButtonClick} />
+            <EditorImageUploader
+              onFileSelect={handleFileSelect}
+              maxFiles={3}
+              currentCount={selectedImages.length}
+              onButtonClick={handleImageButtonClick}
+            />
+
+            {/* Image Previews */}
+            {selectedImages.length > 0 && (
+              <div className="space-y-2">
+                {selectedImages.map((image, index) => (
+                  <div key={index} className="relative rounded-lg border border-gray-200 p-2">
+                    <img src={image.url} alt={`Selected ${index + 1}`} className="h-20 w-full rounded object-cover" />
+                    <button
+                      onClick={() => handleRemoveImage(index)}
+                      className="absolute -top-2 -right-2 rounded-full bg-red-500 p-1 text-white hover:bg-red-600"
+                    >
+                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
 
             <div>
               {prompts.length > 0 ? (

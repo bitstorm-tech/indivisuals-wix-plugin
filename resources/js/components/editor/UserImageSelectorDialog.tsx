@@ -26,14 +26,7 @@ export default function UserImageSelectorDialog({ isOpen, onClose, onImageSelect
       const reader = new FileReader();
       reader.onload = (e) => {
         setSelectedImage(e.target?.result as string);
-        // Set initial crop to center 80% of the image
-        setCrop({
-          unit: '%',
-          x: 10,
-          y: 10,
-          width: 80,
-          height: 80,
-        });
+        // Initial crop will be set in onImageLoad
       };
       reader.readAsDataURL(file);
     }
@@ -49,14 +42,7 @@ export default function UserImageSelectorDialog({ isOpen, onClose, onImageSelect
       const reader = new FileReader();
       reader.onload = (event) => {
         setSelectedImage(event.target?.result as string);
-        // Set initial crop to center 80% of the image
-        setCrop({
-          unit: '%',
-          x: 10,
-          y: 10,
-          width: 80,
-          height: 80,
-        });
+        // Initial crop will be set in onImageLoad
       };
       reader.readAsDataURL(file);
     }
@@ -135,6 +121,29 @@ export default function UserImageSelectorDialog({ isOpen, onClose, onImageSelect
     fileInputRef.current?.click();
   };
 
+  const onImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const { width, height } = e.currentTarget;
+
+    // Set initial crop to center 80% of the image
+    const initialCrop: PixelCrop = {
+      unit: 'px',
+      x: width * 0.1,
+      y: height * 0.1,
+      width: width * 0.8,
+      height: height * 0.8,
+    };
+
+    // Set both crop and completedCrop so the button is enabled immediately
+    setCrop({
+      unit: '%',
+      x: 10,
+      y: 10,
+      width: 80,
+      height: 80,
+    });
+    setCompletedCrop(initialCrop);
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="max-w-4xl">
@@ -159,7 +168,7 @@ export default function UserImageSelectorDialog({ isOpen, onClose, onImageSelect
             <div className="space-y-4">
               <div className="flex items-center justify-center rounded-lg bg-gray-100 p-4">
                 <ReactCrop crop={crop} onChange={(c) => setCrop(c)} onComplete={(c) => setCompletedCrop(c)} aspect={undefined}>
-                  <img ref={imgRef} src={selectedImage} alt="Crop preview" className="max-h-[500px] max-w-full object-contain" />
+                  <img ref={imgRef} src={selectedImage} alt="Crop preview" className="max-h-[500px] max-w-full object-contain" onLoad={onImageLoad} />
                 </ReactCrop>
               </div>
 
