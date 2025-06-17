@@ -3,12 +3,12 @@ import { motion } from 'framer-motion';
 import { Sparkles } from 'lucide-react';
 import React, { useMemo } from 'react';
 
-interface TemplateSelectorProps {
+interface PromptSelectorProps {
   onSelectTemplate: (templateId: number) => void;
   prompts: Prompt[];
 }
 
-const TemplateSelector = React.memo<TemplateSelectorProps>(({ onSelectTemplate, prompts }) => {
+const PromptSelector = React.memo<PromptSelectorProps>(({ onSelectTemplate, prompts }) => {
   // Filter prompts that have example images
   const promptsWithImages = useMemo(() => prompts.filter((prompt) => prompt.example_image_url), [prompts]);
   return (
@@ -47,6 +47,6 @@ const TemplateSelector = React.memo<TemplateSelectorProps>(({ onSelectTemplate, 
   );
 });
 
-TemplateSelector.displayName = 'TemplateSelector';
+PromptSelector.displayName = 'PromptSelector';
 
-export default TemplateSelector;
+export default PromptSelector;

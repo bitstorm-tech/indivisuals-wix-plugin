@@ -11,8 +11,8 @@ import { useWizardStep } from './hooks/useWizardStep';
 // Components
 import ImageUploader from './components/ImageUploader';
 import ProcessingIndicator from './components/ProcessingIndicator';
+import PromptSelector from './components/PromptSelector';
 import ResultDisplay from './components/ResultDisplay';
-import TemplateSelector from './components/TemplateSelector';
 import WizardMascot from './components/WizardMascot';
 import WizardProgress from './components/WizardProgress';
 
@@ -131,7 +131,7 @@ export default function ImageWizardDialog({ isOpen, onClose, prompts, onImageGen
 
           <div className="flex-1 overflow-hidden">
             <AnimatePresence mode="wait">
-              {currentStep === 'template' && <TemplateSelector onSelectTemplate={handleTemplateSelect} prompts={prompts} />}
+              {currentStep === 'template' && <PromptSelector onSelectTemplate={handleTemplateSelect} prompts={prompts} />}
 
               {currentStep === 'upload' && (
                 <ImageUploader
