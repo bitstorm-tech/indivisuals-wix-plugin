@@ -1,6 +1,7 @@
 import Editor from '@/components/editor/Editor';
 import EditorImageUploader from '@/components/editor/EditorImageUploader';
 import TextAdder from '@/components/editor/TextAdder';
+import UserImageSelectorDialog from '@/components/editor/UserImageSelectorDialog';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
 import { EditorImage, EditorText } from '@/types/editor';
@@ -12,6 +13,7 @@ export default function EditorPage() {
   const [prompts, setPrompts] = useState<Prompt[]>([]);
   const [selectedPromptId, setSelectedPromptId] = useState<number | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [isImageSelectorOpen, setIsImageSelectorOpen] = useState(false);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -59,9 +61,15 @@ export default function EditorPage() {
     alert(`Selected ${files.length} image(s). This will be connected to the Editor.`);
   };
 
+  const handleImageCropped = (croppedImageUrl: string, croppedFile: File) => {
+    // Handle the cropped image
+    console.log('Cropped image:', croppedImageUrl, croppedFile);
+    // You can now add this to the editor
+    handleFileSelect([croppedFile]);
+  };
+
   const handleImageButtonClick = () => {
-    // This could open the image wizard dialog or trigger file selection
-    console.log('Image button clicked');
+    setIsImageSelectorOpen(true);
   };
 
   // Get unique categories from prompts
@@ -77,6 +85,7 @@ export default function EditorPage() {
   return (
     <>
       <Head title="Editor - TheIndivisuals" />
+      <UserImageSelectorDialog isOpen={isImageSelectorOpen} onClose={() => setIsImageSelectorOpen(false)} onImageSelected={handleImageCropped} />
       <div className="flex min-h-screen bg-gray-50">
         {/* Sidebar */}
         <aside className="flex w-80 flex-col border-r border-gray-200 bg-white p-6">

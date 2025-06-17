@@ -111,3 +111,4 @@ This is a Laravel + Inertia.js + React application focused on AI-powered image p
 - Format all changed files (except php) with `prettier` at the very end
 - Use `Laravel Pint` after changing php files
 - Use `PascalCase` for react components file names
+- Avoid useless or unnecessary comments
