@@ -1,4 +1,3 @@
-import Editor from '@/components/editor/Editor';
 import EditorImageUploader from '@/components/editor/EditorImageUploader';
 import TextAdder from '@/components/editor/TextAdder';
 import UserImageSelectorDialog from '@/components/editor/UserImageSelectorDialog';
@@ -208,9 +207,7 @@ export default function EditorPage() {
 
         {/* Main Content */}
         <main className="flex-1 p-4">
-          <div className="mx-auto max-w-7xl">
-            <Editor onExport={handleExport} />
-          </div>
+          <div className="mx-auto max-w-7xl">EditorCanvas</div>
         </main>
       </div>
     </>
