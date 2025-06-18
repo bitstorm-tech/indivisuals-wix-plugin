@@ -1,4 +1,5 @@
 import EditorImageUploader from '@/components/editor/EditorImageUploader';
+import ImageGenerationSection from '@/components/editor/ImageGenerationSection';
 import TextAdder from '@/components/editor/TextAdder';
 import UserImageSelectorDialog from '@/components/editor/UserImageSelectorDialog';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
@@ -37,6 +38,7 @@ export default function EditorPage() {
     };
   }, []);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleExport = (data: { images: EditorImage[]; texts: EditorText[] }) => {
     console.log('Exporting editor data:', data);
   };
@@ -207,7 +209,10 @@ export default function EditorPage() {
 
         {/* Main Content */}
         <main className="flex-1 p-4">
-          <div className="mx-auto max-w-7xl">EditorCanvas</div>
+          <div className="mx-auto max-w-7xl">
+            <div>EditorCanvas</div>
+            <ImageGenerationSection selectedImages={selectedImages} selectedPromptId={selectedPromptId} prompts={prompts} />
+          </div>
         </main>
       </div>
     </>
