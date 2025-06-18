@@ -27,6 +27,10 @@ export function useImageCrop(options: UseImageCropOptions = {}): UseImageCropRet
   const [crop, setCrop] = useState<Crop | undefined>();
   const [completedCrop, setCompletedCrop] = useState<PixelCrop | undefined>();
   const imgRef = useRef<HTMLImageElement>(null);
+  const currentAspectRatioRef = useRef(aspectRatio);
+
+  // Update the aspect ratio ref when it changes
+  currentAspectRatioRef.current = aspectRatio;
 
   const setInitialCrop = useCallback(
     (imageElement: HTMLImageElement) => {

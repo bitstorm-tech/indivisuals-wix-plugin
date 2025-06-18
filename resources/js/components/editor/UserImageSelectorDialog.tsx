@@ -1,8 +1,11 @@
 import { Button } from '@/components/ui/Button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
-import { Image, Upload } from 'lucide-react';
+import { Label } from '@/components/ui/Label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { useImageCrop } from '@/hooks/useImageCrop';
+import { Crop as CropIcon, Image, Square, Upload } from 'lucide-react';
 import { useCallback, useRef, useState } from 'react';
-import ReactCrop, { Crop, PixelCrop } from 'react-image-crop';
+import ReactCrop from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 
 interface UserImageSelectorDialogProps {
@@ -11,13 +14,27 @@ interface UserImageSelectorDialogProps {
   onImageSelected?: (croppedImageUrl: string, croppedFile: File) => void;
 }
 
+type AspectRatioOption = 'free' | '1:1' | '16:9' | '4:3' | '3:2';
+
+const ASPECT_RATIOS: Record<AspectRatioOption, { value: number | undefined; label: string; icon?: React.ReactNode }> = {
+  free: { value: undefined, label: 'Frei', icon: <CropIcon className="h-4 w-4" /> },
+  '1:1': { value: 1, label: '1:1 (Quadrat)', icon: <Square className="h-4 w-4" /> },
+  '16:9': { value: 16 / 9, label: '16:9 (Breitbild)' },
+  '4:3': { value: 4 / 3, label: '4:3 (Standard)' },
+  '3:2': { value: 3 / 2, label: '3:2 (Foto)' },
+};
+
 export default function UserImageSelectorDialog({ isOpen, onClose, onImageSelected }: UserImageSelectorDialogProps) {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [crop, setCrop] = useState<Crop>();
-  const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
-  const imgRef = useRef<HTMLImageElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [aspectRatio, setAspectRatio] = useState<AspectRatioOption>('free');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [imageKey, setImageKey] = useState(0); // Force re-render of ReactCrop
+
+  const { crop, setCrop, completedCrop, setCompletedCrop, imgRef, getCroppedImage, setInitialCrop, resetCrop } = useImageCrop({
+    initialCropPercent: 80,
+    aspectRatio: ASPECT_RATIOS[aspectRatio].value,
+  });
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -26,81 +43,44 @@ export default function UserImageSelectorDialog({ isOpen, onClose, onImageSelect
       const reader = new FileReader();
       reader.onload = (e) => {
         setSelectedImage(e.target?.result as string);
-        // Initial crop will be set in onImageLoad
+        resetCrop(); // Reset crop state for new image
+        setAspectRatio('free'); // Reset aspect ratio to free
       };
       reader.readAsDataURL(file);
     }
   };
 
-  const handleDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const handleDrop = useCallback(
+    (e: React.DragEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      e.stopPropagation();
 
-    const file = e.dataTransfer.files[0];
-    if (file && file.type.startsWith('image/')) {
-      setSelectedFile(file);
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        setSelectedImage(event.target?.result as string);
-        // Initial crop will be set in onImageLoad
-      };
-      reader.readAsDataURL(file);
-    }
-  }, []);
+      const file = e.dataTransfer.files[0];
+      if (file && file.type.startsWith('image/')) {
+        setSelectedFile(file);
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          setSelectedImage(event.target?.result as string);
+          resetCrop(); // Reset crop state for new image
+          setAspectRatio('free'); // Reset aspect ratio to free
+        };
+        reader.readAsDataURL(file);
+      }
+    },
+    [resetCrop],
+  );
 
   const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
   }, []);
 
-  const getCroppedImg = useCallback(async (): Promise<{ url: string; file: File } | undefined> => {
-    if (!completedCrop || !imgRef.current || !selectedFile) return undefined;
-
-    const image = imgRef.current;
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-
-    if (!ctx) {
-      throw new Error('No 2d context');
-    }
-
-    const scaleX = image.naturalWidth / image.width;
-    const scaleY = image.naturalHeight / image.height;
-
-    canvas.width = completedCrop.width;
-    canvas.height = completedCrop.height;
-
-    ctx.drawImage(
-      image,
-      completedCrop.x * scaleX,
-      completedCrop.y * scaleY,
-      completedCrop.width * scaleX,
-      completedCrop.height * scaleY,
-      0,
-      0,
-      completedCrop.width,
-      completedCrop.height,
-    );
-
-    return new Promise<{ url: string; file: File }>((resolve) => {
-      canvas.toBlob((blob) => {
-        if (!blob) {
-          throw new Error('Canvas is empty');
-        }
-        const croppedFile = new File([blob], selectedFile.name, { type: selectedFile.type });
-        const croppedImageUrl = URL.createObjectURL(blob);
-        resolve({ url: croppedImageUrl, file: croppedFile });
-      }, selectedFile.type);
-    });
-  }, [completedCrop, selectedFile]);
-
   const handleConfirm = async () => {
-    if (completedCrop && imgRef.current) {
+    if (completedCrop && imgRef.current && selectedFile) {
       try {
-        const result = await getCroppedImg();
+        const result = await getCroppedImage(selectedFile.name, selectedFile.type);
         if (result) {
-          const { url, file } = result;
-          onImageSelected?.(url, file);
+          onImageSelected?.(result.url, result.file);
           handleClose();
         }
       } catch (error) {
@@ -112,8 +92,8 @@ export default function UserImageSelectorDialog({ isOpen, onClose, onImageSelect
   const handleClose = () => {
     setSelectedImage(null);
     setSelectedFile(null);
-    setCrop(undefined);
-    setCompletedCrop(undefined);
+    resetCrop();
+    setAspectRatio('free');
     onClose();
   };
 
@@ -122,26 +102,13 @@ export default function UserImageSelectorDialog({ isOpen, onClose, onImageSelect
   };
 
   const onImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
-    const { width, height } = e.currentTarget;
+    setInitialCrop(e.currentTarget);
+  };
 
-    // Set initial crop to center 80% of the image
-    const initialCrop: PixelCrop = {
-      unit: 'px',
-      x: width * 0.1,
-      y: height * 0.1,
-      width: width * 0.8,
-      height: height * 0.8,
-    };
-
-    // Set both crop and completedCrop so the button is enabled immediately
-    setCrop({
-      unit: '%',
-      x: 10,
-      y: 10,
-      width: 80,
-      height: 80,
-    });
-    setCompletedCrop(initialCrop);
+  const handleAspectRatioChange = (newRatio: AspectRatioOption) => {
+    setAspectRatio(newRatio);
+    setImageKey((prev) => prev + 1); // Force re-render
+    // The crop will be re-initialized when the image loads again
   };
 
   return (
@@ -166,8 +133,37 @@ export default function UserImageSelectorDialog({ isOpen, onClose, onImageSelect
             </div>
           ) : (
             <div className="space-y-4">
+              {/* Aspect Ratio Options */}
+              <div className="space-y-2">
+                <Label>Seitenverhältnis</Label>
+                <RadioGroup value={aspectRatio} onValueChange={(value) => handleAspectRatioChange(value as AspectRatioOption)}>
+                  <div className="flex flex-wrap gap-2">
+                    {Object.entries(ASPECT_RATIOS).map(([key, { label, icon }]) => (
+                      <div key={key} className="flex items-center">
+                        <RadioGroupItem value={key} id={`ratio-${key}`} className="sr-only" />
+                        <Label
+                          htmlFor={`ratio-${key}`}
+                          className={`flex cursor-pointer items-center gap-1 rounded-md border px-3 py-1.5 text-sm transition-colors ${
+                            aspectRatio === key ? 'border-primary bg-primary text-primary-foreground' : 'border-gray-200 hover:border-gray-300'
+                          }`}
+                        >
+                          {icon}
+                          {label}
+                        </Label>
+                      </div>
+                    ))}
+                  </div>
+                </RadioGroup>
+              </div>
+
               <div className="flex items-center justify-center rounded-lg bg-gray-100 p-4">
-                <ReactCrop crop={crop} onChange={(c) => setCrop(c)} onComplete={(c) => setCompletedCrop(c)} aspect={undefined}>
+                <ReactCrop
+                  key={imageKey}
+                  crop={crop}
+                  onChange={(c) => setCrop(c)}
+                  onComplete={(c) => setCompletedCrop(c)}
+                  aspect={ASPECT_RATIOS[aspectRatio].value}
+                >
                   <img ref={imgRef} src={selectedImage} alt="Crop preview" className="max-h-[500px] max-w-full object-contain" onLoad={onImageLoad} />
                 </ReactCrop>
               </div>
@@ -179,8 +175,8 @@ export default function UserImageSelectorDialog({ isOpen, onClose, onImageSelect
                     // Reset to initial state
                     setSelectedImage(null);
                     setSelectedFile(null);
-                    setCrop(undefined);
-                    setCompletedCrop(undefined);
+                    resetCrop();
+                    setAspectRatio('free');
                   }}
                 >
                   <Image className="mr-2 h-4 w-4" />

@@ -4,10 +4,11 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '
 import { Input } from '@/components/ui/Input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
 import { Textarea } from '@/components/ui/Textarea';
+import { useImageCrop } from '@/hooks/useImageCrop';
 import { Prompt } from '@/types/prompt';
 import { router, useForm } from '@inertiajs/react';
 import { useEffect, useRef, useState } from 'react';
-import ReactCrop, { Crop, PixelCrop } from 'react-image-crop';
+import ReactCrop from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 
 interface NewOrEditPromptDialogProps {
@@ -24,13 +25,6 @@ export default function NewOrEditPromptDialog({ isOpen, editingPrompt, categorie
     prompt: string;
     active: boolean;
     example_image: File | null;
-    crop_data?: {
-      x: number;
-      y: number;
-      width: number;
-      height: number;
-      unit: '%' | 'px';
-    };
   }>({
     name: '',
     category: '',
@@ -41,20 +35,21 @@ export default function NewOrEditPromptDialog({ isOpen, editingPrompt, categorie
   const [useCustomCategory, setUseCustomCategory] = useState(false);
   const [customCategory, setCustomCategory] = useState('');
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [crop, setCrop] = useState<Crop>();
-  const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
-  const [imageNaturalSize, setImageNaturalSize] = useState<{ width: number; height: number }>();
+  const [croppedFile, setCroppedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const imgRef = useRef<HTMLImageElement>(null);
+
+  const { crop, setCrop, completedCrop, setCompletedCrop, imgRef, getCroppedImage, setInitialCrop, resetCrop } = useImageCrop({
+    aspectRatio: 16 / 9,
+    initialCropPercent: 80,
+  });
 
   useEffect(() => {
     if (!isOpen) {
       setUseCustomCategory(false);
       setCustomCategory('');
       setImagePreview(null);
-      setCrop(undefined);
-      setCompletedCrop(undefined);
-      setImageNaturalSize(undefined);
+      setCroppedFile(null);
+      resetCrop();
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
@@ -92,41 +87,27 @@ export default function NewOrEditPromptDialog({ isOpen, editingPrompt, categorie
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result as string);
-        setCrop(undefined);
-        setCompletedCrop(undefined);
+        setCroppedFile(null);
+        resetCrop();
       };
       reader.readAsDataURL(file);
     } else {
       form.setData('example_image', null);
       setImagePreview(null);
-      setCrop(undefined);
-      setCompletedCrop(undefined);
+      setCroppedFile(null);
+      resetCrop();
     }
   };
 
-  const onImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
-    const { width, height } = e.currentTarget;
-    setImageNaturalSize({ width, height });
-
-    // Set initial crop to center with 16:9 aspect ratio for 1080p
-    const aspectRatio = 16 / 9;
-    let cropWidth = width * 0.8;
-    let cropHeight = cropWidth / aspectRatio;
-
-    if (cropHeight > height * 0.8) {
-      cropHeight = height * 0.8;
-      cropWidth = cropHeight * aspectRatio;
+  const handleCropImage = async () => {
+    try {
+      const croppedImage = await getCroppedImage('cropped-image.png', 'image/png');
+      if (croppedImage) {
+        setCroppedFile(croppedImage.file);
+      }
+    } catch (error) {
+      console.error('Error cropping image:', error);
     }
-
-    const crop: Crop = {
-      unit: '%',
-      x: ((width - cropWidth) / width) * 50,
-      y: ((height - cropHeight) / height) * 50,
-      width: (cropWidth / width) * 100,
-      height: (cropHeight / height) * 100,
-    };
-
-    setCrop(crop);
   };
 
   const handleSave = () => {
@@ -134,17 +115,12 @@ export default function NewOrEditPromptDialog({ isOpen, editingPrompt, categorie
       return;
     }
 
-    // Prepare form data with crop data if image is being uploaded
+    // Prepare form data with cropped image
     const dataToSubmit = { ...form.data };
 
-    if (form.data.example_image && completedCrop && imageNaturalSize) {
-      dataToSubmit.crop_data = {
-        x: (completedCrop.x / imageNaturalSize.width) * 100,
-        y: (completedCrop.y / imageNaturalSize.height) * 100,
-        width: (completedCrop.width / imageNaturalSize.width) * 100,
-        height: (completedCrop.height / imageNaturalSize.height) * 100,
-        unit: '%',
-      };
+    // If we have a cropped file, use it instead of the original
+    if (croppedFile) {
+      dataToSubmit.example_image = croppedFile;
     }
 
     if (editingPrompt) {
@@ -280,15 +256,23 @@ export default function NewOrEditPromptDialog({ isOpen, editingPrompt, categorie
                     <>
                       <p className="text-sm text-gray-600">Select the area to crop for 1080p (1920x1080) display:</p>
                       <div className="max-h-96 overflow-auto rounded border">
-                        <ReactCrop
-                          crop={crop}
-                          onChange={(_, percentCrop) => setCrop(percentCrop)}
-                          onComplete={(c) => setCompletedCrop(c)}
-                          aspect={16 / 9}
-                          keepSelection
-                        >
-                          <img ref={imgRef} src={imagePreview} alt="Crop preview" onLoad={onImageLoad} style={{ maxWidth: '100%', height: 'auto' }} />
+                        <ReactCrop crop={crop} onChange={(c) => setCrop(c)} onComplete={(c) => setCompletedCrop(c)} aspect={16 / 9} keepSelection>
+                          <img
+                            ref={imgRef}
+                            src={imagePreview}
+                            alt="Crop preview"
+                            onLoad={(e) => {
+                              const img = e.currentTarget;
+                              setInitialCrop(img);
+                            }}
+                            style={{ maxWidth: '100%', height: 'auto' }}
+                          />
                         </ReactCrop>
+                      </div>
+                      <div className="mt-2 flex justify-end">
+                        <Button type="button" size="sm" onClick={handleCropImage} disabled={!completedCrop}>
+                          Apply Crop
+                        </Button>
                       </div>
                     </>
                   ) : (

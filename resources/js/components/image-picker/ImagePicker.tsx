@@ -1,5 +1,10 @@
+import { Button } from '@/components/ui/Button';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
+import { useImageCrop } from '@/hooks/useImageCrop';
 import { Prompt } from '@/types/prompt';
 import React, { useCallback, useEffect, useState } from 'react';
+import ReactCrop from 'react-image-crop';
+import 'react-image-crop/dist/ReactCrop.css';
 import { UploadResponse } from '../../types/image-picker';
 import FileUploader from './FileUploader';
 import ImageDisplay from './ImageDisplay';
@@ -18,6 +23,13 @@ export default function ImagePicker({ defaultPromptId, storeImages = true }: Ima
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [prompts, setPrompts] = useState<Prompt[]>([]);
   const [selectedPromptId, setSelectedPromptId] = useState<number | undefined>(defaultPromptId);
+  const [showCropDialog, setShowCropDialog] = useState(false);
+  const [croppedFile, setCroppedFile] = useState<File | undefined>(undefined);
+
+  const { crop, setCrop, completedCrop, setCompletedCrop, imgRef, getCroppedImage, setInitialCrop } = useImageCrop({
+    aspectRatio: 1,
+    initialCropPercent: 80,
+  });
 
   const fetchPrompts = useCallback(async (): Promise<void> => {
     try {
@@ -37,7 +49,8 @@ export default function ImagePicker({ defaultPromptId, storeImages = true }: Ima
   }, []);
 
   const uploadImage = useCallback(async (): Promise<void> => {
-    if (!selectedFile) {
+    const fileToUpload = croppedFile || selectedFile;
+    if (!fileToUpload) {
       return;
     }
 
@@ -46,7 +59,7 @@ export default function ImagePicker({ defaultPromptId, storeImages = true }: Ima
 
     try {
       const formData = new FormData();
-      formData.append('image', selectedFile);
+      formData.append('image', fileToUpload);
 
       if (selectedPromptId) {
         formData.append('prompt_id', selectedPromptId.toString());
@@ -78,6 +91,8 @@ export default function ImagePicker({ defaultPromptId, storeImages = true }: Ima
       if (result.success && result.generated_image_url) {
         setGeneratedImage(result.generated_image_url);
         setSelectedFile(undefined);
+        setCroppedFile(undefined);
+        setShowCropDialog(false);
       } else {
         throw new Error(result.message || 'Upload failed');
       }
@@ -87,7 +102,7 @@ export default function ImagePicker({ defaultPromptId, storeImages = true }: Ima
     } finally {
       setIsProcessing(false);
     }
-  }, [selectedFile, selectedPromptId, storeImages]);
+  }, [selectedFile, croppedFile, selectedPromptId, storeImages]);
 
   const handleFileChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -101,9 +116,12 @@ export default function ImagePicker({ defaultPromptId, storeImages = true }: Ima
         setSelectedFile(file);
         setPreviewImage(URL.createObjectURL(file));
         setGeneratedImage(undefined);
+        setCroppedFile(undefined);
+        setShowCropDialog(true);
       } else {
         setSelectedFile(undefined);
         setPreviewImage(undefined);
+        setCroppedFile(undefined);
       }
     },
     [previewImage],
@@ -122,7 +140,26 @@ export default function ImagePicker({ defaultPromptId, storeImages = true }: Ima
     };
   }, [previewImage]);
 
-  const canUpload = selectedFile && selectedPromptId && !isProcessing;
+  const handleCropConfirm = useCallback(async () => {
+    try {
+      const croppedImage = await getCroppedImage('cropped-image.png', 'image/png');
+      if (croppedImage) {
+        setCroppedFile(croppedImage.file);
+        setShowCropDialog(false);
+      }
+    } catch (error) {
+      console.error('Error cropping image:', error);
+      alert('Failed to crop image. Please try again.');
+    }
+  }, [getCroppedImage]);
+
+  const handleCropCancel = useCallback(() => {
+    setShowCropDialog(false);
+    setCroppedFile(undefined);
+    // Keep the original file selected
+  }, []);
+
+  const canUpload = (selectedFile || croppedFile) && selectedPromptId && !isProcessing;
 
   return (
     <>
@@ -141,6 +178,39 @@ export default function ImagePicker({ defaultPromptId, storeImages = true }: Ima
       <ProcessingIndicator isVisible={isProcessing} />
 
       <ImageDisplay previewImage={previewImage} generatedImage={generatedImage} />
+
+      <Dialog open={showCropDialog} onOpenChange={setShowCropDialog}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Crop Image</DialogTitle>
+            <DialogDescription>Adjust the crop area for your image. The image will be cropped to a square aspect ratio.</DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            {previewImage && (
+              <ReactCrop crop={crop} onChange={(c) => setCrop(c)} onComplete={(c) => setCompletedCrop(c)} aspect={1}>
+                <img
+                  ref={imgRef}
+                  src={previewImage}
+                  alt="Crop preview"
+                  onLoad={(e) => {
+                    const img = e.currentTarget;
+                    setInitialCrop(img);
+                  }}
+                  className="max-h-[400px] w-full object-contain"
+                />
+              </ReactCrop>
+            )}
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={handleCropCancel}>
+              Skip Cropping
+            </Button>
+            <Button type="button" onClick={handleCropConfirm} disabled={!completedCrop}>
+              Apply Crop
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

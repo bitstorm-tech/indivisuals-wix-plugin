@@ -47,12 +47,6 @@ class PromptController extends Controller
             'prompt' => 'required|string',
             'active' => 'required|boolean',
             'example_image' => 'nullable|image|max:5120', // 5MB max
-            'crop_data' => 'nullable|array',
-            'crop_data.x' => 'required_with:crop_data|numeric|min:0',
-            'crop_data.y' => 'required_with:crop_data|numeric|min:0',
-            'crop_data.width' => 'required_with:crop_data|numeric|min:0',
-            'crop_data.height' => 'required_with:crop_data|numeric|min:0',
-            'crop_data.unit' => 'required_with:crop_data|in:%,px',
         ]);
 
         // Convert string boolean to actual boolean only if it's a string (from FormData)
@@ -66,15 +60,9 @@ class PromptController extends Controller
 
         if ($request->hasFile('example_image')) {
             $file = $request->file('example_image');
-            $cropData = $validated['crop_data'] ?? null;
 
-            if ($cropData) {
-                // Crop and convert to WebP
-                $webpData = $this->imageConverter->cropAndResize($file->getRealPath(), $cropData);
-            } else {
-                // Just convert to WebP without cropping
-                $webpData = $this->imageConverter->convertToWebp($file->getRealPath());
-            }
+            // Just convert to WebP without cropping (images are now cropped on frontend)
+            $webpData = $this->imageConverter->convertToWebp($file->getRealPath());
 
             // Generate UUID filename
             $filename = Str::uuid().'.webp';
@@ -116,12 +104,6 @@ class PromptController extends Controller
             'active' => 'sometimes|required|boolean',
             'example_image' => 'nullable|image|max:5120', // 5MB max
             'remove_example_image' => 'sometimes|boolean',
-            'crop_data' => 'nullable|array',
-            'crop_data.x' => 'required_with:crop_data|numeric|min:0',
-            'crop_data.y' => 'required_with:crop_data|numeric|min:0',
-            'crop_data.width' => 'required_with:crop_data|numeric|min:0',
-            'crop_data.height' => 'required_with:crop_data|numeric|min:0',
-            'crop_data.unit' => 'required_with:crop_data|in:%,px',
         ]);
 
         // Convert string boolean to actual boolean only if it's a string (from FormData)
@@ -130,7 +112,7 @@ class PromptController extends Controller
         }
 
         // Update other fields (except example_image which is handled separately)
-        $dataToUpdate = collect($validated)->except(['example_image', 'remove_example_image', 'crop_data'])->toArray();
+        $dataToUpdate = collect($validated)->except(['example_image', 'remove_example_image'])->toArray();
         $prompt->fill($dataToUpdate);
 
         if ($request->boolean('remove_example_image')) {
@@ -139,22 +121,15 @@ class PromptController extends Controller
             $prompt->example_image_filename = null;
         } elseif ($request->hasFile('example_image')) {
             $file = $request->file('example_image');
-            $cropData = $validated['crop_data'] ?? null;
 
             Log::info('Uploading example image', [
                 'prompt_id' => $prompt->id,
                 'file_size' => $file->getSize(),
                 'mime_type' => $file->getMimeType(),
-                'has_crop_data' => ! is_null($cropData),
             ]);
 
-            if ($cropData) {
-                // Crop and convert to WebP
-                $webpData = $this->imageConverter->cropAndResize($file->getRealPath(), $cropData);
-            } else {
-                // Just convert to WebP without cropping
-                $webpData = $this->imageConverter->convertToWebp($file->getRealPath());
-            }
+            // Just convert to WebP without cropping (images are now cropped on frontend)
+            $webpData = $this->imageConverter->convertToWebp($file->getRealPath());
 
             // Delete old file if exists
             $prompt->deleteExampleImageFile();

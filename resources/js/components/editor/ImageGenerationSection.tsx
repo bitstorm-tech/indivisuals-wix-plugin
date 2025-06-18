@@ -107,9 +107,7 @@ export default function ImageGenerationSection({ selectedImages, selectedPromptI
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
           </svg>
           <p className="text-lg font-medium text-blue-700">Click to generate image</p>
-          <p className="mt-2 text-sm text-gray-600">
-            Using first image with "{selectedPrompt?.name}"
-          </p>
+          <p className="mt-2 text-sm text-gray-600">Using first image with "{selectedPrompt?.name}"</p>
         </div>
       )}
     </div>
