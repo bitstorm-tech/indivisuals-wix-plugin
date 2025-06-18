@@ -44,7 +44,7 @@ class OpenAiService
                     ],
                     [
                         'name' => 'quality',
-                        'contents' => 'medium',
+                        'contents' => 'low',
                     ],
                     [
                         'name' => 'prompt',
