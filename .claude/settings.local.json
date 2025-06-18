@@ -25,7 +25,9 @@
       "Bash(code:*)",
       "Bash(curl:*)",
       "Bash(cat:*)",
-      "Bash(prettier:*)"
+      "Bash(prettier:*)",
+      "mcp__puppeteer__puppeteer_navigate",
+      "mcp__puppeteer__puppeteer_screenshot"
     ]
   },
   "enableAllProjectMcpServers": false

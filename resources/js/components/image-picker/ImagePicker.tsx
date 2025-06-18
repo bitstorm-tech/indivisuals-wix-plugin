@@ -48,61 +48,64 @@ export default function ImagePicker({ defaultPromptId, storeImages = true }: Ima
     }
   }, []);
 
-  const uploadImage = useCallback(async (): Promise<void> => {
-    const fileToUpload = croppedFile || selectedFile;
-    if (!fileToUpload) {
-      return;
-    }
-
-    setIsProcessing(true);
-    setGeneratedImage(undefined);
-
-    try {
-      const formData = new FormData();
-      formData.append('image', fileToUpload);
-
-      if (selectedPromptId) {
-        formData.append('prompt_id', selectedPromptId.toString());
+  const uploadImage = useCallback(
+    async (fileOverride?: File): Promise<void> => {
+      const fileToUpload = fileOverride || croppedFile || selectedFile;
+      if (!fileToUpload) {
+        return;
       }
 
-      formData.append('store_images', storeImages.toString());
+      setIsProcessing(true);
+      setGeneratedImage(undefined);
 
-      const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+      try {
+        const formData = new FormData();
+        formData.append('image', fileToUpload);
 
-      if (!csrfToken) {
-        throw new Error('CSRF token not found');
+        if (selectedPromptId) {
+          formData.append('prompt_id', selectedPromptId.toString());
+        }
+
+        formData.append('store_images', storeImages.toString());
+
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+        if (!csrfToken) {
+          throw new Error('CSRF token not found');
+        }
+
+        const response = await fetch('/upload-image', {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-TOKEN': csrfToken,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result: UploadResponse = await response.json();
+
+        if (result.success && result.generated_image_url) {
+          setGeneratedImage(result.generated_image_url);
+          setSelectedFile(undefined);
+          setCroppedFile(undefined);
+          setShowCropDialog(false);
+        } else {
+          throw new Error(result.message || 'Upload failed');
+        }
+      } catch (error) {
+        console.error('Upload error:', error);
+        alert(`Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      } finally {
+        setIsProcessing(false);
       }
-
-      const response = await fetch('/upload-image', {
-        method: 'POST',
-        body: formData,
-        headers: {
-          'X-Requested-With': 'XMLHttpRequest',
-          'X-CSRF-TOKEN': csrfToken,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const result: UploadResponse = await response.json();
-
-      if (result.success && result.generated_image_url) {
-        setGeneratedImage(result.generated_image_url);
-        setSelectedFile(undefined);
-        setCroppedFile(undefined);
-        setShowCropDialog(false);
-      } else {
-        throw new Error(result.message || 'Upload failed');
-      }
-    } catch (error) {
-      console.error('Upload error:', error);
-      alert(`Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    } finally {
-      setIsProcessing(false);
-    }
-  }, [selectedFile, croppedFile, selectedPromptId, storeImages]);
+    },
+    [selectedFile, croppedFile, selectedPromptId, storeImages],
+  );
 
   const handleFileChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -146,18 +149,21 @@ export default function ImagePicker({ defaultPromptId, storeImages = true }: Ima
       if (croppedImage) {
         setCroppedFile(croppedImage.file);
         setShowCropDialog(false);
+        // Automatically upload the cropped image
+        await uploadImage(croppedImage.file);
       }
     } catch (error) {
       console.error('Error cropping image:', error);
       alert('Failed to crop image. Please try again.');
     }
-  }, [getCroppedImage]);
+  }, [getCroppedImage, uploadImage]);
 
-  const handleCropCancel = useCallback(() => {
+  const handleCropCancel = useCallback(async () => {
     setShowCropDialog(false);
     setCroppedFile(undefined);
-    // Keep the original file selected
-  }, []);
+    // Upload the original file without cropping
+    await uploadImage();
+  }, [uploadImage]);
 
   const canUpload = (selectedFile || croppedFile) && selectedPromptId && !isProcessing;
 
