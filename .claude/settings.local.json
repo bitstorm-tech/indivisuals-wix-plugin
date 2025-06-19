@@ -28,7 +28,8 @@
       "Bash(prettier:*)",
       "mcp__puppeteer__puppeteer_navigate",
       "mcp__puppeteer__puppeteer_screenshot",
-      "Bash(vendor/bin/pint:*)"
+      "Bash(vendor/bin/pint:*)",
+      "Bash(touch:*)"
     ]
   },
   "enableAllProjectMcpServers": false
