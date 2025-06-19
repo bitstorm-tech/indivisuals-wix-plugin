@@ -1,215 +1,127 @@
-import EditorImageUploader from '@/components/editor/EditorImageUploader';
-import ImageGenerationSection from '@/components/editor/ImageGenerationSection';
-import TextAdder from '@/components/editor/TextAdder';
-import UserImageSelectorDialog from '@/components/editor/UserImageSelectorDialog';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
-import { EditorImage, EditorText } from '@/types/editor';
-import { Prompt } from '@/types/prompt';
+import EditorCanvas from '@/components/editor/components/canvas/EditorCanvas';
+import EditorImageUploader from '@/components/editor/components/EditorImageUploader';
+import ImageGenerationSection from '@/components/editor/components/ImageGenerationSection';
+import CategoryFilter from '@/components/editor/components/sidebar/CategoryFilter';
+import ImagePreviewList from '@/components/editor/components/sidebar/ImagePreviewList';
+import InstructionsPanel from '@/components/editor/components/sidebar/InstructionsPanel';
+import PromptList from '@/components/editor/components/sidebar/PromptList';
+import TextAdder from '@/components/editor/components/TextAdder';
+import UserImageSelectorDialog from '@/components/editor/components/UserImageSelectorDialog';
+import { MAX_IMAGES } from '@/components/editor/constants';
+import { useEditorState } from '@/components/editor/hooks/useEditorState';
+import { usePrompts } from '@/components/editor/hooks/usePrompts';
+import { useSelectedImages } from '@/components/editor/hooks/useSelectedImages';
 import { Head } from '@inertiajs/react';
-import { useEffect, useState } from 'react';
+import { useCallback } from 'react';
 
 export default function EditorPage() {
-  const [prompts, setPrompts] = useState<Prompt[]>([]);
-  const [selectedPromptId, setSelectedPromptId] = useState<number | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [isImageSelectorOpen, setIsImageSelectorOpen] = useState(false);
-  const [selectedImages, setSelectedImages] = useState<{ url: string; file: File }[]>([]);
+  const { prompts, filteredPrompts, categories, selectedPromptId, selectedCategory, isLoading, setSelectedPromptId, setSelectedCategory } =
+    usePrompts();
 
-  useEffect(() => {
-    const controller = new AbortController();
+  const { selectedImages, isImageSelectorOpen, currentCount, addImage, removeImage, openImageSelector, closeImageSelector } =
+    useSelectedImages(MAX_IMAGES);
 
-    fetch('/prompts', { signal: controller.signal })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Failed to fetch prompts');
-        }
-        return response.json();
-      })
-      .then((data) => setPrompts(data))
-      .catch((error) => {
-        if (error.name !== 'AbortError') {
-          console.error('Failed to fetch prompts:', error);
-        }
+  const {
+    images,
+    texts,
+    selectedElementId,
+    selectedElementType,
+    addText,
+    updateImage,
+    deleteImage,
+    updateText,
+    deleteText,
+    selectElement,
+    clearSelection,
+  } = useEditorState();
+
+  const handleFileSelect = useCallback(
+    (files: File[]) => {
+      files.forEach((file) => {
+        const url = URL.createObjectURL(file);
+        addImage(url, file);
       });
+    },
+    [addImage],
+  );
 
-    return () => {
-      controller.abort();
+  const handleImageCropped = useCallback(
+    (croppedImageUrl: string, croppedFile: File) => {
+      addImage(croppedImageUrl, croppedFile);
+    },
+    [addImage],
+  );
+
+  const handleAddText = useCallback(() => {
+    const newText = {
+      id: `text-${Date.now()}`,
+      content: 'New Text',
+      position: { x: 100, y: 100 },
+      size: { width: 200, height: 50 },
+      style: {
+        fontFamily: 'Arial',
+        fontSize: 16,
+        color: '#000000',
+        fontWeight: 'normal' as const,
+        fontStyle: 'normal' as const,
+        textAlign: 'left' as const,
+      },
+      zIndex: texts.length + images.length,
     };
-  }, []);
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleExport = (data: { images: EditorImage[]; texts: EditorText[] }) => {
-    console.log('Exporting editor data:', data);
-  };
-
-  const handleSelectPrompt = (promptId: number) => {
-    setSelectedPromptId(promptId);
-  };
-
-  const handleAddText = () => {
-    // For now, this is a placeholder. In a real implementation,
-    // you would need to communicate with the Editor component
-    // through a shared state management solution or context
-    alert('Text hinzufügen functionality will be connected to the Editor');
-  };
-
-  const handleFileSelect = (files: File[]) => {
-    // For now, this is a placeholder. In a real implementation,
-    // you would need to communicate with the Editor component
-    // to add the selected images
-    console.log('Selected files:', files);
-  };
-
-  const handleImageCropped = (croppedImageUrl: string, croppedFile: File) => {
-    // Add the cropped image to the selected images array
-    if (selectedImages.length < 3) {
-      setSelectedImages((prev) => [...prev, { url: croppedImageUrl, file: croppedFile }]);
-      handleFileSelect([croppedFile]);
-    }
-  };
-
-  const handleRemoveImage = (index: number) => {
-    setSelectedImages((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  const handleImageButtonClick = () => {
-    setIsImageSelectorOpen(true);
-  };
-
-  // Get unique categories from prompts
-  const categories = Array.from(new Set(prompts.map((p) => p.category))).sort();
-
-  // Filter prompts based on selected category
-  const filteredPrompts = prompts.filter((p) => {
-    const hasImage = p.example_image_url;
-    const matchesCategory = selectedCategory === 'all' || p.category === selectedCategory;
-    return hasImage && matchesCategory;
-  });
+    addText(newText);
+  }, [texts.length, images.length, addText]);
 
   return (
     <>
       <Head title="Editor - TheIndivisuals" />
-      <UserImageSelectorDialog isOpen={isImageSelectorOpen} onClose={() => setIsImageSelectorOpen(false)} onImageSelected={handleImageCropped} />
+      <UserImageSelectorDialog isOpen={isImageSelectorOpen} onClose={closeImageSelector} onImageSelected={handleImageCropped} />
+
       <div className="flex min-h-screen bg-gray-50">
         {/* Sidebar */}
         <aside className="flex w-80 flex-col border-r border-gray-200 bg-white p-6">
           <nav className="flex flex-col gap-8">
             <EditorImageUploader
               onFileSelect={handleFileSelect}
-              maxFiles={3}
-              currentCount={selectedImages.length}
-              onButtonClick={handleImageButtonClick}
+              maxFiles={MAX_IMAGES}
+              currentCount={currentCount}
+              onButtonClick={openImageSelector}
             />
 
-            {/* Image Previews */}
-            {selectedImages.length > 0 && (
-              <div className="space-y-2">
-                {selectedImages.map((image, index) => (
-                  <div key={index} className="relative rounded-lg border border-gray-200 p-2">
-                    <img src={image.url} alt={`Selected ${index + 1}`} className="h-20 w-full rounded object-cover" />
-                    <button
-                      onClick={() => handleRemoveImage(index)}
-                      className="absolute -top-2 -right-2 rounded-full bg-red-500 p-1 text-white hover:bg-red-600"
-                    >
-                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
+            <ImagePreviewList images={selectedImages} onRemoveImage={removeImage} />
 
             <div>
-              {prompts.length > 0 ? (
+              {!isLoading && prompts.length > 0 && (
                 <>
-                  {/* Category Filter */}
-                  <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                    <SelectTrigger className="mb-3 h-8 w-full text-xs">
-                      <SelectValue placeholder="Select a category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Categories</SelectItem>
-                      {categories.map((category) => (
-                        <SelectItem key={category} value={category}>
-                          {category}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-
-                  {/* Prompt List */}
-                  <div className="space-y-2 overflow-y-auto">
-                    {filteredPrompts.length > 0 ? (
-                      filteredPrompts.map((prompt) => (
-                        <button
-                          key={prompt.id}
-                          onClick={() => handleSelectPrompt(prompt.id)}
-                          className={`w-full rounded-md border p-2 text-left transition-colors ${
-                            selectedPromptId === prompt.id ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                          }`}
-                        >
-                          <div className="flex items-center space-x-2">
-                            {prompt.example_image_url && (
-                              <img src={prompt.example_image_url} alt={prompt.name} className="h-12 w-12 rounded object-cover" />
-                            )}
-                            <div className="min-w-0 flex-1">
-                              <p className="truncate text-xs font-medium text-gray-900">{prompt.name}</p>
-                              <p className="truncate text-xs text-gray-500">{prompt.category}</p>
-                            </div>
-                          </div>
-                        </button>
-                      ))
-                    ) : (
-                      <p className="text-center text-xs text-gray-500">No prompts in this category</p>
-                    )}
-                  </div>
+                  <CategoryFilter categories={categories} selectedCategory={selectedCategory} onCategoryChange={setSelectedCategory} />
+                  <PromptList prompts={filteredPrompts} selectedPromptId={selectedPromptId} onSelectPrompt={setSelectedPromptId} />
                 </>
-              ) : (
-                <p className="text-xs text-gray-500">Loading prompts...</p>
               )}
+              {isLoading && <p className="text-xs text-gray-500">Loading prompts...</p>}
             </div>
 
-            {/* Add Text Button */}
             <TextAdder onAddText={handleAddText} />
           </nav>
 
           <div className="mt-auto">
-            <Accordion type="single" collapsible className="w-full">
-              <AccordionItem value="instructions" className="border-0">
-                <AccordionTrigger className="py-3 text-sm font-medium text-gray-700 hover:no-underline">Anleitung & Tipps</AccordionTrigger>
-                <AccordionContent className="pb-4">
-                  <div className="space-y-3">
-                    <div className="space-y-1 text-xs text-gray-600">
-                      <div className="font-medium text-gray-700">Anleitung:</div>
-                      <div>1. Bilder per Drag & Drop oder Upload hinzufügen</div>
-                      <div>2. Text mit dem "Text erstellen" Button hinzufügen</div>
-                      <div>3. Elemente durch Anklicken auswählen</div>
-                      <div>4. Ausgewählte Elemente verschieben und skalieren</div>
-                      <div>5. Text per Doppelklick bearbeiten</div>
-                      <div>6. Export über "Export Einstellungen" → "Exportieren"</div>
-                    </div>
-
-                    <div className="space-y-1 text-xs text-gray-600">
-                      <div className="font-medium text-gray-700">💡 Tipps:</div>
-                      <div>• Klicken Sie auf Elemente zum Auswählen</div>
-                      <div>• Ziehen Sie Elemente zum Verschieben</div>
-                      <div>• Ziehen Sie an den Ecken zum Größe ändern</div>
-                      <div>• Doppelklick auf Text zum Bearbeiten</div>
-                      <div>• Klicken Sie auf × zum Löschen</div>
-                    </div>
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
+            <InstructionsPanel />
           </div>
         </aside>
 
         {/* Main Content */}
         <main className="flex-1 p-4">
-          <div className="mx-auto max-w-7xl">
-            <div>EditorCanvas</div>
+          <div className="mx-auto max-w-7xl space-y-4">
+            <EditorCanvas
+              images={images}
+              texts={texts}
+              selectedElementId={selectedElementId}
+              selectedElementType={selectedElementType}
+              onImageUpdate={updateImage}
+              onImageDelete={deleteImage}
+              onTextUpdate={updateText}
+              onTextDelete={deleteText}
+              onSelectElement={selectElement}
+              onClearSelection={clearSelection}
+            />
             <ImageGenerationSection selectedImages={selectedImages} selectedPromptId={selectedPromptId} prompts={prompts} />
           </div>
         </main>

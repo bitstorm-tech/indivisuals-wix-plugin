@@ -3,7 +3,7 @@ import { useState } from 'react';
 interface ImageGenerationSectionProps {
   selectedImages: { url: string; file: File }[];
   selectedPromptId: number | null;
-  prompts: Array<{ id: number; name: string }>;
+  prompts: Array;
 }
 
 export default function ImageGenerationSection({ selectedImages, selectedPromptId, prompts }: ImageGenerationSectionProps) {

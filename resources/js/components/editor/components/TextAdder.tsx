@@ -1,5 +1,5 @@
+import { Button } from '@/components/ui/Button';
 import { Type } from 'lucide-react';
-import { Button } from '../ui/Button';
 
 interface TextAdderProps {
   onAddText: () => void;

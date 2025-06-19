@@ -1,6 +1,6 @@
+import { Button } from '@/components/ui/Button';
 import { Image } from 'lucide-react';
 import React, { useRef } from 'react';
-import { Button } from '../ui/Button';
 
 interface EditorImageUploaderProps {
   onFileSelect: (files: File[]) => void;
@@ -14,7 +14,7 @@ export default function EditorImageUploader({ onFileSelect, maxFiles, currentCou
   const inputRef = useRef<HTMLInputElement>(null);
   const remainingSlots = maxFiles - currentCount;
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (event: React.ChangeEvent) => {
     const files = Array.from(event.target.files || []);
     const validFiles = files.filter((file) => file.type.startsWith('image/'));
     const filesToAdd = validFiles.slice(0, remainingSlots);

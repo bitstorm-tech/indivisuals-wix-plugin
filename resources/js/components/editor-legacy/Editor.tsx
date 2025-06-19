@@ -9,8 +9,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '../ui/Dr
 import { Label } from '../ui/Label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/Select';
 import EditorCanvas from './EditorCanvas';
-import EditorImageUploader from '../editor/EditorImageUploader';
-import TextAdder from '../editor/TextAdder';
+import EditorImageUploader from '../editor/components/EditorImageUploader';
+import TextAdder from '../editor/components/TextAdder';
 import TextPropertiesPanel from './TextPropertiesPanel';
 
 interface EditorProps {

@@ -16,7 +16,7 @@ interface UserImageSelectorDialogProps {
 
 type AspectRatioOption = 'free' | '1:1' | '16:9' | '4:3' | '3:2';
 
-const ASPECT_RATIOS: Record<AspectRatioOption, { value: number | undefined; label: string; icon?: React.ReactNode }> = {
+const ASPECT_RATIOS: Record = {
   free: { value: undefined, label: 'Frei', icon: <CropIcon className="h-4 w-4" /> },
   '1:1': { value: 1, label: '1:1 (Quadrat)', icon: <Square className="h-4 w-4" /> },
   '16:9': { value: 16 / 9, label: '16:9 (Breitbild)' },
@@ -36,7 +36,7 @@ export default function UserImageSelectorDialog({ isOpen, onClose, onImageSelect
     aspectRatio: ASPECT_RATIOS[aspectRatio].value,
   });
 
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = (event: React.ChangeEvent) => {
     const file = event.target.files?.[0];
     if (file && file.type.startsWith('image/')) {
       setSelectedFile(file);
@@ -51,7 +51,7 @@ export default function UserImageSelectorDialog({ isOpen, onClose, onImageSelect
   };
 
   const handleDrop = useCallback(
-    (e: React.DragEvent<HTMLDivElement>) => {
+    (e: React.DragEvent) => {
       e.preventDefault();
       e.stopPropagation();
 
@@ -70,7 +70,7 @@ export default function UserImageSelectorDialog({ isOpen, onClose, onImageSelect
     [resetCrop],
   );
 
-  const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+  const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
   }, []);
@@ -101,7 +101,7 @@ export default function UserImageSelectorDialog({ isOpen, onClose, onImageSelect
     fileInputRef.current?.click();
   };
 
-  const onImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
+  const onImageLoad = (e: React.SyntheticEvent) => {
     setInitialCrop(e.currentTarget);
   };
 
