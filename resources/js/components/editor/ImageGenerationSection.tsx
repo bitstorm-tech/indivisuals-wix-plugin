@@ -24,7 +24,7 @@ export default function ImageGenerationSection({ selectedImages, selectedPromptI
       // Currently the backend expects a single image
       formData.append('image', selectedImages[0].file);
       formData.append('prompt_id', selectedPromptId!.toString());
-      formData.append('n', 4);
+      formData.append('n', '4');
 
       const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
       if (!csrfToken) {
