@@ -45,7 +45,6 @@ export default function EditorPage() {
 
   const handleSelectPrompt = (promptId: number) => {
     setSelectedPromptId(promptId);
-    console.log('Selected prompt:', promptId);
   };
 
   const handleAddText = () => {

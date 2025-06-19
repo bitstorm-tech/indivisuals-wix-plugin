@@ -96,10 +96,10 @@ This is a Laravel + Inertia.js + React application focused on AI-powered image p
 
 ### Development Notes
 
-- ALWAYS read the latest documentation from context7
-- Uses SQLite for simplicity in development
-- Concurrent development setup runs all services simultaneously
+- Use React and Laravel best practices
 - Private image storage requires route-based access control
+- ALWAYS read the latest documentation from context7
+- Concurrent development setup runs all services simultaneously
 - Use shadcn-ui and Tailwind CSS for the styling in the frontend
 - New UI components must be generated with shadcn-ui with `bunx --bun shadcn@latest add`
 - Use as much Laravel functionallity in the backend as possible
