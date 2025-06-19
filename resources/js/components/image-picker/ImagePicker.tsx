@@ -68,6 +68,14 @@ export default function ImagePicker({ defaultPromptId, storeImages = true }: Ima
 
         formData.append('store_images', storeImages.toString());
 
+        // Debug logging
+        console.log('Uploading file:', {
+          name: fileToUpload.name,
+          type: fileToUpload.type,
+          size: fileToUpload.size,
+          lastModified: fileToUpload.lastModified,
+        });
+
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
         if (!csrfToken) {
@@ -83,11 +91,16 @@ export default function ImagePicker({ defaultPromptId, storeImages = true }: Ima
           },
         });
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
         const result: UploadResponse = await response.json();
+
+        if (!response.ok) {
+          // Handle validation errors
+          if (response.status === 422 && result.errors) {
+            const errorMessages = Object.values(result.errors).flat().join(', ');
+            throw new Error(errorMessages || result.message || `HTTP error! status: ${response.status}`);
+          }
+          throw new Error(result.message || `HTTP error! status: ${response.status}`);
+        }
 
         if (result.success && result.generated_image_url) {
           setGeneratedImage(result.generated_image_url);
@@ -162,8 +175,10 @@ export default function ImagePicker({ defaultPromptId, storeImages = true }: Ima
     setShowCropDialog(false);
     setCroppedFile(undefined);
     // Upload the original file without cropping
-    await uploadImage();
-  }, [uploadImage]);
+    if (selectedFile) {
+      await uploadImage(selectedFile);
+    }
+  }, [uploadImage, selectedFile]);
 
   const canUpload = (selectedFile || croppedFile) && selectedPromptId && !isProcessing;
 

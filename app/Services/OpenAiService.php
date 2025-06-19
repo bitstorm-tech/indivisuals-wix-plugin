@@ -22,7 +22,7 @@ class OpenAiService
         $this->apiKey = env('OPENAI_API_KEY');
     }
 
-    public function generateImage(string $imagePath, string $prompt, int $n = 1, string $size = '1024x1024'): string
+    public function generateImage(string $imagePath, string $prompt, int $n = 1, string $size = '1024x1024'): string|array
     {
         try {
             if (! file_exists($imagePath) || ! is_readable($imagePath)) {
@@ -68,7 +68,11 @@ class OpenAiService
             $data = json_decode($response->getBody(), true);
 
             if (isset($data['data'])) {
-                return $data['data'][0]['b64_json'];
+                if ($n === 1) {
+                    return $data['data'][0]['b64_json'];
+                }
+
+                return array_map(fn ($item) => $item['b64_json'], $data['data']);
             }
 
             throw new \Exception('Unexpected API response structure.');

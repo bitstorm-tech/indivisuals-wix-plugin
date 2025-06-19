@@ -25,6 +25,7 @@ class ImageController
             'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:4096',
             'prompt_id' => 'required|exists:prompts,id',
             'store_images' => 'nullable|in:true,false,1,0',
+            'n' => 'nullable|integer|min:1|max:4',
         ]);
 
         if ($validator->fails()) {
@@ -38,9 +39,12 @@ class ImageController
         try {
             $image = $request->file('image');
             $storeImages = $request->boolean('store_images', true);
+            $n = $request->integer('n', 1);
+
+            $uuid = Str::uuid()->toString();
 
             if ($storeImages) {
-                $filename = Str::uuid().'.'.$image->getClientOriginalExtension();
+                $filename = $uuid.'.'.$image->getClientOriginalExtension();
                 $path = $image->storeAs('images', $filename, 'local');
                 $pngPath = $this->imageConverter->convertToPng(Storage::disk('local')->path($path), true, $path);
                 $fullPath = Storage::disk('local')->path($pngPath);
@@ -51,27 +55,62 @@ class ImageController
 
             $prompt = Prompt::whereActive(true)->find($request->prompt_id)?->prompt;
 
-            $base64Json = $this->openAiService->generateImage($fullPath, $prompt);
+            $base64Json = $this->openAiService->generateImage($fullPath, $prompt, $n);
 
             if (! empty($base64Json)) {
-                $imageContent = base64_decode($base64Json);
+                if ($n === 1) {
+                    // Single image response (backward compatibility)
+                    $imageContent = base64_decode($base64Json);
 
-                if ($imageContent === false) {
-                    throw new \Exception('Failed to decode base64 image data');
+                    if ($imageContent === false) {
+                        throw new \Exception('Failed to decode base64 image data');
+                    }
+
+                    $responseData = [
+                        'success' => true,
+                        'message' => 'Image uploaded and generated successfully',
+                        'generated_image_url' => 'data:image/png;base64,'.base64_encode($imageContent),
+                    ];
+
+                    if ($storeImages) {
+                        Storage::disk('local')->put("generated/$uuid.png", $imageContent);
+                        $responseData['generated_image_path'] = "generated/$uuid.png";
+                    }
+
+                    return response()->json($responseData, 200);
+                } else {
+                    // Multiple images response
+                    $generatedImageUrls = [];
+                    $generatedImagePaths = [];
+
+                    foreach ($base64Json as $index => $base64) {
+                        $imageContent = base64_decode($base64);
+
+                        if ($imageContent === false) {
+                            throw new \Exception("Failed to decode base64 image data for image $index");
+                        }
+
+                        $generatedImageUrls[] = 'data:image/png;base64,'.base64_encode($imageContent);
+
+                        if ($storeImages) {
+                            $indexedFilename = "generated/{$uuid}-{$index}.png";
+                            Storage::disk('local')->put($indexedFilename, $imageContent);
+                            $generatedImagePaths[] = $indexedFilename;
+                        }
+                    }
+
+                    $responseData = [
+                        'success' => true,
+                        'message' => 'Images uploaded and generated successfully',
+                        'generated_image_urls' => $generatedImageUrls,
+                    ];
+
+                    if ($storeImages) {
+                        $responseData['generated_image_paths'] = $generatedImagePaths;
+                    }
+
+                    return response()->json($responseData, 200);
                 }
-
-                $responseData = [
-                    'success' => true,
-                    'message' => 'Image uploaded and generated successfully',
-                    'generated_image_url' => 'data:image/png;base64,'.base64_encode($imageContent),
-                ];
-
-                if ($storeImages) {
-                    Storage::disk('local')->put("generated/$filename.png", $imageContent);
-                    $responseData['generated_image_path'] = "generated/$filename.png";
-                }
-
-                return response()->json($responseData, 200);
             } else {
                 return response()->json([
                     'success' => false,
@@ -117,5 +156,4 @@ class ImageController
             'Content-Disposition' => 'inline; filename="'.$filename.'"',
         ]);
     }
-
 }
