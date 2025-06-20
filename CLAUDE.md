@@ -67,12 +67,6 @@ This is a Laravel + Inertia.js + React application focused on AI-powered image p
 - API routes return JSON, Inertia routes return React components
 - CSRF protection required for all POST requests
 
-#### OpenAI Integration
-
-- Configuration in `config/openai.php` with environment variables
-- Direct API calls using `OpenAI::images()->edit()` facade
-- Image processing workflow: upload → store locally → generate via API → store result
-
 #### File Storage Pattern
 
 - Original images stored in `storage/app/private/images/`
@@ -87,29 +81,32 @@ This is a Laravel + Inertia.js + React application focused on AI-powered image p
 - File uploads use FormData with validation on backend
 - Preview functionality using URL.createObjectURL()
 
-### Current Implementation Status
-
-- Image upload and OpenAI processing implemented in `ImageController`
-- Basic React image picker component functional
-- Prompt model created but not fully utilized
-- Routes configured for image operations
-
 ### Development Notes
 
-- Use React and Laravel best practices
 - Private image storage requires route-based access control
 - ALWAYS read the latest documentation from context7
 - Concurrent development setup runs all services simultaneously
+- Use `git mv` to move files that are under version control
+- Avoid useless or unnecessary comments
+
+#### React
+
+- Use React best practices
+- Create small, self contained components or subcomponents where it is usefull
+- Create custom hooks where it is usefull
+- Move subcomponents and custom hooks into dedicated folders
 - Use shadcn-ui and Tailwind CSS for the styling in the frontend
 - New UI components must be generated with shadcn-ui with `bunx --bun shadcn@latest add`
-- Use as much Laravel functionallity in the backend as possible
-- Use Inertia functionallity whereever possible
-- Use `git mv` to move files that are under version control
-- Use PHP nullsafe syntax (`?->`) whereever it is usefull
 - Check for compiler errors with `bun run types` at the end
 - Check for linter errors with `bun run lint` at the end
 - Format all changed files (except php) with `prettier` at the very end
-- Use `Laravel Pint` after changing php files
-- Use `PascalCase` for react components file names
-- Avoid useless or unnecessary comments
+- Use `PascalCase` for components file names
 - Use Tailwind flex whereever usefull
+
+#### Laravel
+
+- Use Laravel best practices
+- Use as much Laravel functionallity in the backend as possible
+- Use Inertia functionallity whereever possible
+- Use PHP nullsafe syntax (`?->`) whereever it is usefull
+- Use `Laravel Pint` after changing php files
