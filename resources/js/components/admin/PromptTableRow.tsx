@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/Button';
 import { TableCell, TableRow } from '@/components/ui/Table';
 import { Prompt } from '@/types/prompt';
+import { Edit, Play, Trash2 } from 'lucide-react';
 import React from 'react';
 
 interface PromptTableRowProps {
@@ -45,14 +46,14 @@ const PromptTableRow = React.memo(function PromptTableRow({ prompt, onEdit, onDe
       </TableCell>
       <TableCell>
         <div className="flex gap-2">
-          <Button variant="default" size="sm" onClick={() => onEdit(prompt)}>
-            Edit
+          <Button variant="ghost" size="sm" onClick={() => onEdit(prompt)}>
+            <Edit className="h-4 w-4" />
           </Button>
-          <Button variant="secondary" size="sm" onClick={() => onTest(prompt.id)}>
-            Test
+          <Button variant="ghost" size="sm" onClick={() => onTest(prompt.id)}>
+            <Play className="h-4 w-4" />
           </Button>
-          <Button variant="destructive" size="sm" onClick={() => onDelete(prompt.id)}>
-            Delete
+          <Button variant="ghost" size="sm" onClick={() => onDelete(prompt.id)}>
+            <Trash2 className="h-4 w-4" />
           </Button>
         </div>
       </TableCell>
