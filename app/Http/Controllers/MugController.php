@@ -25,7 +25,7 @@ class MugController extends Controller
         $categories = MugCategory::orderBy('name')->get();
         $subcategories = MugSubCategory::orderBy('name')->get();
 
-        return Inertia::render('admin/Mugs', [
+        return Inertia::render('admin/mugs', [
             'mugs' => $mugs,
             'categories' => $categories,
             'subcategories' => $subcategories,
@@ -104,7 +104,7 @@ class MugController extends Controller
             ->orderBy('name')
             ->get();
 
-        return Inertia::render('admin/mugs/Categories', [
+        return Inertia::render('admin/mugs/categories', [
             'categories' => $categories,
             'subcategories' => $subcategories,
         ]);
