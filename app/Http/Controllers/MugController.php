@@ -109,19 +109,4 @@ class MugController extends Controller
             'subcategories' => $subcategories,
         ]);
     }
-
-    public function subcategories()
-    {
-        $subcategories = MugSubCategory::with('category')
-            ->withCount('mugs')
-            ->orderBy('name')
-            ->get();
-
-        $categories = MugCategory::orderBy('name')->get();
-
-        return Inertia::render('admin/mugs/SubCategories', [
-            'subcategories' => $subcategories,
-            'categories' => $categories,
-        ]);
-    }
 }

@@ -44,19 +44,4 @@ class AdminController extends Controller
             'subcategories' => $subcategories,
         ]);
     }
-
-    public function promptSubCategories()
-    {
-        $subcategories = PromptSubCategory::with('category')
-            ->withCount('prompts')
-            ->orderBy('name')
-            ->get();
-
-        $categories = PromptCategory::orderBy('name')->get();
-
-        return Inertia::render('admin/prompts/SubCategories', [
-            'subcategories' => $subcategories,
-            'categories' => $categories,
-        ]);
-    }
 }
