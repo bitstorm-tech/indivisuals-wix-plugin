@@ -97,7 +97,7 @@ This is a Laravel + Inertia.js + React application focused on AI-powered image p
 - Create custom hooks where it is usefull
 - Move subcomponents and custom hooks into dedicated folders
 - Use shadcn-ui and Tailwind CSS for the styling in the frontend
-- New UI components must be generated with shadcn-ui with `bunx --bun shadcn@latest add`
+- New UI components must be generated with shadcn-ui with `bunx --bun shadcn@latest add` (rename files to PascalCase after generation)
 - Check for compiler errors with `bun run types` at the end
 - Check for linter errors with `bun run lint` at the end
 - Format all changed files (except php) with `prettier` at the very end
