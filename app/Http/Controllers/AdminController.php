@@ -7,7 +7,7 @@ use Inertia\Inertia;
 
 class AdminController extends Controller
 {
-    public function dashboard()
+    public function prompts()
     {
         $prompts = Prompt::all();
 
@@ -21,7 +21,7 @@ class AdminController extends Controller
             ->orderBy('category')
             ->pluck('category');
 
-        return Inertia::render('admin', [
+        return Inertia::render('admin/Prompts', [
             'prompts' => $prompts,
             'categories' => $categories,
         ]);

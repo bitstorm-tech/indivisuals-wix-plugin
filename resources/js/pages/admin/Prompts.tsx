@@ -14,7 +14,7 @@ interface User {
   email: string;
 }
 
-interface AdminProps {
+interface PromptsProps {
   prompts: Prompt[];
   categories: string[];
   auth: {
@@ -22,7 +22,7 @@ interface AdminProps {
   };
 }
 
-export default function Admin({ prompts, categories, auth }: AdminProps) {
+export default function Prompts({ prompts, categories, auth }: PromptsProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [testingPromptId, setTestingPromptId] = useState<number | undefined>(undefined);
@@ -94,7 +94,7 @@ export default function Admin({ prompts, categories, auth }: AdminProps) {
 
   return (
     <>
-      <Head title="Admin Dashboard" />
+      <Head title="Admin - Prompts" />
       <div className="flex h-screen">
         <AdminSidebar user={auth.user} />
 
