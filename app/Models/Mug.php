@@ -13,13 +13,28 @@ class Mug extends Model
         'category_id',
         'subcategory_id',
         'image_path',
-        'status',
+        'active',
     ];
 
     protected $casts = [
-        'price' => 'decimal:2',
-        'status' => 'boolean',
+        'active' => 'boolean',
     ];
+
+    /**
+     * Set the price attribute (converts from dollars to cents)
+     */
+    public function setPriceAttribute($value): void
+    {
+        $this->attributes['price'] = (int) round($value * 100);
+    }
+
+    /**
+     * Get the price attribute (converts from cents to dollars)
+     */
+    public function getPriceAttribute($value): float
+    {
+        return $value / 100;
+    }
 
     public function category()
     {

@@ -41,7 +41,7 @@ class MugController extends Controller
             'category_id' => 'nullable|exists:mug_categories,id',
             'subcategory_id' => 'nullable|exists:mug_sub_categories,id',
             'image' => 'nullable|image|max:10240', // 10MB max
-            'status' => 'required|boolean',
+            'active' => 'required|boolean',
         ]);
 
         if ($request->hasFile('image')) {
@@ -63,7 +63,7 @@ class MugController extends Controller
             'category_id' => 'nullable|exists:mug_categories,id',
             'subcategory_id' => 'nullable|exists:mug_sub_categories,id',
             'image' => 'nullable|image|max:10240', // 10MB max
-            'status' => 'required|boolean',
+            'active' => 'required|boolean',
         ]);
 
         if ($request->hasFile('image')) {

@@ -37,7 +37,7 @@ interface Mug {
   subcategory_id?: number;
   image_path?: string;
   image_url?: string;
-  status: boolean;
+  active: boolean;
   category?: MugCategory;
   subcategory?: MugSubCategory;
   created_at: string;
@@ -62,7 +62,7 @@ export default function Mugs({ mugs, categories, subcategories, auth }: MugsProp
     price: '',
     category_id: '',
     subcategory_id: '',
-    status: true,
+    active: true,
   });
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -79,7 +79,7 @@ export default function Mugs({ mugs, categories, subcategories, auth }: MugsProp
         price: mug.price.toString(),
         category_id: mug.category_id?.toString() || '',
         subcategory_id: mug.subcategory_id?.toString() || '',
-        status: mug.status,
+        active: mug.active,
       });
     } else {
       setEditingMug(null);
@@ -89,7 +89,7 @@ export default function Mugs({ mugs, categories, subcategories, auth }: MugsProp
         price: '',
         category_id: '',
         subcategory_id: '',
-        status: true,
+        active: true,
       });
     }
     setSelectedFile(null);
@@ -102,7 +102,7 @@ export default function Mugs({ mugs, categories, subcategories, auth }: MugsProp
     setSelectedFile(null);
   }, []);
 
-  const handleFileChange = (e: React.ChangeEvent) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setSelectedFile(e.target.files[0]);
     }
@@ -116,7 +116,7 @@ export default function Mugs({ mugs, categories, subcategories, auth }: MugsProp
       data.append('name', formData.name);
       data.append('description', formData.description);
       data.append('price', formData.price);
-      data.append('status', formData.status ? '1' : '0');
+      data.append('active', formData.active ? '1' : '0');
 
       if (formData.category_id) {
         data.append('category_id', formData.category_id);
@@ -167,8 +167,12 @@ export default function Mugs({ mugs, categories, subcategories, auth }: MugsProp
 
   const handleToggleStatus = useCallback((mug: Mug) => {
     router.put(`/mugs/${mug.id}`, {
-      ...mug,
-      status: !mug.status,
+      name: mug.name,
+      description: mug.description || '',
+      price: mug.price,
+      category_id: mug.category_id,
+      subcategory_id: mug.subcategory_id,
+      active: !mug.active,
     });
   }, []);
 
@@ -196,7 +200,7 @@ export default function Mugs({ mugs, categories, subcategories, auth }: MugsProp
                     <TableHead>Name</TableHead>
                     <TableHead>Category</TableHead>
                     <TableHead>Price</TableHead>
-                    <TableHead>Status</TableHead>
+                    <TableHead>Active</TableHead>
                     <TableHead>Created At</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
@@ -227,7 +231,7 @@ export default function Mugs({ mugs, categories, subcategories, auth }: MugsProp
                         </TableCell>
                         <TableCell>${mug.price}</TableCell>
                         <TableCell>
-                          <Switch checked={mug.status} onCheckedChange={() => handleToggleStatus(mug)} />
+                          <Switch checked={mug.active} onCheckedChange={() => handleToggleStatus(mug)} />
                         </TableCell>
                         <TableCell>{new Date(mug.created_at).toLocaleDateString()}</TableCell>
                         <TableCell className="text-right">
@@ -337,10 +341,10 @@ export default function Mugs({ mugs, categories, subcategories, auth }: MugsProp
                       <Input id="image" type="file" accept="image/*" onChange={handleFileChange} className="col-span-3" />
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="status" className="text-right">
+                      <Label htmlFor="active" className="text-right">
                         Active
                       </Label>
-                      <Switch id="status" checked={formData.status} onCheckedChange={(checked) => setFormData({ ...formData, status: checked })} />
+                      <Switch id="active" checked={formData.active} onCheckedChange={(checked) => setFormData({ ...formData, active: checked })} />
                     </div>
                   </div>
                   <DialogFooter>
