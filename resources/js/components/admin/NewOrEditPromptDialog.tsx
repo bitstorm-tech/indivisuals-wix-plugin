@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/Input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
 import { Textarea } from '@/components/ui/Textarea';
 import { useImageCrop } from '@/hooks/useImageCrop';
-import { Prompt } from '@/types/prompt';
+import { Prompt, PromptCategory, PromptSubCategory } from '@/types/prompt';
 import { router, useForm } from '@inertiajs/react';
 import { useEffect, useRef, useState } from 'react';
 import ReactCrop from 'react-image-crop';
@@ -14,27 +14,29 @@ import 'react-image-crop/dist/ReactCrop.css';
 interface NewOrEditPromptDialogProps {
   isOpen: boolean;
   editingPrompt?: Prompt;
-  categories: string[];
+  categories: PromptCategory[];
+  subcategories: PromptSubCategory[];
   onClose: () => void;
 }
 
-export default function NewOrEditPromptDialog({ isOpen, editingPrompt, categories, onClose }: NewOrEditPromptDialogProps) {
+export default function NewOrEditPromptDialog({ isOpen, editingPrompt, categories, subcategories, onClose }: NewOrEditPromptDialogProps) {
   const form = useForm<{
     name: string;
-    category: string;
+    category_id: string;
+    subcategory_id: string;
     prompt: string;
     active: boolean;
     example_image: File | null;
   }>({
     name: '',
-    category: '',
+    category_id: '',
+    subcategory_id: '',
     prompt: '',
     active: true,
     example_image: null,
   });
-  const [useCustomCategory, setUseCustomCategory] = useState(false);
-  const [customCategory, setCustomCategory] = useState('');
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [filteredSubcategories, setFilteredSubcategories] = useState<PromptSubCategory[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { crop, setCrop, completedCrop, setCompletedCrop, imgRef, getCroppedImage, setInitialCrop, resetCrop } = useImageCrop({
@@ -44,8 +46,6 @@ export default function NewOrEditPromptDialog({ isOpen, editingPrompt, categorie
 
   useEffect(() => {
     if (!isOpen) {
-      setUseCustomCategory(false);
-      setCustomCategory('');
       setImagePreview(null);
       resetCrop();
       if (fileInputRef.current) {
@@ -57,7 +57,8 @@ export default function NewOrEditPromptDialog({ isOpen, editingPrompt, categorie
       if (editingPrompt) {
         form.setData({
           name: editingPrompt.name,
-          category: editingPrompt.category,
+          category_id: editingPrompt.category_id?.toString() || '',
+          subcategory_id: editingPrompt.subcategory_id?.toString() || '',
           prompt: editingPrompt.prompt,
           active: editingPrompt.active ?? true,
           example_image: null,
@@ -69,7 +70,8 @@ export default function NewOrEditPromptDialog({ isOpen, editingPrompt, categorie
         form.reset();
         form.setData({
           name: '',
-          category: '',
+          category_id: '',
+          subcategory_id: '',
           prompt: '',
           active: true,
           example_image: null,
@@ -78,7 +80,17 @@ export default function NewOrEditPromptDialog({ isOpen, editingPrompt, categorie
     }
   }, [isOpen, editingPrompt]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Filter subcategories based on selected category
+  useEffect(() => {
+    if (form.data.category_id) {
+      const filtered = subcategories.filter((sub) => sub.category_id === parseInt(form.data.category_id));
+      setFilteredSubcategories(filtered);
+    } else {
+      setFilteredSubcategories([]);
+    }
+  }, [form.data.category_id, subcategories]);
+
+  const handleImageChange = (e: React.ChangeEvent) => {
     const file = e.target.files?.[0];
     if (file) {
       form.setData('example_image', file);
@@ -96,7 +108,7 @@ export default function NewOrEditPromptDialog({ isOpen, editingPrompt, categorie
   };
 
   const handleSave = async () => {
-    if (!form.data.name || !form.data.category || !form.data.prompt) {
+    if (!form.data.name || !form.data.category_id || !form.data.prompt) {
       return;
     }
 
@@ -147,7 +159,7 @@ export default function NewOrEditPromptDialog({ isOpen, editingPrompt, categorie
           onClose();
           form.reset();
         },
-        onError: (errors: Record<string, string>) => {
+        onError: (errors: Record) => {
           console.error('Create validation errors:', errors);
           // Also log the full error response
           console.error('Full error response:', {
@@ -165,7 +177,7 @@ export default function NewOrEditPromptDialog({ isOpen, editingPrompt, categorie
     onClose();
   };
 
-  const isFormValid = form.data.name && form.data.category && form.data.prompt;
+  const isFormValid = form.data.name && form.data.category_id && form.data.prompt;
 
   return (
     <Dialog open={isOpen} onOpenChange={handleCancel}>
@@ -180,52 +192,46 @@ export default function NewOrEditPromptDialog({ isOpen, editingPrompt, categorie
             {form.errors.name && <p className="mt-1 text-sm text-red-500">{form.errors.name}</p>}
           </div>
           <div>
-            <div className="space-y-2">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="useCustomCategory"
-                  checked={useCustomCategory}
-                  onCheckedChange={(checked) => {
-                    setUseCustomCategory(checked as boolean);
-                    if (checked) {
-                      form.setData('category', customCategory);
-                    } else {
-                      form.setData('category', '');
-                      setCustomCategory('');
-                    }
-                  }}
-                />
-                <label htmlFor="useCustomCategory" className="text-sm">
-                  Create new category
-                </label>
-              </div>
-
-              {useCustomCategory ? (
-                <Input
-                  type="text"
-                  value={customCategory}
-                  onChange={(e) => {
-                    setCustomCategory(e.target.value);
-                    form.setData('category', e.target.value);
-                  }}
-                  placeholder="Enter new category name"
-                />
-              ) : (
-                <Select value={form.data.category} onValueChange={(value) => form.setData('category', value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.map((category) => (
-                      <SelectItem key={category} value={category}>
-                        {category}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-            </div>
+            <label className="text-sm font-medium">Category</label>
+            <Select
+              value={form.data.category_id}
+              onValueChange={(value) => {
+                form.setData('category_id', value);
+                form.setData('subcategory_id', ''); // Reset subcategory when category changes
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select a category" />
+              </SelectTrigger>
+              <SelectContent>
+                {categories.map((category) => (
+                  <SelectItem key={category.id} value={category.id.toString()}>
+                    {category.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {form.errors.category_id && <p className="mt-1 text-sm text-red-500">{form.errors.category_id}</p>}
           </div>
+          {form.data.category_id && filteredSubcategories.length > 0 && (
+            <div>
+              <label className="text-sm font-medium">Subcategory (Optional)</label>
+              <Select value={form.data.subcategory_id} onValueChange={(value) => form.setData('subcategory_id', value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a subcategory" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">None</SelectItem>
+                  {filteredSubcategories.map((subcategory) => (
+                    <SelectItem key={subcategory.id} value={subcategory.id.toString()}>
+                      {subcategory.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {form.errors.subcategory_id && <p className="mt-1 text-sm text-red-500">{form.errors.subcategory_id}</p>}
+            </div>
+          )}
           <div>
             <label className="text-sm font-medium">Prompt</label>
             <Textarea

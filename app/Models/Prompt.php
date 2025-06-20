@@ -9,7 +9,8 @@ class Prompt extends Model
 {
     protected $fillable = [
         'name',
-        'category',
+        'category_id',
+        'subcategory_id',
         'prompt',
         'active',
         'example_image_filename',
@@ -19,14 +20,29 @@ class Prompt extends Model
         'active' => 'boolean',
     ];
 
+    public function category()
+    {
+        return $this->belongsTo(PromptCategory::class, 'category_id');
+    }
+
+    public function subcategory()
+    {
+        return $this->belongsTo(PromptSubCategory::class, 'subcategory_id');
+    }
+
     public function scopeActive($query)
     {
         return $query->where('active', true);
     }
 
-    public function scopeByCategory($query, $category)
+    public function scopeByCategory($query, $categoryId)
     {
-        return $query->where('category', $category);
+        return $query->where('category_id', $categoryId);
+    }
+
+    public function scopeBySubcategory($query, $subcategoryId)
+    {
+        return $query->where('subcategory_id', $subcategoryId);
     }
 
     public function getExampleImageUrl(): ?string

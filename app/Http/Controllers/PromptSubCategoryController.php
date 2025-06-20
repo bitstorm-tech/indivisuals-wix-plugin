@@ -20,6 +20,7 @@ class PromptSubCategoryController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:prompt_sub_categories',
+            'category_id' => 'nullable|exists:prompt_categories,id',
         ]);
 
         $subCategory = PromptSubCategory::create($validated);
@@ -49,6 +50,7 @@ class PromptSubCategoryController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:prompt_sub_categories,name,'.$promptSubCategory->id,
+            'category_id' => 'nullable|exists:prompt_categories,id',
         ]);
 
         $promptSubCategory->update($validated);

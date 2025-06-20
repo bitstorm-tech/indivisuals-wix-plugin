@@ -20,7 +20,10 @@ const PromptTableRow = React.memo(function PromptTableRow({ prompt, onEdit, onDe
         <span>{prompt.name}</span>
       </TableCell>
       <TableCell>
-        <span>{prompt.category}</span>
+        <span>
+          {prompt.category?.name || '-'}
+          {prompt.subcategory && <span className="text-sm text-gray-500"> / {prompt.subcategory.name}</span>}
+        </span>
       </TableCell>
       <TableCell>
         {prompt.example_image_url ? (

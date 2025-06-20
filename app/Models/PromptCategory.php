@@ -12,6 +12,11 @@ class PromptCategory extends Model
 
     public function prompts()
     {
-        return $this->hasMany(Prompt::class);
+        return $this->hasMany(Prompt::class, 'category_id');
+    }
+
+    public function subcategories()
+    {
+        return $this->hasMany(PromptSubCategory::class, 'category_id');
     }
 }

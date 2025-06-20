@@ -3,6 +3,9 @@
 use App\Controller\ImageController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\MugCategoryController;
+use App\Http\Controllers\MugController;
+use App\Http\Controllers\MugSubCategoryController;
 use App\Http\Controllers\PromptCategoryController;
 use App\Http\Controllers\PromptController;
 use App\Http\Controllers\PromptSubCategoryController;
@@ -17,7 +20,6 @@ Route::get('/images/{filename}', [ImageController::class, 'show'])->name('image.
 Route::post('/generate-image', [ImageController::class, 'generateImage'])->name('image.generate');
 
 Route::apiResource('prompts', PromptController::class);
-Route::get('/prompt-categories', [PromptController::class, 'categories'])->name('prompts.categories');
 Route::apiResource('prompt-categories', PromptCategoryController::class);
 Route::apiResource('prompt-sub-categories', PromptSubCategoryController::class);
 
@@ -31,6 +33,20 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 
 // Protected admin routes
 Route::middleware('auth')->group(function () {
+    // Prompt management
     Route::get('/admin/prompts', [AdminController::class, 'prompts'])->name('admin.prompts');
+    Route::get('/admin/prompts/categories', [AdminController::class, 'promptCategories'])->name('admin.prompts.categories');
+    Route::get('/admin/prompts/subcategories', [AdminController::class, 'promptSubCategories'])->name('admin.prompts.subcategories');
+    
+    // Mug management
+    Route::get('/admin/mugs', [MugController::class, 'index'])->name('admin.mugs');
+    Route::get('/admin/mugs/categories', [MugController::class, 'categories'])->name('admin.mugs.categories');
+    Route::get('/admin/mugs/subcategories', [MugController::class, 'subcategories'])->name('admin.mugs.subcategories');
+    
+    // Mug CRUD routes
+    Route::apiResource('mugs', MugController::class)->except(['index', 'show']);
+    Route::apiResource('mug-categories', MugCategoryController::class)->except(['index', 'show']);
+    Route::apiResource('mug-sub-categories', MugSubCategoryController::class)->except(['index', 'show']);
+    
     Route::redirect('/admin', '/admin/prompts'); // Redirect old route to new location
 });

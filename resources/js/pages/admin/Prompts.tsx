@@ -4,7 +4,7 @@ import NewOrEditPromptDialog from '@/components/admin/NewOrEditPromptDialog';
 import PromptTable from '@/components/admin/PromptTable';
 import PromptTableHeader from '@/components/admin/PromptTableHeader';
 import TestPromptDialog from '@/components/admin/TestPromptDialog';
-import { Prompt } from '@/types/prompt';
+import { Prompt, PromptCategory, PromptSubCategory } from '@/types/prompt';
 import { Head, router } from '@inertiajs/react';
 import { useCallback, useMemo, useState } from 'react';
 
@@ -16,13 +16,14 @@ interface User {
 
 interface PromptsProps {
   prompts: Prompt[];
-  categories: string[];
+  categories: PromptCategory[];
+  subcategories: PromptSubCategory[];
   auth: {
     user: User;
   };
 }
 
-export default function Prompts({ prompts, categories, auth }: PromptsProps) {
+export default function Prompts({ prompts, categories, subcategories, auth }: PromptsProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [testingPromptId, setTestingPromptId] = useState<number | undefined>(undefined);
@@ -33,7 +34,7 @@ export default function Prompts({ prompts, categories, auth }: PromptsProps) {
 
   // Filter prompts based on selected category
   const filteredPrompts = useMemo(
-    () => (selectedCategory === 'all' ? prompts : prompts.filter((prompt) => prompt.category === selectedCategory)),
+    () => (selectedCategory === 'all' ? prompts : prompts.filter((prompt) => prompt.category_id === parseInt(selectedCategory))),
     [prompts, selectedCategory],
   );
 
@@ -117,6 +118,7 @@ export default function Prompts({ prompts, categories, auth }: PromptsProps) {
               isOpen={isPromptDialogOpen}
               editingPrompt={editingPrompt}
               categories={categories}
+              subcategories={subcategories}
               onClose={handleClosePromptDialog}
             />
           </div>

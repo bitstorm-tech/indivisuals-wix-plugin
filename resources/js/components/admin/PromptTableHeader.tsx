@@ -1,8 +1,9 @@
 import { Button } from '@/components/ui/Button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
+import { PromptCategory } from '@/types/prompt';
 
 interface PromptTableHeaderProps {
-  categories: string[];
+  categories: PromptCategory[];
   selectedCategory: string;
   onCategoryChange: (category: string) => void;
   onNewPrompt: () => void;
@@ -21,8 +22,8 @@ export default function PromptTableHeader({ categories, selectedCategory, onCate
           <SelectContent>
             <SelectItem value="all">All Categories</SelectItem>
             {categories.map((category) => (
-              <SelectItem key={category} value={category}>
-                {category}
+              <SelectItem key={category.id} value={category.id.toString()}>
+                {category.name}
               </SelectItem>
             ))}
           </SelectContent>

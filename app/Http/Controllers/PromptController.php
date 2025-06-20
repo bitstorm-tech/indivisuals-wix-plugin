@@ -29,7 +29,7 @@ class PromptController extends Controller
             $query->active();
         }
 
-        $prompts = $query->orderBy('category')->orderBy('name')->get();
+        $prompts = $query->orderBy('category_id')->orderBy('name')->get();
 
         // Add virtual field
         $prompts->each(function ($prompt) {
@@ -43,7 +43,8 @@ class PromptController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'category' => 'required|string|max:255',
+            'category_id' => 'required|exists:prompt_categories,id',
+            'subcategory_id' => 'nullable|exists:prompt_sub_categories,id',
             'prompt' => 'required|string',
             'active' => 'required|boolean',
             'example_image' => 'nullable|image|max:5120', // 5MB max
@@ -99,7 +100,8 @@ class PromptController extends Controller
     {
         $validated = $request->validate([
             'name' => 'sometimes|required|string|max:255',
-            'category' => 'sometimes|required|string|max:255',
+            'category_id' => 'sometimes|required|exists:prompt_categories,id',
+            'subcategory_id' => 'nullable|exists:prompt_sub_categories,id',
             'prompt' => 'sometimes|required|string',
             'active' => 'sometimes|required|boolean',
             'example_image' => 'nullable|image|max:5120', // 5MB max
@@ -172,15 +174,5 @@ class PromptController extends Controller
         }
 
         return response()->json(null, 204);
-    }
-
-    public function categories(): JsonResponse
-    {
-        $categories = Prompt::select('category')
-            ->distinct()
-            ->orderBy('category')
-            ->pluck('category');
-
-        return response()->json($categories);
     }
 }
