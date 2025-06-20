@@ -104,7 +104,7 @@ class MugController extends Controller
             ->orderBy('name')
             ->get();
 
-        return Inertia::render('admin/mugs/categories', [
+        return Inertia::render('admin/mug-categories', [
             'categories' => $categories,
             'subcategories' => $subcategories,
         ]);

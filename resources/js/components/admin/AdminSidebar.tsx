@@ -82,9 +82,9 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
                 All Mugs
               </button>
               <button
-                onClick={() => handleNavigate('/admin/mugs/categories')}
+                onClick={() => handleNavigate('/admin/mug-categories')}
                 className={`flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors hover:bg-gray-100 ${
-                  isActive('/admin/mugs/categories') ? 'bg-gray-200 font-medium' : ''
+                  isActive('/admin/mug-categories') ? 'bg-gray-200 font-medium' : ''
                 }`}
               >
                 Categories

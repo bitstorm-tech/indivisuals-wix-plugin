@@ -40,7 +40,7 @@ Route::middleware('auth')->group(function () {
 
     // Mug management
     Route::get('/admin/mugs', [MugController::class, 'index'])->name('admin.mugs');
-    Route::get('/admin/mugs/categories', [MugController::class, 'categories'])->name('admin.mugs.categories');
+    Route::get('/admin/mug-categories', [MugController::class, 'categories'])->name('admin.mug-categories');
 
     // Mug CRUD routes
     Route::apiResource('mugs', MugController::class)->except(['index', 'show']);
