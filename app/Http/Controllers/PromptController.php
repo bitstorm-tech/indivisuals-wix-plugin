@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Inertia\Inertia;
 
 class PromptController extends Controller
 {
@@ -20,6 +21,44 @@ class PromptController extends Controller
         private ImageConverterService $imageConverter
     ) {}
 
+    // Admin page methods
+    public function prompts()
+    {
+        $prompts = Prompt::with(['category', 'subcategory'])->get();
+
+        // Add virtual field for example image URL
+        $prompts->each(function ($prompt) {
+            $prompt->example_image_url = $prompt->getExampleImageUrl();
+        });
+
+        $categories = PromptCategory::orderBy('name')->get();
+        $subcategories = PromptSubCategory::orderBy('name')->get();
+
+        return Inertia::render('admin/prompts', [
+            'prompts' => $prompts,
+            'categories' => $categories,
+            'subcategories' => $subcategories,
+        ]);
+    }
+
+    public function promptCategories()
+    {
+        $categories = PromptCategory::withCount(['prompts', 'subcategories'])
+            ->orderBy('name')
+            ->get();
+
+        $subcategories = PromptSubCategory::with('category')
+            ->withCount('prompts')
+            ->orderBy('name')
+            ->get();
+
+        return Inertia::render('admin/prompt-categories', [
+            'categories' => $categories,
+            'subcategories' => $subcategories,
+        ]);
+    }
+
+    // API methods
     public function index(Request $request): JsonResponse
     {
         $query = Prompt::query();

@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\MugController;
@@ -45,8 +44,8 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 // Protected admin routes
 Route::middleware('auth')->group(function () {
     // Prompt management
-    Route::get('/admin/prompts', [AdminController::class, 'prompts'])->name('admin.prompts');
-    Route::get('/admin/prompt-categories', [AdminController::class, 'promptCategories'])->name('admin.prompt-categories');
+    Route::get('/admin/prompts', [PromptController::class, 'prompts'])->name('admin.prompts');
+    Route::get('/admin/prompt-categories', [PromptController::class, 'promptCategories'])->name('admin.prompt-categories');
 
     // Mug management
     Route::get('/admin/mugs', [MugController::class, 'index'])->name('admin.mugs');
