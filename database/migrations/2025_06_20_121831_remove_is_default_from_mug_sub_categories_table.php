@@ -11,10 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('prompt_sub_categories', function (Blueprint $table) {
-            $table->id()->startingValue(1001);
-            $table->string('name')->unique();
-            $table->timestamps();
+        Schema::table('mug_sub_categories', function (Blueprint $table) {
+            $table->dropColumn('is_default');
         });
     }
 
@@ -23,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('prompt_sub_categories');
+        Schema::table('mug_sub_categories', function (Blueprint $table) {
+            $table->boolean('is_default')->default(false);
+        });
     }
 };

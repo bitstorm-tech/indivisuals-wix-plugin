@@ -19,8 +19,8 @@ return new class extends Migration
             'updated_at' => now(),
         ]);
 
-        // Update sequence to continue from 101 for PostgreSQL
-        DB::statement('ALTER SEQUENCE mug_categories_id_seq RESTART WITH 101');
+        // Update sequence to continue from 102 for PostgreSQL
+        DB::statement('ALTER SEQUENCE mug_categories_id_seq RESTART WITH 102');
 
         // Insert default "None" subcategory with ID 1000
         DB::table('mug_sub_categories')->insert([
@@ -32,8 +32,8 @@ return new class extends Migration
             'updated_at' => now(),
         ]);
 
-        // Update sequence to continue from 1001 for PostgreSQL
-        DB::statement('ALTER SEQUENCE mug_sub_categories_id_seq RESTART WITH 1001');
+        // Update sequence to continue from 1002 for PostgreSQL
+        DB::statement('ALTER SEQUENCE mug_sub_categories_id_seq RESTART WITH 1002');
     }
 
     /**

@@ -38,15 +38,6 @@ class PromptCategoryController extends Controller
 
     public function update(Request $request, PromptCategory $promptCategory): JsonResponse|RedirectResponse
     {
-        // Prevent modification of the default "None" category
-        if ($promptCategory->id === 100) {
-            if ($request->header('X-Inertia')) {
-                return redirect()->back()->withErrors(['category' => 'Cannot modify the default "None" category.']);
-            }
-
-            return response()->json(['error' => 'Cannot modify the default "None" category.'], 422);
-        }
-
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:prompt_categories,name,'.$promptCategory->id,
         ]);
@@ -62,15 +53,6 @@ class PromptCategoryController extends Controller
 
     public function destroy(PromptCategory $promptCategory): JsonResponse|RedirectResponse
     {
-        // Prevent deletion of the default "None" category
-        if ($promptCategory->id === 100) {
-            if (request()->header('X-Inertia')) {
-                return redirect()->back()->withErrors(['category' => 'Cannot delete the default "None" category.']);
-            }
-
-            return response()->json(['error' => 'Cannot delete the default "None" category.'], 422);
-        }
-
         if ($promptCategory->prompts()->exists()) {
             if (request()->header('X-Inertia')) {
                 return redirect()->back()->withErrors(['category' => 'Cannot delete category with associated prompts.']);

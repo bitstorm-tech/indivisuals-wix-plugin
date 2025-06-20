@@ -12,16 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('prompt_categories', function (Blueprint $table) {
-            $table->id()->startingValue(100);
+            $table->id()->startingValue(101);
             $table->string('name')->unique();
             $table->timestamps();
         });
-
-        // Create default "None" category
-        \App\Models\PromptCategory::create([
-            'id' => 100,
-            'name' => 'None',
-        ]);
     }
 
     /**
