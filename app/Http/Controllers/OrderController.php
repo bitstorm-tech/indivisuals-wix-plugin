@@ -190,7 +190,7 @@ class OrderController extends Controller
             ],
         ];
 
-        return Inertia::render('admin/completed', [
+        return Inertia::render('admin/completed-orders', [
             'orders' => $completedOrders,
         ]);
     }
