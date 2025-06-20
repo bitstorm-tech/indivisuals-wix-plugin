@@ -101,7 +101,8 @@ This is a Laravel + Inertia.js + React application focused on AI-powered image p
 - Check for compiler errors with `bun run types` at the end
 - Check for linter errors with `bun run lint` at the end
 - Format all changed files (except php) with `prettier` at the very end
-- Use `PascalCase` for components file names
+- Use `PascalCase` for components file names except page components (in page folder)
+- Use `kebab-case` for page components (in page folder)
 - Use Tailwind flex whereever usefull
 
 #### Laravel
