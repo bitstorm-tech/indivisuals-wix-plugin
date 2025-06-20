@@ -39,7 +39,7 @@ class AdminController extends Controller
             ->orderBy('name')
             ->get();
 
-        return Inertia::render('admin/prompts/categories', [
+        return Inertia::render('admin/prompt-categories', [
             'categories' => $categories,
             'subcategories' => $subcategories,
         ]);

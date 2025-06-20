@@ -54,9 +54,9 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
                 All Prompts
               </button>
               <button
-                onClick={() => handleNavigate('/admin/prompts/categories')}
+                onClick={() => handleNavigate('/admin/prompt-categories')}
                 className={`flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors hover:bg-gray-100 ${
-                  isActive('/admin/prompts/categories') ? 'bg-gray-200 font-medium' : ''
+                  isActive('/admin/prompt-categories') ? 'bg-gray-200 font-medium' : ''
                 }`}
               >
                 Categories
