@@ -2,6 +2,8 @@ import { ChevronDown, Download, Info, Palette } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { EditorImage, EditorSize, EditorState, EditorText, EXPORT_RESOLUTIONS, ExportResolutionId, ExportSettings } from '../../types/editor';
 import { Prompt } from '../../types/prompt';
+import EditorImageUploader from '../editor/components/EditorImageUploader';
+import TextAdder from '../editor/components/TextAdder';
 import ImageWizardDialog from '../image-wizard-dialog/ImageWizardDialog';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
@@ -9,8 +11,6 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '../ui/Dr
 import { Label } from '../ui/Label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/Select';
 import EditorCanvas from './EditorCanvas';
-import EditorImageUploader from '../editor/components/EditorImageUploader';
-import TextAdder from '../editor/components/TextAdder';
 import TextPropertiesPanel from './TextPropertiesPanel';
 
 interface EditorProps {

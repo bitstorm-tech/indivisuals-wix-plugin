@@ -1,4 +1,5 @@
 import AdminHeader from '@/components/admin/AdminHeader';
+import AdminSidebar from '@/components/admin/AdminSidebar';
 import DeleteConfirmationDialog from '@/components/admin/DeleteConfirmationDialog';
 import NewOrEditPromptDialog from '@/components/admin/NewOrEditPromptDialog';
 import PromptTable from '@/components/admin/PromptTable';
@@ -95,23 +96,34 @@ export default function Admin({ prompts, categories, auth }: AdminProps) {
   return (
     <>
       <Head title="Admin Dashboard" />
-      <div className="container mx-auto p-6">
-        <AdminHeader user={auth.user} />
+      <div className="flex h-screen">
+        <AdminSidebar user={auth.user} />
 
-        <PromptTableHeader
-          categories={categories}
-          selectedCategory={selectedCategory}
-          onCategoryChange={setSelectedCategory}
-          onNewPrompt={handleNewPrompt}
-        />
+        <div className="flex-1 overflow-auto">
+          <div className="container mx-auto p-6">
+            <AdminHeader />
 
-        <PromptTable prompts={filteredPrompts} onEdit={handleEdit} onDelete={handleDelete} onTest={handleTest} />
+            <PromptTableHeader
+              categories={categories}
+              selectedCategory={selectedCategory}
+              onCategoryChange={setSelectedCategory}
+              onNewPrompt={handleNewPrompt}
+            />
 
-        <TestPromptDialog isOpen={isModalOpen} testingPromptId={testingPromptId} onClose={closeModal} />
+            <PromptTable prompts={filteredPrompts} onEdit={handleEdit} onDelete={handleDelete} onTest={handleTest} />
 
-        <DeleteConfirmationDialog isOpen={isDeleteDialogOpen} onConfirm={confirmDelete} onCancel={cancelDelete} />
+            <TestPromptDialog isOpen={isModalOpen} testingPromptId={testingPromptId} onClose={closeModal} />
 
-        <NewOrEditPromptDialog isOpen={isPromptDialogOpen} editingPrompt={editingPrompt} categories={categories} onClose={handleClosePromptDialog} />
+            <DeleteConfirmationDialog isOpen={isDeleteDialogOpen} onConfirm={confirmDelete} onCancel={cancelDelete} />
+
+            <NewOrEditPromptDialog
+              isOpen={isPromptDialogOpen}
+              editingPrompt={editingPrompt}
+              categories={categories}
+              onClose={handleClosePromptDialog}
+            />
+          </div>
+        </div>
       </div>
     </>
   );

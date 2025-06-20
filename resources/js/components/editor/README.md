@@ -11,18 +11,21 @@ The Editor component provides a complete image editing interface with AI-driven 
 ### Core Components
 
 #### Canvas
+
 - **EditorCanvas** (`components/canvas/EditorCanvas.tsx`): Main canvas component for image and text editing
   - Currently displays placeholder content
   - Manages image and text elements
   - Handles element selection and manipulation
 
 #### Sidebar Components
+
 - **CategoryFilter** (`components/sidebar/CategoryFilter.tsx`): Filter prompts by category
 - **ImagePreviewList** (`components/sidebar/ImagePreviewList.tsx`): Preview selected images
 - **InstructionsPanel** (`components/sidebar/InstructionsPanel.tsx`): User instructions and help
 - **PromptList** (`components/sidebar/PromptList.tsx`): List of available AI prompts
 
 #### Utility Components
+
 - **EditorImageUploader** (`components/EditorImageUploader.tsx`): File upload component
 - **ImageGenerationSection** (`components/ImageGenerationSection.tsx`): AI image generation interface
 - **TextAdder** (`components/TextAdder.tsx`): Add text elements to canvas
@@ -31,15 +34,18 @@ The Editor component provides a complete image editing interface with AI-driven 
 ## Hooks
 
 ### useEditorState
+
 Main state management hook for the editor.
 
 **State:**
+
 - `images: EditorImage[]` - Array of images on canvas
 - `texts: EditorText[]` - Array of text elements on canvas
 - `selectedElementId: string | null` - Currently selected element ID
 - `selectedElementType: 'image' | 'text' | null` - Type of selected element
 
 **Methods:**
+
 - `addImage(image)` - Add image to canvas
 - `updateImage(id, updates)` - Update image properties
 - `deleteImage(id)` - Remove image from canvas
@@ -50,9 +56,11 @@ Main state management hook for the editor.
 - `clearSelection()` - Clear element selection
 
 ### usePrompts
+
 Manages AI prompts and categories.
 
 **State:**
+
 - `prompts: Prompt[]` - All available prompts
 - `filteredPrompts: Prompt[]` - Prompts filtered by category
 - `categories: string[]` - Available prompt categories
@@ -63,16 +71,20 @@ Manages AI prompts and categories.
 - `error: string | null` - Error state
 
 **Methods:**
+
 - `setSelectedPromptId(id)` - Select a prompt
 - `setSelectedCategory(category)` - Filter by category
 
 ### useSelectedImages
+
 Manages image selection for processing.
 
 **Configuration:**
+
 - `maxImages: number` - Maximum selectable images (default: 3)
 
 **State:**
+
 - `selectedImages: SelectedImage[]` - Selected images with URL and File
 - `isImageSelectorOpen: boolean` - Image selector dialog state
 - `currentCount: number` - Number of selected images
@@ -80,6 +92,7 @@ Manages image selection for processing.
 - `canAddMore: boolean` - Whether more images can be added
 
 **Methods:**
+
 - `addImage(url, file)` - Add image to selection
 - `removeImage(index)` - Remove image by index
 - `clearImages()` - Clear all selected images
