@@ -17,7 +17,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->foreignId('category_id')->constrained('mug_categories')->onDelete('cascade');
             $table->timestamps();
-            
+
             $table->index(['category_id', 'name']);
         });
     }

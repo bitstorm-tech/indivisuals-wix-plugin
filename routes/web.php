@@ -36,17 +36,15 @@ Route::middleware('auth')->group(function () {
     // Prompt management
     Route::get('/admin/prompts', [AdminController::class, 'prompts'])->name('admin.prompts');
     Route::get('/admin/prompts/categories', [AdminController::class, 'promptCategories'])->name('admin.prompts.categories');
-    Route::get('/admin/prompts/subcategories', [AdminController::class, 'promptSubCategories'])->name('admin.prompts.subcategories');
-    
+
     // Mug management
     Route::get('/admin/mugs', [MugController::class, 'index'])->name('admin.mugs');
     Route::get('/admin/mugs/categories', [MugController::class, 'categories'])->name('admin.mugs.categories');
-    Route::get('/admin/mugs/subcategories', [MugController::class, 'subcategories'])->name('admin.mugs.subcategories');
-    
+
     // Mug CRUD routes
     Route::apiResource('mugs', MugController::class)->except(['index', 'show']);
     Route::apiResource('mug-categories', MugCategoryController::class)->except(['index', 'show']);
     Route::apiResource('mug-sub-categories', MugSubCategoryController::class)->except(['index', 'show']);
-    
+
     Route::redirect('/admin', '/admin/prompts'); // Redirect old route to new location
 });

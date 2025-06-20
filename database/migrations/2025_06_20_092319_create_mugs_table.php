@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('image_path')->nullable();
             $table->boolean('status')->default(true);
             $table->timestamps();
-            
+
             $table->index('name');
             $table->index('status');
             $table->index(['category_id', 'subcategory_id']);

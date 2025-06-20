@@ -30,12 +30,18 @@ class AdminController extends Controller
 
     public function promptCategories()
     {
-        $categories = PromptCategory::withCount('prompts')
+        $categories = PromptCategory::withCount(['prompts', 'subcategories'])
+            ->orderBy('name')
+            ->get();
+
+        $subcategories = PromptSubCategory::with('category')
+            ->withCount('prompts')
             ->orderBy('name')
             ->get();
 
         return Inertia::render('admin/prompts/Categories', [
             'categories' => $categories,
+            'subcategories' => $subcategories,
         ]);
     }
 

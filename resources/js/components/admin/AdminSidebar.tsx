@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/Button';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { router, usePage } from '@inertiajs/react';
-import { Coffee, FileText, LogOut, Minus } from 'lucide-react';
+import { Coffee, FileText, LogOut } from 'lucide-react';
 import { useState } from 'react';
 
 interface User {
@@ -51,7 +51,6 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
                   isActive('/admin/prompts') || isActive('/admin') ? 'bg-gray-200 font-medium' : ''
                 }`}
               >
-                <Minus className="h-3 w-3" />
                 All Prompts
               </button>
               <button
@@ -60,17 +59,7 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
                   isActive('/admin/prompts/categories') ? 'bg-gray-200 font-medium' : ''
                 }`}
               >
-                <Minus className="h-3 w-3" />
                 Categories
-              </button>
-              <button
-                onClick={() => handleNavigate('/admin/prompts/subcategories')}
-                className={`flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors hover:bg-gray-100 ${
-                  isActive('/admin/prompts/subcategories') ? 'bg-gray-200 font-medium' : ''
-                }`}
-              >
-                <Minus className="h-3 w-3" />
-                Subcategories
               </button>
             </AccordionContent>
           </AccordionItem>
@@ -90,7 +79,6 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
                   isActive('/admin/mugs') ? 'bg-gray-200 font-medium' : ''
                 }`}
               >
-                <Minus className="h-3 w-3" />
                 All Mugs
               </button>
               <button
@@ -99,17 +87,7 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
                   isActive('/admin/mugs/categories') ? 'bg-gray-200 font-medium' : ''
                 }`}
               >
-                <Minus className="h-3 w-3" />
                 Categories
-              </button>
-              <button
-                onClick={() => handleNavigate('/admin/mugs/subcategories')}
-                className={`flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors hover:bg-gray-100 ${
-                  isActive('/admin/mugs/subcategories') ? 'bg-gray-200 font-medium' : ''
-                }`}
-              >
-                <Minus className="h-3 w-3" />
-                Subcategories
               </button>
             </AccordionContent>
           </AccordionItem>
