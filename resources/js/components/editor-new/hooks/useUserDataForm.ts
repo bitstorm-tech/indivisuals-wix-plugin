@@ -34,7 +34,7 @@ export function useUserDataForm(initialData?: UserData | null): UseUserDataFormR
       newErrors.email = 'Please enter a valid email address';
     }
 
-    if (formData.phoneNumber && !/^[\d\s\-\+\(\)]+$/.test(formData.phoneNumber)) {
+    if (formData.phoneNumber && !/^[\d\s\-+()]+$/.test(formData.phoneNumber)) {
       newErrors.phoneNumber = 'Please enter a valid phone number';
     }
 

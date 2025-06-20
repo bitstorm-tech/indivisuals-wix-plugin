@@ -37,13 +37,13 @@ export function usePrompts() {
   }, []);
 
   const categories = useMemo(() => {
-    return Array.from(new Set(prompts.map((p) => p.category))).sort();
+    return Array.from(new Set(prompts.map((p) => p.category?.name).filter((name): name is string => !!name))).sort();
   }, [prompts]);
 
   const filteredPrompts = useMemo(() => {
     return prompts.filter((p) => {
       const hasImage = p.example_image_url;
-      const matchesCategory = selectedCategory === 'all' || p.category === selectedCategory;
+      const matchesCategory = selectedCategory === 'all' || p.category?.name === selectedCategory;
       return hasImage && matchesCategory;
     });
   }, [prompts, selectedCategory]);

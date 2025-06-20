@@ -6,9 +6,9 @@ interface EditorCanvasProps {
   texts: EditorText[];
   selectedElementId: string | null;
   selectedElementType: 'image' | 'text' | null;
-  onImageUpdate: (id: string, updates: Partial) => void;
+  onImageUpdate: (id: string, updates: Partial<EditorImage>) => void;
   onImageDelete: (id: string) => void;
-  onTextUpdate: (id: string, updates: Partial) => void;
+  onTextUpdate: (id: string, updates: Partial<EditorText>) => void;
   onTextDelete: (id: string) => void;
   onSelectElement: (id: string, type: 'image' | 'text') => void;
   onClearSelection: () => void;

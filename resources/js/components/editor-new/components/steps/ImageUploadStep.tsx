@@ -16,16 +16,9 @@ interface ImageUploadStepProps {
   onRemoveImage: () => void;
 }
 
-export default function ImageUploadStep({
-  uploadedImage,
-  uploadedImageUrl,
-  cropData,
-  onImageUpload,
-  onCropComplete,
-  onRemoveImage,
-}: ImageUploadStepProps) {
+export default function ImageUploadStep({ uploadedImageUrl, onImageUpload, onCropComplete, onRemoveImage }: ImageUploadStepProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { crop, setCrop, completedCrop, setCompletedCrop, convertToCropData } = useImageCropper();
+  const { crop, setCrop, setCompletedCrop, convertToCropData } = useImageCropper();
 
   const handleFileChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -61,7 +54,7 @@ export default function ImageUploadStep({
     (pixelCrop: PixelCrop) => {
       setCompletedCrop(pixelCrop);
       if (pixelCrop.width && pixelCrop.height) {
-        const cropData = convertToCropData(pixelCrop, pixelCrop.width, pixelCrop.height);
+        const cropData = convertToCropData(pixelCrop);
         onCropComplete(cropData);
       }
     },

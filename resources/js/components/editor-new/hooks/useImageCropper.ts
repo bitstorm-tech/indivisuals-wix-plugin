@@ -8,10 +8,10 @@ interface UseImageCropperReturn {
   completedCrop: PixelCrop | null;
   setCompletedCrop: (crop: PixelCrop | null) => void;
   getCroppedImage: (image: HTMLImageElement, pixelCrop: PixelCrop) => Promise<File>;
-  convertToCropData: (pixelCrop: PixelCrop, imageWidth: number, imageHeight: number) => CropData;
+  convertToCropData: (pixelCrop: PixelCrop) => CropData;
 }
 
-export function useImageCropper(aspect?: number): UseImageCropperReturn {
+export function useImageCropper(): UseImageCropperReturn {
   const [crop, setCrop] = useState<Crop>({
     unit: '%',
     width: 90,
@@ -63,7 +63,7 @@ export function useImageCropper(aspect?: number): UseImageCropperReturn {
     });
   }, []);
 
-  const convertToCropData = useCallback((pixelCrop: PixelCrop, imageWidth: number, imageHeight: number): CropData => {
+  const convertToCropData = useCallback((pixelCrop: PixelCrop): CropData => {
     return {
       unit: 'px',
       x: pixelCrop.x,

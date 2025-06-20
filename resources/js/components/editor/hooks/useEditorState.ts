@@ -11,7 +11,7 @@ export function useEditorState() {
     setImages((prev) => [...prev, image]);
   }, []);
 
-  const updateImage = useCallback((id: string, updates: Partial) => {
+  const updateImage = useCallback((id: string, updates: Partial<EditorImage>) => {
     setImages((prev) => prev.map((img) => (img.id === id ? { ...img, ...updates } : img)));
   }, []);
 
@@ -30,7 +30,7 @@ export function useEditorState() {
     setTexts((prev) => [...prev, text]);
   }, []);
 
-  const updateText = useCallback((id: string, updates: Partial) => {
+  const updateText = useCallback((id: string, updates: Partial<EditorText>) => {
     setTexts((prev) => prev.map((txt) => (txt.id === id ? { ...txt, ...updates } : txt)));
   }, []);
 

@@ -16,7 +16,7 @@ interface UserImageSelectorDialogProps {
 
 type AspectRatioOption = 'free' | '1:1' | '16:9' | '4:3' | '3:2';
 
-const ASPECT_RATIOS: Record = {
+const ASPECT_RATIOS: Record<AspectRatioOption, { value: number | undefined; label: string; icon?: React.ReactElement }> = {
   free: { value: undefined, label: 'Frei', icon: <CropIcon className="h-4 w-4" /> },
   '1:1': { value: 1, label: '1:1 (Quadrat)', icon: <Square className="h-4 w-4" /> },
   '16:9': { value: 16 / 9, label: '16:9 (Breitbild)' },
@@ -36,7 +36,7 @@ export default function UserImageSelectorDialog({ isOpen, onClose, onImageSelect
     aspectRatio: ASPECT_RATIOS[aspectRatio].value,
   });
 
-  const handleFileSelect = (event: React.ChangeEvent) => {
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file && file.type.startsWith('image/')) {
       setSelectedFile(file);
@@ -101,7 +101,7 @@ export default function UserImageSelectorDialog({ isOpen, onClose, onImageSelect
     fileInputRef.current?.click();
   };
 
-  const onImageLoad = (e: React.SyntheticEvent) => {
+  const onImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
     setInitialCrop(e.currentTarget);
   };
 

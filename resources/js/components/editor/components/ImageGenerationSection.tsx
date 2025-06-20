@@ -1,16 +1,17 @@
+import { Prompt } from '@/types/prompt';
 import { useState } from 'react';
 
 interface ImageGenerationSectionProps {
   selectedImages: { url: string; file: File }[];
   selectedPromptId: number | null;
-  prompts: Array;
+  prompts: Prompt[];
 }
 
 export default function ImageGenerationSection({ selectedImages, selectedPromptId, prompts }: ImageGenerationSectionProps) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
 
-  const selectedPrompt = prompts.find((p) => p.id === selectedPromptId);
+  const selectedPrompt = prompts.find((p: Prompt) => p.id === selectedPromptId);
   const canGenerate = selectedImages.length > 0 && selectedPromptId !== null;
 
   const handleGenerate = async () => {

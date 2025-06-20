@@ -47,7 +47,7 @@ export default function PromptSelectionStep({ prompts, selectedPrompt, onPromptS
 
               {prompt.category && (
                 <span className="mb-2 inline-block rounded-full bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600 capitalize">
-                  {prompt.category}
+                  {prompt.category.name}
                 </span>
               )}
 

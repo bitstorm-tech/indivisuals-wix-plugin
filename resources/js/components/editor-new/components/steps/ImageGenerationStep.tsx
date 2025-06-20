@@ -41,7 +41,7 @@ export default function ImageGenerationStep({
       };
       performGeneration();
     }
-  }, [uploadedImage, promptId, generatedImageUrls]);
+  }, [uploadedImage, promptId, generatedImageUrls, generateImages, onGenerationStart, onGenerationEnd, onImagesGenerated]);
 
   if (isGenerating) {
     return (

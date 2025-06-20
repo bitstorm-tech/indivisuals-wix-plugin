@@ -26,10 +26,10 @@ const PromptSelector = React.memo<PromptSelectorProps>(({ onSelectTemplate, prom
             onClick={() => onSelectTemplate(prompt.id)}
             className="group relative overflow-hidden rounded-lg shadow-lg transition-shadow hover:shadow-xl"
           >
-            <img src={prompt.example_image_url} alt={`${prompt.category} - ${prompt.name}`} className="h-40 w-full object-cover" />
+            <img src={prompt.example_image_url} alt={`${prompt.category?.name} - ${prompt.name}`} className="h-40 w-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 transition-opacity group-hover:opacity-100">
               <p className="absolute right-2 bottom-2 left-2 text-sm font-medium text-white">
-                {prompt.category} - {prompt.name}
+                {prompt.category?.name} - {prompt.name}
               </p>
             </div>
             <motion.div

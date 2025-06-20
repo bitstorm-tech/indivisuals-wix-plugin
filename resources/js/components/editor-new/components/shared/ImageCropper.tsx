@@ -19,7 +19,7 @@ export default function ImageCropper({ imageUrl, crop, onCropChange, onCropCompl
   const handleAspectChange = (value: number | undefined) => {
     setSelectedAspect(value);
     if (value && imgRef.current) {
-      const { width, height } = imgRef.current;
+      // const { width, height } = imgRef.current;
       const newCrop: Crop = {
         unit: '%',
         width: 50,
@@ -55,8 +55,7 @@ export default function ImageCropper({ imageUrl, crop, onCropChange, onCropCompl
             src={imageUrl}
             alt="Upload preview"
             className="max-h-[500px] max-w-full"
-            onLoad={(e) => {
-              const { width, height } = e.currentTarget;
+            onLoad={() => {
               if (!crop.width && !crop.height) {
                 const newCrop: Crop = {
                   unit: '%',

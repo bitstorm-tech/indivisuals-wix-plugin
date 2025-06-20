@@ -14,7 +14,7 @@ export default function EditorImageUploader({ onFileSelect, maxFiles, currentCou
   const inputRef = useRef<HTMLInputElement>(null);
   const remainingSlots = maxFiles - currentCount;
 
-  const handleFileChange = (event: React.ChangeEvent) => {
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
     const validFiles = files.filter((file) => file.type.startsWith('image/'));
     const filesToAdd = validFiles.slice(0, remainingSlots);

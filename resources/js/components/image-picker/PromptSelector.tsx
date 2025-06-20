@@ -21,7 +21,7 @@ export default function PromptSelector({ prompts, selectedPromptId, onPromptChan
       <SelectContent>
         {prompts.map((prompt) => (
           <SelectItem key={prompt.id} value={prompt.id.toString()}>
-            {prompt.category} - {prompt.name}
+            {prompt.category?.name} - {prompt.name}
           </SelectItem>
         ))}
       </SelectContent>

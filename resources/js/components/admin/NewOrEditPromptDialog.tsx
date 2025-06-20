@@ -174,10 +174,10 @@ export default function NewOrEditPromptDialog({ isOpen, editingPrompt, categorie
             onClose();
             form.reset();
           },
-          onError: (errors: any) => {
+          onError: (errors: Record<string, string>) => {
             console.error('Update validation errors:', errors);
           },
-          onProgress: (progress: any) => {
+          onProgress: (progress) => {
             console.log('Upload progress:', progress);
           },
         },

@@ -26,7 +26,7 @@ export default React.memo(function PromptList({ prompts, selectedPromptId, onSel
             {prompt.example_image_url && <img src={prompt.example_image_url} alt={prompt.name} className="h-12 w-12 rounded object-cover" />}
             <div className="min-w-0 flex-1">
               <p className="truncate text-xs font-medium text-gray-900">{prompt.name}</p>
-              <p className="truncate text-xs text-gray-500">{prompt.category}</p>
+              <p className="truncate text-xs text-gray-500">{prompt.category?.name}</p>
             </div>
           </div>
         </button>

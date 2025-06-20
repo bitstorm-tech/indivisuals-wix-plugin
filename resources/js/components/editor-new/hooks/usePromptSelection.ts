@@ -15,7 +15,7 @@ export function usePromptSelection(prompts: Prompt[]): UsePromptSelectionReturn 
     const uniqueCategories = new Set<string>();
     prompts.forEach((prompt) => {
       if (prompt.category) {
-        uniqueCategories.add(prompt.category);
+        uniqueCategories.add(prompt.category.name);
       }
     });
     return ['all', ...Array.from(uniqueCategories).sort()];
@@ -25,7 +25,7 @@ export function usePromptSelection(prompts: Prompt[]): UsePromptSelectionReturn 
     if (selectedCategory === 'all') {
       return prompts;
     }
-    return prompts.filter((prompt) => prompt.category === selectedCategory);
+    return prompts.filter((prompt) => prompt.category?.name === selectedCategory);
   }, [prompts, selectedCategory]);
 
   return {
