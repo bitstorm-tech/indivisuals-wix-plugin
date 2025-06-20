@@ -83,6 +83,7 @@ This is a Laravel + Inertia.js + React application focused on AI-powered image p
 
 ### Development Notes
 
+- Use and spawn sub agents whenever it makes sense
 - Private image storage requires route-based access control
 - ALWAYS read the latest documentation from context7
 - Concurrent development setup runs all services simultaneously
