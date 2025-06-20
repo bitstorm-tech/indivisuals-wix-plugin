@@ -74,7 +74,7 @@ class OrderController extends Controller
             ],
         ];
 
-        return Inertia::render('admin/open', [
+        return Inertia::render('admin/open-orders', [
             'orders' => $openOrders,
         ]);
     }
