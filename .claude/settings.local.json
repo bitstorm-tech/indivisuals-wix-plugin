@@ -31,7 +31,8 @@
       "Bash(vendor/bin/pint:*)",
       "Bash(touch:*)",
       "Bash(sqlite3:*)",
-      "Bash(mv:*)"
+      "Bash(mv:*)",
+      "mcp__ide__getDiagnostics"
     ]
   },
   "enableAllProjectMcpServers": false
