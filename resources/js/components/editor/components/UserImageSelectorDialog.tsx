@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/Button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
 import { Label } from '@/components/ui/Label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/RadioGroup';
 import { useImageCrop } from '@/hooks/useImageCrop';
 import { Crop as CropIcon, Image, Square, Upload } from 'lucide-react';
 import { useCallback, useRef, useState } from 'react';

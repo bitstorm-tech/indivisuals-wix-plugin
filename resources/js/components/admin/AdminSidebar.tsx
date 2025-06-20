@@ -1,5 +1,5 @@
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/Accordion';
 import { Button } from '@/components/ui/Button';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { router, usePage } from '@inertiajs/react';
 import { Coffee, FileText, LogOut } from 'lucide-react';
 import { useState } from 'react';
