@@ -21,6 +21,11 @@ class MugCategoryController extends Controller
 
     public function update(Request $request, MugCategory $mugCategory)
     {
+        // Prevent updating the default "None" category
+        if ($mugCategory->id === 100) {
+            return redirect()->back()->withErrors(['error' => 'The default "None" category cannot be modified']);
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:mug_categories,name,'.$mugCategory->id,
             'description' => 'nullable|string',
@@ -33,6 +38,11 @@ class MugCategoryController extends Controller
 
     public function destroy(MugCategory $mugCategory)
     {
+        // Prevent deleting the default "None" category
+        if ($mugCategory->id === 100) {
+            return redirect()->back()->withErrors(['error' => 'The default "None" category cannot be deleted']);
+        }
+
         // Check if category has mugs or subcategories
         if ($mugCategory->mugs()->exists() || $mugCategory->subcategories()->exists()) {
             return redirect()->back()->withErrors(['error' => 'Cannot delete category with mugs or subcategories']);
