@@ -4,6 +4,7 @@ use App\Controller\ImageController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PromptController;
+use App\Http\Controllers\PromptCategoryController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'index')->name('home');
@@ -16,6 +17,7 @@ Route::post('/generate-image', [ImageController::class, 'generateImage'])->name(
 
 Route::apiResource('prompts', PromptController::class);
 Route::get('/prompt-categories', [PromptController::class, 'categories'])->name('prompts.categories');
+Route::apiResource('prompt-categories', PromptCategoryController::class);
 
 // Authentication routes
 Route::middleware('guest')->group(function () {
