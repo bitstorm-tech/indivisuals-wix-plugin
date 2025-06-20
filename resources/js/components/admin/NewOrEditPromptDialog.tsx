@@ -90,9 +90,17 @@ export default function NewOrEditPromptDialog({ isOpen, editingPrompt, categorie
     }
   }, [form.data.category_id, subcategories]);
 
-  const handleImageChange = (e: React.ChangeEvent) => {
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      // Check file size (2MB limit due to PHP upload_max_filesize)
+      const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+      if (file.size > maxSize) {
+        alert('Image file size must be less than 2MB. Please choose a smaller image or compress it.');
+        e.target.value = ''; // Clear the input
+        return;
+      }
+
       form.setData('example_image', file);
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -112,56 +120,79 @@ export default function NewOrEditPromptDialog({ isOpen, editingPrompt, categorie
       return;
     }
 
-    // Prepare form data with cropped image
-    const dataToSubmit = { ...form.data };
-
     // If there's a completed crop and an image, apply the crop
+    let finalImageFile = form.data.example_image;
     if (completedCrop && form.data.example_image) {
       try {
-        const croppedImage = await getCroppedImage('cropped-image.png', 'image/png');
+        const croppedImage = await getCroppedImage('cropped-image.jpg', 'image/jpeg');
         if (croppedImage) {
-          dataToSubmit.example_image = croppedImage.file;
+          finalImageFile = croppedImage.file;
+          console.log('Cropped image size:', finalImageFile.size, 'bytes (', (finalImageFile.size / 1024).toFixed(2), 'KB)');
+
+          // Check if the cropped image is too large
+          const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+          if (finalImageFile.size > maxSize) {
+            alert('The cropped image is too large (over 2MB). Please select a smaller area or use a lower quality image.');
+            return;
+          }
         }
       } catch (error) {
         console.error('Error cropping image:', error);
       }
     }
 
-    if (editingPrompt) {
-      // Update existing prompt - use router.post with method spoofing for file uploads
-      const formData = {
-        ...dataToSubmit,
-        _method: 'put',
-      };
+    // Prepare submission data
+    const submissionData = {
+      name: form.data.name,
+      category_id: form.data.category_id,
+      subcategory_id: form.data.subcategory_id,
+      prompt: form.data.prompt,
+      active: form.data.active ? '1' : '0', // Send as string for FormData
+      example_image: finalImageFile,
+    };
 
-      router.post(`/prompts/${editingPrompt.id}`, formData, {
-        forceFormData: true, // Always use FormData for updates to handle file uploads properly
-        preserveScroll: true,
-        onSuccess: () => {
-          onClose();
-          form.reset();
+    // Log for debugging
+    console.log('Submitting form:', {
+      data: submissionData,
+      hasImage: !!submissionData.example_image,
+      imageType: submissionData.example_image ? submissionData.example_image.constructor.name : 'no image',
+      imageSize: submissionData.example_image ? (submissionData.example_image as File).size : 0,
+    });
+
+    if (editingPrompt) {
+      // Update existing prompt
+      router.post(
+        `/prompts/${editingPrompt.id}`,
+        {
+          ...submissionData,
+          _method: 'put',
         },
-        onError: (errors) => {
-          console.error('Update validation errors:', errors);
-          // The errors are already handled by Inertia and will be available in form.errors
+        {
+          forceFormData: true, // Always use FormData for file uploads
+          preserveScroll: true,
+          onSuccess: () => {
+            onClose();
+            form.reset();
+          },
+          onError: (errors: any) => {
+            console.error('Update validation errors:', errors);
+          },
+          onProgress: (progress: any) => {
+            console.log('Upload progress:', progress);
+          },
         },
-        onProgress: (progress) => {
-          // You can track upload progress here if needed
-          console.log('Upload progress:', progress);
-        },
-      });
+      );
     } else {
       // Create new prompt
-      router.post('/prompts', dataToSubmit, {
-        forceFormData: !!dataToSubmit.example_image, // Only use FormData if there's a file
+      router.post('/prompts', submissionData, {
+        forceFormData: true, // Always use FormData for consistent handling
         preserveScroll: true,
         onSuccess: () => {
           onClose();
           form.reset();
         },
-        onError: (errors: Record) => {
+        onError: (errors: Record<string, string>) => {
           console.error('Create validation errors:', errors);
-          // Also log the full error response
           console.error('Full error response:', {
             errors: form.errors,
             processing: form.processing,
@@ -216,12 +247,12 @@ export default function NewOrEditPromptDialog({ isOpen, editingPrompt, categorie
           {form.data.category_id && filteredSubcategories.length > 0 && (
             <div>
               <label className="text-sm font-medium">Subcategory (Optional)</label>
-              <Select value={form.data.subcategory_id} onValueChange={(value) => form.setData('subcategory_id', value)}>
+              <Select value={form.data.subcategory_id} onValueChange={(value) => form.setData('subcategory_id', value === '0' ? '' : value)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select a subcategory" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">None</SelectItem>
+                  <SelectItem value="0">None</SelectItem>
                   {filteredSubcategories.map((subcategory) => (
                     <SelectItem key={subcategory.id} value={subcategory.id.toString()}>
                       {subcategory.name}

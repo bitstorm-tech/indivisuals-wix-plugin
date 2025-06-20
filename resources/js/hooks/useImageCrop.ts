@@ -135,7 +135,7 @@ export function useImageCrop(options: UseImageCropOptions = {}): UseImageCropRet
             resolve({ url, file });
           },
           fileType,
-          0.95, // Quality for JPEG/WEBP
+          0.8, // Lower quality for smaller file sizes
         );
       });
     },
