@@ -1,4 +1,3 @@
-import AdminHeader from '@/components/admin/AdminHeader';
 import AdminSidebar from '@/components/admin/AdminSidebar';
 import DeleteConfirmationDialog from '@/components/admin/DeleteConfirmationDialog';
 import NewOrEditPromptDialog from '@/components/admin/NewOrEditPromptDialog';
@@ -101,8 +100,6 @@ export default function Admin({ prompts, categories, auth }: AdminProps) {
 
         <div className="flex-1 overflow-auto">
           <div className="container mx-auto p-6">
-            <AdminHeader />
-
             <PromptTableHeader
               categories={categories}
               selectedCategory={selectedCategory}
