@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MugCategoryController;
 use App\Http\Controllers\MugController;
 use App\Http\Controllers\MugSubCategoryController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PromptCategoryController;
 use App\Http\Controllers\PromptController;
 use App\Http\Controllers\PromptSubCategoryController;
@@ -45,6 +46,10 @@ Route::middleware('auth')->group(function () {
     Route::apiResource('mugs', MugController::class)->except(['index', 'show']);
     Route::apiResource('mug-categories', MugCategoryController::class)->except(['index', 'show']);
     Route::apiResource('mug-sub-categories', MugSubCategoryController::class)->except(['index', 'show']);
+
+    // Order management
+    Route::get('/admin/orders/open', [OrderController::class, 'open'])->name('admin.orders.open');
+    Route::get('/admin/orders/completed', [OrderController::class, 'completed'])->name('admin.orders.completed');
 
     Route::redirect('/admin', '/admin/prompts'); // Redirect old route to new location
 });

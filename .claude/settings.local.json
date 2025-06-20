@@ -29,7 +29,9 @@
       "mcp__puppeteer__puppeteer_navigate",
       "mcp__puppeteer__puppeteer_screenshot",
       "Bash(vendor/bin/pint:*)",
-      "Bash(touch:*)"
+      "Bash(touch:*)",
+      "Bash(sqlite3:*)",
+      "Bash(mv:*)"
     ]
   },
   "enableAllProjectMcpServers": false

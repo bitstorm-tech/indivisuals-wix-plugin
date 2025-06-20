@@ -1,7 +1,7 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/Accordion';
 import { Button } from '@/components/ui/Button';
 import { router, usePage } from '@inertiajs/react';
-import { Coffee, FileText, LogOut } from 'lucide-react';
+import { Coffee, FileText, LogOut, Package } from 'lucide-react';
 import { useState } from 'react';
 
 interface User {
@@ -16,7 +16,7 @@ interface AdminSidebarProps {
 
 export default function AdminSidebar({ user }: AdminSidebarProps) {
   const { url } = usePage();
-  const [openItems, setOpenItems] = useState<string[]>(['prompts', 'mugs']);
+  const [openItems, setOpenItems] = useState<string[]>(['prompts', 'mugs', 'orders']);
 
   const handleLogout = () => {
     router.post('/logout');
@@ -88,6 +88,34 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
                 }`}
               >
                 Categories
+              </button>
+            </AccordionContent>
+          </AccordionItem>
+
+          {/* Orders Section */}
+          <AccordionItem value="orders" className="border-none">
+            <AccordionTrigger className="rounded-md px-3 py-2 hover:bg-gray-100 hover:no-underline">
+              <div className="flex items-center gap-2">
+                <Package className="h-4 w-4" />
+                <span>Orders</span>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="ml-4 space-y-1">
+              <button
+                onClick={() => handleNavigate('/admin/orders/open')}
+                className={`flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors hover:bg-gray-100 ${
+                  isActive('/admin/orders/open') ? 'bg-gray-200 font-medium' : ''
+                }`}
+              >
+                Open Orders
+              </button>
+              <button
+                onClick={() => handleNavigate('/admin/orders/completed')}
+                className={`flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors hover:bg-gray-100 ${
+                  isActive('/admin/orders/completed') ? 'bg-gray-200 font-medium' : ''
+                }`}
+              >
+                Completed Orders
               </button>
             </AccordionContent>
           </AccordionItem>
