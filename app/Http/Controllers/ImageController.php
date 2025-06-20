@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
-class ImageController
+class ImageController extends Controller
 {
     public function __construct(
         private OpenAiService $openAiService,

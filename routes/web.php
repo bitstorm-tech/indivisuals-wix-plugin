@@ -7,9 +7,7 @@ use App\Http\Controllers\MugCategoryController;
 use App\Http\Controllers\MugController;
 use App\Http\Controllers\MugSubCategoryController;
 use App\Http\Controllers\OrderController;
-use App\Http\Controllers\PromptCategoryController;
 use App\Http\Controllers\PromptController;
-use App\Http\Controllers\PromptSubCategoryController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'index')->name('home');
@@ -21,8 +19,22 @@ Route::get('/images/{filename}', [ImageController::class, 'show'])->name('image.
 Route::post('/generate-image', [ImageController::class, 'generateImage'])->name('image.generate');
 
 Route::apiResource('prompts', PromptController::class);
-Route::apiResource('prompt-categories', PromptCategoryController::class);
-Route::apiResource('prompt-sub-categories', PromptSubCategoryController::class);
+
+// Prompt categories
+Route::get('prompt-categories', [PromptController::class, 'indexCategories']);
+Route::post('prompt-categories', [PromptController::class, 'storeCategory']);
+Route::get('prompt-categories/{promptCategory}', [PromptController::class, 'showCategory']);
+Route::put('prompt-categories/{promptCategory}', [PromptController::class, 'updateCategory']);
+Route::patch('prompt-categories/{promptCategory}', [PromptController::class, 'updateCategory']);
+Route::delete('prompt-categories/{promptCategory}', [PromptController::class, 'destroyCategory']);
+
+// Prompt sub-categories
+Route::get('prompt-sub-categories', [PromptController::class, 'indexSubCategories']);
+Route::post('prompt-sub-categories', [PromptController::class, 'storeSubCategory']);
+Route::get('prompt-sub-categories/{promptSubCategory}', [PromptController::class, 'showSubCategory']);
+Route::put('prompt-sub-categories/{promptSubCategory}', [PromptController::class, 'updateSubCategory']);
+Route::patch('prompt-sub-categories/{promptSubCategory}', [PromptController::class, 'updateSubCategory']);
+Route::delete('prompt-sub-categories/{promptSubCategory}', [PromptController::class, 'destroySubCategory']);
 
 // Authentication routes
 Route::middleware('guest')->group(function () {
