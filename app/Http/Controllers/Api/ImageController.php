@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use App\Models\Prompt;
 use App\Services\ImageConverterService;
 use App\Services\OpenAiService;

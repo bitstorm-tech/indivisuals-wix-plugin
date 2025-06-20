@@ -1,10 +1,11 @@
 <?php
 
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\ImageController;
-use App\Http\Controllers\MugController;
-use App\Http\Controllers\OrderController;
-use App\Http\Controllers\PromptController;
+use App\Http\Controllers\Admin\MugController;
+use App\Http\Controllers\Admin\OrderController;
+use App\Http\Controllers\Admin\PromptController as AdminPromptController;
+use App\Http\Controllers\Api\ImageController;
+use App\Http\Controllers\Api\PromptController;
+use App\Http\Controllers\Auth\AuthController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'index')->name('home');
@@ -44,8 +45,8 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 // Protected admin routes
 Route::middleware('auth')->group(function () {
     // Prompt management
-    Route::get('/admin/prompts', [PromptController::class, 'prompts'])->name('admin.prompts');
-    Route::get('/admin/prompt-categories', [PromptController::class, 'promptCategories'])->name('admin.prompt-categories');
+    Route::get('/admin/prompts', [AdminPromptController::class, 'prompts'])->name('admin.prompts');
+    Route::get('/admin/prompt-categories', [AdminPromptController::class, 'promptCategories'])->name('admin.prompt-categories');
 
     // Mug management
     Route::get('/admin/mugs', [MugController::class, 'index'])->name('admin.mugs');
