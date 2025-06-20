@@ -1,8 +1,8 @@
 <?php
 
-use App\Controller\ImageController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ImageController;
 use App\Http\Controllers\MugCategoryController;
 use App\Http\Controllers\MugController;
 use App\Http\Controllers\MugSubCategoryController;
