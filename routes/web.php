@@ -3,9 +3,7 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ImageController;
-use App\Http\Controllers\MugCategoryController;
 use App\Http\Controllers\MugController;
-use App\Http\Controllers\MugSubCategoryController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PromptController;
 use Illuminate\Support\Facades\Route;
@@ -56,8 +54,18 @@ Route::middleware('auth')->group(function () {
 
     // Mug CRUD routes
     Route::apiResource('mugs', MugController::class)->except(['index', 'show']);
-    Route::apiResource('mug-categories', MugCategoryController::class)->except(['index', 'show']);
-    Route::apiResource('mug-sub-categories', MugSubCategoryController::class)->except(['index', 'show']);
+
+    // Mug categories
+    Route::post('mug-categories', [MugController::class, 'storeCategory']);
+    Route::put('mug-categories/{mugCategory}', [MugController::class, 'updateCategory']);
+    Route::patch('mug-categories/{mugCategory}', [MugController::class, 'updateCategory']);
+    Route::delete('mug-categories/{mugCategory}', [MugController::class, 'destroyCategory']);
+
+    // Mug sub-categories
+    Route::post('mug-sub-categories', [MugController::class, 'storeSubCategory']);
+    Route::put('mug-sub-categories/{mugSubCategory}', [MugController::class, 'updateSubCategory']);
+    Route::patch('mug-sub-categories/{mugSubCategory}', [MugController::class, 'updateSubCategory']);
+    Route::delete('mug-sub-categories/{mugSubCategory}', [MugController::class, 'destroySubCategory']);
 
     // Order management
     Route::get('/admin/orders/open', [OrderController::class, 'open'])->name('admin.orders.open');

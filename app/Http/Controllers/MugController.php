@@ -109,4 +109,80 @@ class MugController extends Controller
             'subcategories' => $subcategories,
         ]);
     }
+
+    // Category methods
+    public function storeCategory(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255|unique:mug_categories',
+            'description' => 'nullable|string',
+        ]);
+
+        MugCategory::create($validated);
+
+        return redirect()->back();
+    }
+
+    public function updateCategory(Request $request, MugCategory $mugCategory)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255|unique:mug_categories,name,'.$mugCategory->id,
+            'description' => 'nullable|string',
+        ]);
+
+        $mugCategory->update($validated);
+
+        return redirect()->back();
+    }
+
+    public function destroyCategory(MugCategory $mugCategory)
+    {
+        // Check if category has mugs or subcategories
+        if ($mugCategory->mugs()->exists() || $mugCategory->subcategories()->exists()) {
+            return redirect()->back()->withErrors(['error' => 'Cannot delete category with mugs or subcategories']);
+        }
+
+        $mugCategory->delete();
+
+        return redirect()->back();
+    }
+
+    // SubCategory methods
+    public function storeSubCategory(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'category_id' => 'required|exists:mug_categories,id',
+        ]);
+
+        MugSubCategory::create($validated);
+
+        return redirect()->back();
+    }
+
+    public function updateSubCategory(Request $request, MugSubCategory $mugSubCategory)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'category_id' => 'required|exists:mug_categories,id',
+        ]);
+
+        $mugSubCategory->update($validated);
+
+        return redirect()->back();
+    }
+
+    public function destroySubCategory(MugSubCategory $mugSubCategory)
+    {
+        // Check if subcategory has mugs
+        if ($mugSubCategory->mugs()->exists()) {
+            return redirect()->back()->withErrors(['error' => 'Cannot delete subcategory with mugs']);
+        }
+
+        $mugSubCategory->delete();
+
+        return redirect()->back();
+    }
 }

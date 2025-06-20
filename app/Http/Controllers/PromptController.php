@@ -267,7 +267,7 @@ class PromptController extends Controller
     }
 
     // Category methods
-    public function indexCategories(Request $request): JsonResponse
+    public function indexCategories(): JsonResponse
     {
         $categories = PromptCategory::orderBy('name')->get();
 
@@ -329,7 +329,7 @@ class PromptController extends Controller
     }
 
     // SubCategory methods
-    public function indexSubCategories(Request $request): JsonResponse
+    public function indexSubCategories(): JsonResponse
     {
         $subCategories = PromptSubCategory::orderBy('name')->get();
 
