@@ -16,13 +16,13 @@ export default function ImageCropper({ imageUrl, crop, onCropChange, onCropCompl
 
   return (
     <div className={cn('space-y-4', className)}>
-      <div className="relative overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
-        <ReactCrop crop={crop} onChange={onCropChange} onComplete={onCropComplete} className="max-h-[500px]">
+      <div className="flex items-center justify-center rounded-lg bg-gray-100 p-4">
+        <ReactCrop crop={crop} onChange={onCropChange} onComplete={onCropComplete}>
           <img
             ref={imgRef}
             src={imageUrl}
             alt="Upload preview"
-            className="max-h-[500px] max-w-full"
+            className="max-h-[500px] max-w-full object-contain"
             onLoad={() => {
               if (!crop.width && !crop.height) {
                 const newCrop: Crop = {
