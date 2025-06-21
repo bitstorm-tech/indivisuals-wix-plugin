@@ -37,7 +37,7 @@ export function useWizardNavigation(): UseWizardNavigationReturn {
     (step: WizardStep): boolean => {
       switch (step) {
         case 'image-upload':
-          return state.uploadedImage !== null && state.cropData !== null;
+          return state.uploadedImage !== null;
         case 'prompt-selection':
           return state.selectedPrompt !== null;
         case 'mug-selection':
