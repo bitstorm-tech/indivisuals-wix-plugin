@@ -34,7 +34,7 @@ class PromptController extends Controller
             $query->active();
         }
 
-        $prompts = $query->orderBy('category_id')->orderBy('name')->get();
+        $prompts = $query->with(['category', 'subcategory'])->orderBy('category_id')->orderBy('name')->get();
 
         // Add virtual field
         $prompts->each(function ($prompt) {
