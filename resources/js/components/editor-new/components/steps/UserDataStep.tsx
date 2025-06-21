@@ -14,6 +14,18 @@ interface UserDataStepProps {
 export default function UserDataStep({ userData, onUserDataComplete }: UserDataStepProps) {
   const { formData, errors, handleChange, validateForm } = useUserDataForm(userData);
 
+  const handleEmailChange = useCallback(
+    (value: string) => {
+      handleChange('email', value);
+      // Check if email is valid and update parent state immediately
+      const isValidEmail = value && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+      if (isValidEmail) {
+        onUserDataComplete({ ...formData, email: value });
+      }
+    },
+    [formData, handleChange, onUserDataComplete],
+  );
+
   const handleBlur = useCallback(() => {
     if (validateForm()) {
       onUserDataComplete(formData);
@@ -45,7 +57,7 @@ export default function UserDataStep({ userData, onUserDataComplete }: UserDataS
             type="email"
             placeholder="your.email@example.com"
             value={formData.email}
-            onChange={(e) => handleChange('email', e.target.value)}
+            onChange={(e) => handleEmailChange(e.target.value)}
             onBlur={handleBlur}
             className={errors.email ? 'border-red-500' : ''}
           />
