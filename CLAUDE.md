@@ -91,7 +91,6 @@ This is a Laravel + Inertia.js + React application focused on AI-powered image p
 - Concurrent development setup runs all services simultaneously
 - Use `git mv` to move files that are under version control
 - Avoid useless or unnecessary comments
-- After a file was edited or created open it in the current running Visual Studio Code instance
 
 #### React
 
