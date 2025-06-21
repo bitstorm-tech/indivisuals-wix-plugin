@@ -31,27 +31,33 @@ export default function PromptSelectionStep({ prompts, selectedPrompt, onPromptS
               key={prompt.id}
               onClick={() => onPromptSelect(prompt)}
               className={cn(
-                'relative cursor-pointer rounded-lg border-2 p-4 transition-all',
-                isSelected ? 'border-primary bg-primary/5 shadow-md' : 'border-gray-200 hover:border-gray-300 hover:shadow-sm',
+                'relative cursor-pointer overflow-hidden rounded-lg border-2 transition-all',
+                isSelected ? 'border-primary shadow-md' : 'border-gray-200 hover:border-gray-300 hover:shadow-sm',
               )}
             >
               {isSelected && (
-                <div className="absolute top-2 right-2">
+                <div className="absolute top-2 right-2 z-10">
                   <div className="bg-primary flex h-6 w-6 items-center justify-center rounded-full text-white">
                     <Check className="h-4 w-4" />
                   </div>
                 </div>
               )}
 
-              <h4 className="mb-2 font-medium">{prompt.name}</h4>
-
-              {prompt.category && (
-                <span className="mb-2 inline-block rounded-full bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600 capitalize">
-                  {prompt.category.name}
-                </span>
+              {prompt.example_image_url ? (
+                <div className="relative">
+                  <img src={prompt.example_image_url} alt={prompt.name} className="h-48 w-full object-cover" loading="lazy" />
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-3">
+                    <h4 className="font-medium text-white">{prompt.name}</h4>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex h-48 items-center justify-center bg-gray-100 p-4">
+                  <div className="text-center">
+                    <h4 className="mb-2 font-medium">{prompt.name}</h4>
+                    <p className="text-xs text-gray-500">No preview available</p>
+                  </div>
+                </div>
               )}
-
-              <p className="line-clamp-2 text-sm text-gray-600">{prompt.prompt}</p>
             </div>
           );
         })}
