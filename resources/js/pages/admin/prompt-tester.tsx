@@ -37,6 +37,8 @@ const GPT_IMAGE_1_SIZES: Record<GptImage1Size, string> = {
   '1024x1536': '1024x1536 (portrait)',
 };
 
+const MASTER_PROMPT_STORAGE_KEY = 'promptTester.masterPrompt';
+
 export default function PromptTester({ auth }: PromptTesterProps) {
   const [selectedModel, setSelectedModel] = useState<Model>('gpt-image-1');
   const [uploadedImage, setUploadedImage] = useState<File | null>(null);
@@ -54,6 +56,21 @@ export default function PromptTester({ auth }: PromptTesterProps) {
     quality: 'low' as Quality,
     size: '1024x1024',
   });
+
+  // Load master prompt from localStorage on mount
+  useEffect(() => {
+    const storedMasterPrompt = localStorage.getItem(MASTER_PROMPT_STORAGE_KEY);
+    if (storedMasterPrompt) {
+      setData('masterPrompt', storedMasterPrompt);
+    }
+  }, [setData]);
+
+  // Save master prompt to localStorage whenever it changes
+  useEffect(() => {
+    if (data.masterPrompt) {
+      localStorage.setItem(MASTER_PROMPT_STORAGE_KEY, data.masterPrompt);
+    }
+  }, [data.masterPrompt]);
 
   useEffect(() => {
     setData('model', selectedModel);
