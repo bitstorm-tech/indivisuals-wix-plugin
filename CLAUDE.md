@@ -95,6 +95,7 @@ This is a Laravel + Inertia.js + React application focused on AI-powered image p
 
 #### React
 
+- Follow Rules of React (https://react.dev/reference/rules) strictly
 - Use React best practices
 - Create small, self contained components or subcomponents where it is usefull
 - Create custom hooks where it is usefull
