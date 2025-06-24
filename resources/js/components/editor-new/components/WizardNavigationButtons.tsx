@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/Button';
 import { router } from '@inertiajs/react';
-import { ArrowLeft, ArrowRight, Loader2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Loader2, ShoppingCart } from 'lucide-react';
 import { MugOption, UserData, WizardNavigationProps } from '../types';
 
 interface ExtendedWizardNavigationProps extends WizardNavigationProps {
@@ -22,13 +22,9 @@ export default function WizardNavigationButtons({
 }: ExtendedWizardNavigationProps) {
   const handleNext = () => {
     if (currentStep === 'preview' && canGoNext && wizardData) {
-      router.visit('/checkout', {
-        data: {
-          selectedMug: wizardData.selectedMug,
-          selectedGeneratedImage: wizardData.selectedGeneratedImage,
-          userData: wizardData.userData,
-        },
-      });
+      // Since this is going to the checkout page, we need to store the data in session or pass it differently
+      // For now, let's just navigate to checkout - the checkout page will need to be updated to handle the cart data
+      router.visit('/checkout');
     } else {
       onNext();
     }
@@ -47,9 +43,14 @@ export default function WizardNavigationButtons({
             <Loader2 className="h-4 w-4 animate-spin" />
             Processing...
           </>
+        ) : currentStep === 'preview' ? (
+          <>
+            <ShoppingCart className="h-4 w-4" />
+            Add to Cart
+          </>
         ) : (
           <>
-            {currentStep === 'preview' ? 'Finish' : 'Next'}
+            Next
             <ArrowRight className="h-4 w-4" />
           </>
         )}

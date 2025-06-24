@@ -1,5 +1,4 @@
-import { Button } from '@/components/ui/Button';
-import { CheckCircle, Download, ShoppingCart } from 'lucide-react';
+import { CheckCircle } from 'lucide-react';
 import { MugOption, UserData } from '../../types';
 import MugPreview from '../shared/MugPreview';
 
@@ -13,15 +12,6 @@ export default function PreviewStep({ selectedMug, selectedGeneratedImage, userD
   if (!selectedMug || !selectedGeneratedImage || !userData) {
     return null;
   }
-
-  const handleDownload = () => {
-    const link = document.createElement('a');
-    link.href = selectedGeneratedImage;
-    link.download = 'my-custom-mug-design.png';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
 
   return (
     <div className="space-y-8">
@@ -67,17 +57,6 @@ export default function PreviewStep({ selectedMug, selectedGeneratedImage, userD
             <span className="text-primary">${selectedMug.price}</span>
           </div>
         </div>
-      </div>
-
-      <div className="flex justify-center gap-4">
-        <Button variant="outline" onClick={handleDownload} className="gap-2">
-          <Download className="h-4 w-4" />
-          Download Design
-        </Button>
-        <Button size="lg" className="gap-2">
-          <ShoppingCart className="h-4 w-4" />
-          Add to Cart
-        </Button>
       </div>
 
       <p className="text-center text-sm text-gray-500">Your design has been saved and will be available in your account</p>
