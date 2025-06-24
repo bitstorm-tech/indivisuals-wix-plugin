@@ -37,9 +37,6 @@ class PromptTesterController extends Controller
         ]);
 
         try {
-            // Prepare the combined prompt
-            $combinedPrompt = $validated['masterPrompt'].' '.$validated['specificPrompt'];
-
             // Handle image upload if present (for gpt-image-1)
             $imageSource = null;
             if ($request->hasFile('image')) {
@@ -48,14 +45,16 @@ class PromptTesterController extends Controller
                 return response()->json(['message' => 'Image is required for gpt-image-1 model'], 422);
             }
 
-            // Generate image using the service
+            // Generate image using the service with masterPrompt override
             $result = $this->openAiService->generateImageWithParams(
                 $imageSource,
-                $combinedPrompt,
+                $validated['specificPrompt'],
                 $validated['model'],
                 $validated['quality'],
                 $validated['background'],
-                $validated['size']
+                $validated['size'],
+                1,
+                $validated['masterPrompt']
             );
 
             // Return the image as a base64 data URL (no filesystem storage)

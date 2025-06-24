@@ -37,11 +37,12 @@ class OpenAiService
         string $quality = 'low',
         string $background = 'auto',
         string $size = '1024x1024',
-        int $n = 1
+        int $n = 1,
+        ?string $overrideMasterPrompt = null
     ): array {
         try {
-            $userPrompt = $prompt;
-            $combinedPrompt = "{$this->masterPrompt} {$prompt}";
+            $masterPrompt = $overrideMasterPrompt ?? $this->masterPrompt;
+            $combinedPrompt = "{$masterPrompt} {$prompt}";
             Log::debug('Prompt: '.$combinedPrompt);
 
             $requestParams = [
@@ -49,8 +50,8 @@ class OpenAiService
                 'size' => $size,
                 'n' => $n,
                 'response_format' => 'b64_json',
-                'masterPrompt' => $this->masterPrompt,
-                'userPrompt' => $userPrompt,
+                'masterPrompt' => $masterPrompt,
+                'specificPrompt' => $prompt,
                 'combinedPrompt' => $combinedPrompt,
             ];
 

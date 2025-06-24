@@ -27,13 +27,13 @@ type Quality = 'low' | 'medium' | 'high';
 type DallE2Size = '256x256' | '512x512' | '1024x1024';
 type GptImage1Size = '1024x1024' | '1536x1024' | '1024x1536';
 
-interface RequestParams {
+interface OpenAiRequestParams {
   model: string;
   size: string;
   n: number;
   response_format: string;
-  systemPrompt: string;
-  userPrompt: string;
+  masterPrompt: string;
+  specificPrompt: string;
   combinedPrompt: string;
   quality?: string;
   background?: string;
@@ -61,7 +61,7 @@ export default function PromptTester({ auth }: PromptTesterProps) {
   const [generatedImage, setGeneratedImage] = useState<string>('');
   const [error, setError] = useState<string>('');
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
-  const [requestParams, setRequestParams] = useState<RequestParams | null>(null);
+  const [requestParams, setRequestParams] = useState<OpenAiRequestParams | null>(null);
 
   const { data, setData } = useForm({
     masterPrompt: '',
@@ -342,15 +342,15 @@ export default function PromptTester({ auth }: PromptTesterProps) {
                         <AccordionContent>
                           <div className="space-y-4">
                             <div>
-                              <Label className="text-sm font-medium">System Prompt</Label>
-                              <div className="mt-1 rounded-md bg-gray-50 p-3 text-sm">{requestParams.systemPrompt}</div>
+                              <Label className="text-sm font-medium">Master Prompt</Label>
+                              <div className="mt-1 rounded-md bg-gray-50 p-3 text-sm">{requestParams.masterPrompt}</div>
                             </div>
                             <div>
-                              <Label className="text-sm font-medium">User Prompt (Master + Specific)</Label>
-                              <div className="mt-1 rounded-md bg-gray-50 p-3 text-sm">{requestParams.userPrompt}</div>
+                              <Label className="text-sm font-medium">Specific Prompt</Label>
+                              <div className="mt-1 rounded-md bg-gray-50 p-3 text-sm">{requestParams.specificPrompt}</div>
                             </div>
                             <div>
-                              <Label className="text-sm font-medium">Combined Prompt (Sent to API)</Label>
+                              <Label className="text-sm font-medium">Combined Prompt (Sent to OpenAI API)</Label>
                               <div className="mt-1 rounded-md bg-gray-50 p-3 text-sm">{requestParams.combinedPrompt}</div>
                             </div>
                           </div>
