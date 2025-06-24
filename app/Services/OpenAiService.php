@@ -42,7 +42,7 @@ class OpenAiService
             Log::debug('Prompt: '.$prompt);
 
             if ($model === 'dall-e-2') {
-                $response = $this->generateWithDallE2($prompt, $size, $n);
+                $response = $this->generateWithDallE2($imageSource, $prompt, $size, $n);
             } else {
                 $response = $this->generateWithGptImage1($imageSource, $prompt, $quality, $background, $size, $n);
             }
@@ -68,20 +68,63 @@ class OpenAiService
     /**
      * Generate image using DALL-E 2 model.
      */
-    private function generateWithDallE2(string $prompt, string $size, int $n)
-    {
-        return $this->httpClient->post('https://api.openai.com/v1/images/generations', [
+    private function generateWithDallE2(
+        string|UploadedFile|null $imageSource,
+        string $prompt,
+        string $size,
+        int $n
+    ) {
+        if (! $imageSource) {
+            throw new \InvalidArgumentException('Image file is required for dall-e-2 model');
+        }
+
+        // Handle the image source
+        if ($imageSource instanceof UploadedFile) {
+            // Handle uploaded file
+            $imageStream = $this->prepareUploadedFileStream($imageSource);
+            $filename = $imageSource->getClientOriginalName();
+        } else {
+            // Handle file path (existing behavior)
+            if (! file_exists($imageSource) || ! is_readable($imageSource)) {
+                throw new \InvalidArgumentException('Image file is not accessible');
+            }
+            $imageStream = fopen($imageSource, 'r');
+            $filename = basename($imageSource);
+        }
+
+        $multipart = [
+            [
+                'name' => 'image',
+                'contents' => $imageStream,
+                'filename' => $filename,
+            ],
+            [
+                'name' => 'prompt',
+                'contents' => $prompt,
+            ],
+            [
+                'name' => 'model',
+                'contents' => 'dall-e-2',
+            ],
+            [
+                'name' => 'size',
+                'contents' => $size,
+            ],
+            [
+                'name' => 'n',
+                'contents' => $n,
+            ],
+            [
+                'name' => 'response_format',
+                'contents' => 'b64_json',
+            ],
+        ];
+
+        return $this->httpClient->post($this->baseUrl, [
             'headers' => [
                 'Authorization' => 'Bearer '.$this->apiKey,
-                'Content-Type' => 'application/json',
             ],
-            'json' => [
-                'model' => 'dall-e-2',
-                'prompt' => $prompt,
-                'size' => $size,
-                'n' => $n,
-                'response_format' => 'b64_json',
-            ],
+            'multipart' => $multipart,
             'timeout' => 120, // 2 minutes timeout
         ]);
     }
