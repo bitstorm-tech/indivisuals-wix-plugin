@@ -1,7 +1,7 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/Accordion';
 import { Button } from '@/components/ui/Button';
 import { router, usePage } from '@inertiajs/react';
-import { Coffee, FileText, FlaskConical, LogOut, Package } from 'lucide-react';
+import { Coffee, FileText, FlaskConical, LogOut, Package, Palette } from 'lucide-react';
 import { useState } from 'react';
 
 interface User {
@@ -131,6 +131,17 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
           >
             <FlaskConical className="h-4 w-4" />
             <span>Prompt Tester</span>
+          </button>
+        </div>
+
+        {/* Editor - Opens in new tab */}
+        <div className="mt-2">
+          <button
+            onClick={() => window.open('/editor-new', '_blank')}
+            className="flex w-full items-center gap-2 rounded-md px-3 py-2 transition-colors hover:bg-gray-100"
+          >
+            <Palette className="h-4 w-4" />
+            <span>Editor</span>
           </button>
         </div>
       </div>
