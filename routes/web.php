@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\MugController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\PromptController as AdminPromptController;
+use App\Http\Controllers\Admin\PromptTesterController;
 use App\Http\Controllers\Api\ImageController;
 use App\Http\Controllers\Api\PromptController;
 use App\Http\Controllers\Auth\AuthController;
@@ -71,6 +72,10 @@ Route::middleware('auth')->group(function () {
     // Order management
     Route::get('/admin/orders/open', [OrderController::class, 'open'])->name('admin.orders.open');
     Route::get('/admin/orders/completed', [OrderController::class, 'completed'])->name('admin.orders.completed');
+
+    // Prompt Tester
+    Route::get('/admin/prompt-tester', [PromptTesterController::class, 'index'])->name('admin.prompt-tester');
+    Route::post('/admin/test-prompt', [PromptTesterController::class, 'testPrompt'])->name('admin.test-prompt');
 
     Route::redirect('/admin', '/admin/prompts'); // Redirect old route to new location
 });

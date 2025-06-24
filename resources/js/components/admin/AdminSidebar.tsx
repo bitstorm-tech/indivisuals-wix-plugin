@@ -1,7 +1,7 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/Accordion';
 import { Button } from '@/components/ui/Button';
 import { router, usePage } from '@inertiajs/react';
-import { Coffee, FileText, LogOut, Package } from 'lucide-react';
+import { Coffee, FileText, FlaskConical, LogOut, Package } from 'lucide-react';
 import { useState } from 'react';
 
 interface User {
@@ -120,6 +120,19 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
             </AccordionContent>
           </AccordionItem>
         </Accordion>
+
+        {/* Prompt Tester - Outside accordion */}
+        <div className="mt-4">
+          <button
+            onClick={() => handleNavigate('/admin/prompt-tester')}
+            className={`flex w-full items-center gap-2 rounded-md px-3 py-2 transition-colors hover:bg-gray-100 ${
+              isActive('/admin/prompt-tester') ? 'bg-gray-200 font-medium' : ''
+            }`}
+          >
+            <FlaskConical className="h-4 w-4" />
+            <span>Prompt Tester</span>
+          </button>
+        </div>
       </div>
 
       <div className="border-t p-4">

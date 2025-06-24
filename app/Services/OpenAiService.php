@@ -24,27 +24,49 @@ class OpenAiService
 
     public function generateImage(string $imagePath, string $prompt, int $n = 1, string $size = '1024x1024'): string|array
     {
-        try {
-            if (! file_exists($imagePath) || ! is_readable($imagePath)) {
-                throw new \InvalidArgumentException("Image file is not accessible: {$imagePath}");
-            }
+        return $this->generateImageWithParams($imagePath, $prompt, 'gpt-image-1', 'low', 'default', $size, $n);
+    }
 
+    public function generateImageWithParams(
+        ?string $imagePath,
+        string $prompt,
+        string $model = 'gpt-image-1',
+        string $quality = 'low',
+        string $background = 'default',
+        string $size = '1024x1024',
+        int $n = 1
+    ): string|array {
+        try {
             $prompt = "{$this->systemPrompt} {$prompt}";
             Log::debug('Prompt: '.$prompt);
 
-            $response = $this->httpClient->post($this->baseUrl, [
-                'headers' => [
-                    'Authorization' => 'Bearer '.$this->apiKey,
-                ],
-                'multipart' => [
+            if ($model === 'dall-e-2') {
+                // Use generations endpoint for DALL-E 2
+                $response = $this->httpClient->post('https://api.openai.com/v1/images/generations', [
+                    'headers' => [
+                        'Authorization' => 'Bearer '.$this->apiKey,
+                        'Content-Type' => 'application/json',
+                    ],
+                    'json' => [
+                        'model' => 'dall-e-2',
+                        'prompt' => $prompt,
+                        'size' => $size,
+                        'quality' => $quality,
+                        'n' => $n,
+                        'response_format' => 'b64_json',
+                    ],
+                ]);
+            } else {
+                // Use edits endpoint for gpt-image-1
+                if (! $imagePath || ! file_exists($imagePath) || ! is_readable($imagePath)) {
+                    throw new \InvalidArgumentException('Image file is required and must be accessible for gpt-image-1 model');
+                }
+
+                $multipart = [
                     [
                         'name' => 'image',
                         'contents' => fopen($imagePath, 'r'),
                         'filename' => basename($imagePath),
-                    ],
-                    [
-                        'name' => 'quality',
-                        'contents' => 'low',
                     ],
                     [
                         'name' => 'prompt',
@@ -62,8 +84,25 @@ class OpenAiService
                         'name' => 'n',
                         'contents' => $n,
                     ],
-                ],
-            ]);
+                    [
+                        'name' => 'response_format',
+                        'contents' => 'b64_json',
+                    ],
+                ];
+
+                // Only add quality for gpt-image-1 (it supports quality parameter)
+                $multipart[] = [
+                    'name' => 'quality',
+                    'contents' => $quality,
+                ];
+
+                $response = $this->httpClient->post($this->baseUrl, [
+                    'headers' => [
+                        'Authorization' => 'Bearer '.$this->apiKey,
+                    ],
+                    'multipart' => $multipart,
+                ]);
+            }
 
             $data = json_decode($response->getBody(), true);
 
