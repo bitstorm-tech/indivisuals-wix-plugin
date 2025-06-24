@@ -96,8 +96,8 @@ export default function PromptTester({ auth }: PromptTesterProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!uploadedImage && data.model === 'gpt-image-1') {
-      setError('Please upload an image for gpt-image-1 model');
+    if (!uploadedImage) {
+      setError('Please upload an image');
       return;
     }
 
@@ -265,30 +265,28 @@ export default function PromptTester({ auth }: PromptTesterProps) {
               </div>
             </div>
 
-            {selectedModel === 'gpt-image-1' && (
-              <div>
-                <Label htmlFor="image">Upload Image</Label>
-                <div className="mt-1">
-                  <label
-                    htmlFor="image"
-                    className={`flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-6 hover:border-gray-400 ${
-                      validationErrors.image ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                  >
-                    {previewUrl ? (
-                      <img src={previewUrl} alt="Preview" className="max-h-48 rounded" />
-                    ) : (
-                      <>
-                        <Upload className="mb-2 h-8 w-8 text-gray-400" />
-                        <span className="text-sm text-gray-600">Click to upload image</span>
-                      </>
-                    )}
-                    <input id="image" type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
-                  </label>
-                  {validationErrors.image && <p className="mt-1 text-sm text-red-600">{validationErrors.image}</p>}
-                </div>
+            <div>
+              <Label htmlFor="image">Upload Image</Label>
+              <div className="mt-1">
+                <label
+                  htmlFor="image"
+                  className={`flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-6 hover:border-gray-400 ${
+                    validationErrors.image ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                >
+                  {previewUrl ? (
+                    <img src={previewUrl} alt="Preview" className="max-h-48 rounded" />
+                  ) : (
+                    <>
+                      <Upload className="mb-2 h-8 w-8 text-gray-400" />
+                      <span className="text-sm text-gray-600">Click to upload image</span>
+                    </>
+                  )}
+                  <input id="image" type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                </label>
+                {validationErrors.image && <p className="mt-1 text-sm text-red-600">{validationErrors.image}</p>}
               </div>
-            )}
+            </div>
 
             {error && <div className="rounded-md bg-red-50 p-4 text-sm text-red-600">{error}</div>}
 
