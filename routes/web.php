@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Route;
 Route::inertia('/', 'index')->name('home');
 Route::inertia('/editor', 'editor')->name('editor');
 Route::inertia('/editor-new', 'editor-new')->name('editor-new');
+Route::inertia('/checkout', 'checkout')->name('checkout');
 
 Route::post('/upload-image', [ImageController::class, 'store'])->middleware('auth')->name('image.upload');
 Route::get('/images/{filename}', [ImageController::class, 'show'])->name('image.show');

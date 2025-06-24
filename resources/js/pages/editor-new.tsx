@@ -172,6 +172,11 @@ export default function EditorNewPage() {
           onNext={wizard.goNext}
           onPrevious={wizard.goPrevious}
           isProcessing={wizard.isProcessing}
+          wizardData={{
+            selectedMug: wizard.selectedMug,
+            selectedGeneratedImage: wizard.selectedGeneratedImage,
+            userData: wizard.userData,
+          }}
         />
       </div>
     </div>
