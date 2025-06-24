@@ -11,7 +11,7 @@ class OpenAiService
 {
     private Client $httpClient;
 
-    private string $systemPrompt = 'Prioritize subject fidelity in stylizations. Preserve facial identity (proportions, features, expression, skin tone) in portraits. For groups, maintain exact count, positions, and faces. For animals: pose, proportions, fur, eyes. For vehicles: shape, logo, angle. For buildings: windows, roof, layout. For landscapes: terrain, horizon, structure. Apply style as soft overlay only (Level 1–3), never distort form. Backgrounds may be fully stylized but remain secondary. Output must always be clearly recognizable. Target: mug prints.';
+    private string $masterPrompt = 'Prioritize subject fidelity in stylizations. Preserve facial identity (proportions, features, expression, skin tone) in portraits. For groups, maintain exact count, positions, and faces. For animals: pose, proportions, fur, eyes. For vehicles: shape, logo, angle. For buildings: windows, roof, layout. For landscapes: terrain, horizon, structure. Apply style as soft overlay only (Level 1–3), never distort form. Backgrounds may be fully stylized but remain secondary. Output must always be clearly recognizable. Target: mug prints.';
 
     private string $apiKey;
 
@@ -25,7 +25,9 @@ class OpenAiService
 
     public function generateImage(string $imagePath, string $prompt, int $n = 1, string $size = '1024x1024'): string|array
     {
-        return $this->generateImageWithParams($imagePath, $prompt, 'gpt-image-1', 'low', 'auto', $size, $n);
+        $result = $this->generateImageWithParams($imagePath, $prompt, 'gpt-image-1', 'low', 'auto', $size, $n);
+
+        return $result['images'];
     }
 
     public function generateImageWithParams(
@@ -36,25 +38,41 @@ class OpenAiService
         string $background = 'auto',
         string $size = '1024x1024',
         int $n = 1
-    ): string|array {
+    ): array {
         try {
-            $prompt = "{$this->systemPrompt} {$prompt}";
-            Log::debug('Prompt: '.$prompt);
+            $userPrompt = $prompt;
+            $combinedPrompt = "{$this->masterPrompt} {$prompt}";
+            Log::debug('Prompt: '.$combinedPrompt);
+
+            $requestParams = [
+                'model' => $model,
+                'size' => $size,
+                'n' => $n,
+                'response_format' => 'b64_json',
+                'masterPrompt' => $this->masterPrompt,
+                'userPrompt' => $userPrompt,
+                'combinedPrompt' => $combinedPrompt,
+            ];
 
             if ($model === 'dall-e-2') {
-                $response = $this->generateWithDallE2($imageSource, $prompt, $size, $n);
+                $response = $this->generateWithDallE2($imageSource, $combinedPrompt, $size, $n);
             } else {
-                $response = $this->generateWithGptImage1($imageSource, $prompt, $quality, $background, $size, $n);
+                $requestParams['quality'] = $quality;
+                $requestParams['background'] = $background;
+                $response = $this->generateWithGptImage1($imageSource, $combinedPrompt, $quality, $background, $size, $n);
             }
 
             $data = json_decode($response->getBody(), true);
 
             if (isset($data['data'])) {
-                if ($n === 1) {
-                    return $data['data'][0]['b64_json'];
-                }
+                $images = $n === 1
+                    ? $data['data'][0]['b64_json']
+                    : array_map(fn ($item) => $item['b64_json'], $data['data']);
 
-                return array_map(fn ($item) => $item['b64_json'], $data['data']);
+                return [
+                    'images' => $images,
+                    'requestParams' => $requestParams,
+                ];
             }
 
             throw new \Exception('Unexpected API response structure.');

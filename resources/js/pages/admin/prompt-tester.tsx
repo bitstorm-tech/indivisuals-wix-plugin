@@ -1,10 +1,12 @@
 import AdminSidebar from '@/components/admin/AdminSidebar';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/Accordion';
 import { Button } from '@/components/ui/Button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Label } from '@/components/ui/Label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
 import { Textarea } from '@/components/ui/Textarea';
 import { Head, useForm } from '@inertiajs/react';
-import { Loader2, Upload } from 'lucide-react';
+import { Code, Loader2, Upload } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 
 interface User {
@@ -24,6 +26,18 @@ type Background = 'auto' | 'transparent' | 'opaque';
 type Quality = 'low' | 'medium' | 'high';
 type DallE2Size = '256x256' | '512x512' | '1024x1024';
 type GptImage1Size = '1024x1024' | '1536x1024' | '1024x1536';
+
+interface RequestParams {
+  model: string;
+  size: string;
+  n: number;
+  response_format: string;
+  systemPrompt: string;
+  userPrompt: string;
+  combinedPrompt: string;
+  quality?: string;
+  background?: string;
+}
 
 const DALLE2_SIZES: Record<DallE2Size, string> = {
   '256x256': '256x256',
@@ -47,6 +61,7 @@ export default function PromptTester({ auth }: PromptTesterProps) {
   const [generatedImage, setGeneratedImage] = useState<string>('');
   const [error, setError] = useState<string>('');
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  const [requestParams, setRequestParams] = useState<RequestParams | null>(null);
 
   const { data, setData } = useForm({
     masterPrompt: '',
@@ -90,6 +105,7 @@ export default function PromptTester({ auth }: PromptTesterProps) {
       setGeneratedImage('');
       setError('');
       setValidationErrors({});
+      setRequestParams(null);
     }
   }, []);
 
@@ -152,6 +168,7 @@ export default function PromptTester({ auth }: PromptTesterProps) {
       }
 
       setGeneratedImage(result.imageUrl);
+      setRequestParams(result.requestParams);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -303,9 +320,81 @@ export default function PromptTester({ auth }: PromptTesterProps) {
           </form>
 
           {generatedImage && (
-            <div className="mt-8">
-              <h2 className="mb-4 text-xl font-semibold">Generated Image</h2>
-              <img src={generatedImage} alt="Generated" className="max-w-full rounded-lg shadow-lg" />
+            <div className="mt-8 space-y-6">
+              <div>
+                <h2 className="mb-4 text-xl font-semibold">Generated Image</h2>
+                <img src={generatedImage} alt="Generated" className="max-w-full rounded-lg shadow-lg" />
+              </div>
+
+              {requestParams && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Code className="h-5 w-5" />
+                      API Request Parameters
+                    </CardTitle>
+                    <CardDescription>These are the actual parameters sent to the OpenAI API</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Accordion type="single" collapsible className="w-full">
+                      <AccordionItem value="prompts">
+                        <AccordionTrigger>Prompts</AccordionTrigger>
+                        <AccordionContent>
+                          <div className="space-y-4">
+                            <div>
+                              <Label className="text-sm font-medium">System Prompt</Label>
+                              <div className="mt-1 rounded-md bg-gray-50 p-3 text-sm">{requestParams.systemPrompt}</div>
+                            </div>
+                            <div>
+                              <Label className="text-sm font-medium">User Prompt (Master + Specific)</Label>
+                              <div className="mt-1 rounded-md bg-gray-50 p-3 text-sm">{requestParams.userPrompt}</div>
+                            </div>
+                            <div>
+                              <Label className="text-sm font-medium">Combined Prompt (Sent to API)</Label>
+                              <div className="mt-1 rounded-md bg-gray-50 p-3 text-sm">{requestParams.combinedPrompt}</div>
+                            </div>
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+                      <AccordionItem value="parameters">
+                        <AccordionTrigger>Other Parameters</AccordionTrigger>
+                        <AccordionContent>
+                          <div className="grid grid-cols-2 gap-4 text-sm">
+                            <div>
+                              <Label className="font-medium">Model</Label>
+                              <p className="mt-1 text-gray-600">{requestParams.model}</p>
+                            </div>
+                            <div>
+                              <Label className="font-medium">Size</Label>
+                              <p className="mt-1 text-gray-600">{requestParams.size}</p>
+                            </div>
+                            {requestParams.quality && (
+                              <div>
+                                <Label className="font-medium">Quality</Label>
+                                <p className="mt-1 text-gray-600">{requestParams.quality}</p>
+                              </div>
+                            )}
+                            {requestParams.background && (
+                              <div>
+                                <Label className="font-medium">Background</Label>
+                                <p className="mt-1 text-gray-600">{requestParams.background}</p>
+                              </div>
+                            )}
+                            <div>
+                              <Label className="font-medium">Number of Images</Label>
+                              <p className="mt-1 text-gray-600">{requestParams.n}</p>
+                            </div>
+                            <div>
+                              <Label className="font-medium">Response Format</Label>
+                              <p className="mt-1 text-gray-600">{requestParams.response_format}</p>
+                            </div>
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+                    </Accordion>
+                  </CardContent>
+                </Card>
+              )}
             </div>
           )}
         </main>

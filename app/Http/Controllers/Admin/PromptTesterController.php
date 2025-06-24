@@ -49,7 +49,7 @@ class PromptTesterController extends Controller
             }
 
             // Generate image using the service
-            $generatedImageData = $this->openAiService->generateImageWithParams(
+            $result = $this->openAiService->generateImageWithParams(
                 $imageSource,
                 $combinedPrompt,
                 $validated['model'],
@@ -60,7 +60,8 @@ class PromptTesterController extends Controller
 
             // Return the image as a base64 data URL (no filesystem storage)
             return response()->json([
-                'imageUrl' => 'data:image/png;base64,'.$generatedImageData,
+                'imageUrl' => 'data:image/png;base64,'.$result['images'],
+                'requestParams' => $result['requestParams'],
             ]);
 
         } catch (\Exception $e) {
