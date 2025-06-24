@@ -20,7 +20,7 @@ interface PromptTesterProps {
 }
 
 type Model = 'dall-e-2' | 'gpt-image-1';
-type Background = 'default' | 'transparent' | 'opaque';
+type Background = 'auto' | 'transparent' | 'opaque';
 type Quality = 'low' | 'medium' | 'high';
 type DallE2Size = '256x256' | '512x512' | '1024x1024';
 type GptImage1Size = '1024x1024' | '1536x1024' | '1024x1536';
@@ -49,7 +49,7 @@ export default function PromptTester({ auth }: PromptTesterProps) {
     masterPrompt: '',
     specificPrompt: '',
     model: 'gpt-image-1' as Model,
-    background: 'default' as Background,
+    background: 'auto' as Background,
     quality: 'low' as Quality,
     size: '1024x1024',
   });
@@ -103,6 +103,7 @@ export default function PromptTester({ auth }: PromptTesterProps) {
         method: 'POST',
         headers: {
           'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+          'X-Requested-With': 'XMLHttpRequest',
         },
         body: formData,
       });
@@ -188,12 +189,16 @@ export default function PromptTester({ auth }: PromptTesterProps) {
 
                 <div>
                   <Label htmlFor="background">Background</Label>
-                  <Select value={data.background} onValueChange={(value) => setData('background', value as Background)}>
+                  <Select
+                    value={data.background}
+                    onValueChange={(value) => setData('background', value as Background)}
+                    disabled={selectedModel === 'dall-e-2'}
+                  >
                     <SelectTrigger id="background" className="mt-1">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="default">Default</SelectItem>
+                      <SelectItem value="auto">Auto</SelectItem>
                       <SelectItem value="transparent">Transparent</SelectItem>
                       <SelectItem value="opaque">Opaque</SelectItem>
                     </SelectContent>

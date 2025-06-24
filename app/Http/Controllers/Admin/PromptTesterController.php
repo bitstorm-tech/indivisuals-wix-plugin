@@ -5,8 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Services\OpenAiService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class PromptTesterController extends Controller
@@ -32,7 +30,7 @@ class PromptTesterController extends Controller
             'masterPrompt' => 'required|string',
             'specificPrompt' => 'required|string',
             'model' => 'required|in:dall-e-2,gpt-image-1',
-            'background' => 'required|in:default,transparent,opaque',
+            'background' => 'required|in:auto,transparent,opaque',
             'quality' => 'required|in:low,medium,high',
             'size' => 'required|string',
             'image' => 'nullable|image|max:10240', // 10MB max
@@ -43,26 +41,16 @@ class PromptTesterController extends Controller
             $combinedPrompt = $validated['masterPrompt'].' '.$validated['specificPrompt'];
 
             // Handle image upload if present (for gpt-image-1)
-            $imagePath = null;
+            $imageSource = null;
             if ($request->hasFile('image')) {
-                $image = $request->file('image');
-                $filename = Str::uuid().'.png';
-
-                // Store original image
-                $path = $image->storeAs('images', $filename, 'private');
-                $imagePath = Storage::disk('private')->path($path);
-
-                // Convert to PNG if needed
-                $imageResource = imagecreatefromstring(file_get_contents($imagePath));
-                imagepng($imageResource, $imagePath);
-                imagedestroy($imageResource);
+                $imageSource = $request->file('image');
             } elseif ($validated['model'] === 'gpt-image-1') {
                 return response()->json(['message' => 'Image is required for gpt-image-1 model'], 422);
             }
 
             // Generate image using the service
             $generatedImageData = $this->openAiService->generateImageWithParams(
-                $imagePath,
+                $imageSource,
                 $combinedPrompt,
                 $validated['model'],
                 $validated['quality'],
@@ -70,20 +58,9 @@ class PromptTesterController extends Controller
                 $validated['size']
             );
 
-            // Save generated image
-            $generatedFilename = Str::uuid().'.png';
-            $generatedPath = Storage::disk('private')->put(
-                'generated/'.$generatedFilename,
-                base64_decode($generatedImageData)
-            );
-
-            // Clean up original image if it was uploaded
-            if ($imagePath && file_exists($imagePath)) {
-                unlink($imagePath);
-            }
-
+            // Return the image as a base64 data URL (no filesystem storage)
             return response()->json([
-                'imageUrl' => route('image.show', ['filename' => 'generated/'.$generatedFilename]),
+                'imageUrl' => 'data:image/png;base64,'.$generatedImageData,
             ]);
 
         } catch (\Exception $e) {

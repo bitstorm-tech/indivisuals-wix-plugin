@@ -4,6 +4,7 @@ namespace App\Services;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Log;
 
 class OpenAiService
@@ -24,15 +25,15 @@ class OpenAiService
 
     public function generateImage(string $imagePath, string $prompt, int $n = 1, string $size = '1024x1024'): string|array
     {
-        return $this->generateImageWithParams($imagePath, $prompt, 'gpt-image-1', 'low', 'default', $size, $n);
+        return $this->generateImageWithParams($imagePath, $prompt, 'gpt-image-1', 'low', 'auto', $size, $n);
     }
 
     public function generateImageWithParams(
-        ?string $imagePath,
+        string|UploadedFile|null $imageSource,
         string $prompt,
         string $model = 'gpt-image-1',
         string $quality = 'low',
-        string $background = 'default',
+        string $background = 'auto',
         string $size = '1024x1024',
         int $n = 1
     ): string|array {
@@ -41,69 +42,9 @@ class OpenAiService
             Log::debug('Prompt: '.$prompt);
 
             if ($model === 'dall-e-2') {
-                // Use generations endpoint for DALL-E 2
-                $response = $this->httpClient->post('https://api.openai.com/v1/images/generations', [
-                    'headers' => [
-                        'Authorization' => 'Bearer '.$this->apiKey,
-                        'Content-Type' => 'application/json',
-                    ],
-                    'json' => [
-                        'model' => 'dall-e-2',
-                        'prompt' => $prompt,
-                        'size' => $size,
-                        'quality' => $quality,
-                        'n' => $n,
-                        'response_format' => 'b64_json',
-                    ],
-                    'timeout' => 120, // 2 minutes timeout
-                ]);
+                $response = $this->generateWithDallE2($prompt, $size, $n);
             } else {
-                // Use edits endpoint for gpt-image-1
-                if (! $imagePath || ! file_exists($imagePath) || ! is_readable($imagePath)) {
-                    throw new \InvalidArgumentException('Image file is required and must be accessible for gpt-image-1 model');
-                }
-
-                $multipart = [
-                    [
-                        'name' => 'image',
-                        'contents' => fopen($imagePath, 'r'),
-                        'filename' => basename($imagePath),
-                    ],
-                    [
-                        'name' => 'prompt',
-                        'contents' => $prompt,
-                    ],
-                    [
-                        'name' => 'model',
-                        'contents' => 'gpt-image-1',
-                    ],
-                    [
-                        'name' => 'size',
-                        'contents' => $size,
-                    ],
-                    [
-                        'name' => 'n',
-                        'contents' => $n,
-                    ],
-                    [
-                        'name' => 'response_format',
-                        'contents' => 'b64_json',
-                    ],
-                ];
-
-                // Only add quality for gpt-image-1 (it supports quality parameter)
-                $multipart[] = [
-                    'name' => 'quality',
-                    'contents' => $quality,
-                ];
-
-                $response = $this->httpClient->post($this->baseUrl, [
-                    'headers' => [
-                        'Authorization' => 'Bearer '.$this->apiKey,
-                    ],
-                    'multipart' => $multipart,
-                    'timeout' => 120, // 2 minutes timeout
-                ]);
+                $response = $this->generateWithGptImage1($imageSource, $prompt, $quality, $background, $size, $n);
             }
 
             $data = json_decode($response->getBody(), true);
@@ -122,5 +63,141 @@ class OpenAiService
         } catch (\Exception $e) {
             throw new \Exception('An error occurred: '.$e->getMessage(), 0, $e);
         }
+    }
+
+    /**
+     * Generate image using DALL-E 2 model.
+     */
+    private function generateWithDallE2(string $prompt, string $size, int $n)
+    {
+        return $this->httpClient->post('https://api.openai.com/v1/images/generations', [
+            'headers' => [
+                'Authorization' => 'Bearer '.$this->apiKey,
+                'Content-Type' => 'application/json',
+            ],
+            'json' => [
+                'model' => 'dall-e-2',
+                'prompt' => $prompt,
+                'size' => $size,
+                'n' => $n,
+                'response_format' => 'b64_json',
+            ],
+            'timeout' => 120, // 2 minutes timeout
+        ]);
+    }
+
+    /**
+     * Generate image using GPT-Image-1 model (image edits).
+     */
+    private function generateWithGptImage1(
+        string|UploadedFile|null $imageSource,
+        string $prompt,
+        string $quality,
+        string $background,
+        string $size,
+        int $n
+    ) {
+        if (! $imageSource) {
+            throw new \InvalidArgumentException('Image file is required for gpt-image-1 model');
+        }
+
+        // Handle the image source
+        if ($imageSource instanceof UploadedFile) {
+            // Handle uploaded file
+            $imageStream = $this->prepareUploadedFileStream($imageSource);
+            $filename = $imageSource->getClientOriginalName();
+        } else {
+            // Handle file path (existing behavior)
+            if (! file_exists($imageSource) || ! is_readable($imageSource)) {
+                throw new \InvalidArgumentException('Image file is not accessible');
+            }
+            $imageStream = fopen($imageSource, 'r');
+            $filename = basename($imageSource);
+        }
+
+        $multipart = [
+            [
+                'name' => 'image',
+                'contents' => $imageStream,
+                'filename' => $filename,
+            ],
+            [
+                'name' => 'prompt',
+                'contents' => $prompt,
+            ],
+            [
+                'name' => 'model',
+                'contents' => 'gpt-image-1',
+            ],
+            [
+                'name' => 'size',
+                'contents' => $size,
+            ],
+            [
+                'name' => 'n',
+                'contents' => $n,
+            ],
+            [
+                'name' => 'quality',
+                'contents' => $quality,
+            ],
+            [
+                'name' => 'background',
+                'contents' => $background,
+            ],
+        ];
+
+        return $this->httpClient->post($this->baseUrl, [
+            'headers' => [
+                'Authorization' => 'Bearer '.$this->apiKey,
+            ],
+            'multipart' => $multipart,
+            'timeout' => 120, // 2 minutes timeout
+        ]);
+    }
+
+    /**
+     * Prepare an uploaded file stream, converting to PNG if necessary.
+     */
+    private function prepareUploadedFileStream(UploadedFile $file)
+    {
+        $mimeType = $file->getMimeType();
+
+        // If it's already a PNG, just return the file stream
+        if ($mimeType === 'image/png') {
+            return fopen($file->getRealPath(), 'r');
+        }
+
+        // Convert to PNG in memory and save to temp file
+        $tempPath = tempnam(sys_get_temp_dir(), 'openai_img_');
+
+        // Get image info
+        $imageInfo = getimagesize($file->getRealPath());
+        if (! $imageInfo) {
+            throw new \Exception('Invalid image file');
+        }
+
+        // Create image resource based on type
+        $image = match ($imageInfo[2]) {
+            IMAGETYPE_JPEG => imagecreatefromjpeg($file->getRealPath()),
+            IMAGETYPE_GIF => imagecreatefromgif($file->getRealPath()),
+            IMAGETYPE_WEBP => imagecreatefromwebp($file->getRealPath()),
+            default => throw new \Exception('Unsupported image format')
+        };
+
+        if (! $image) {
+            throw new \Exception('Failed to create image resource');
+        }
+
+        // Save as PNG to temp file
+        if (! imagepng($image, $tempPath)) {
+            imagedestroy($image);
+            throw new \Exception('Failed to convert image to PNG');
+        }
+
+        imagedestroy($image);
+
+        // Return stream to temp file (will be auto-cleaned by PHP)
+        return fopen($tempPath, 'r');
     }
 }
