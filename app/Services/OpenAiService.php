@@ -55,6 +55,7 @@ class OpenAiService
                         'n' => $n,
                         'response_format' => 'b64_json',
                     ],
+                    'timeout' => 120, // 2 minutes timeout
                 ]);
             } else {
                 // Use edits endpoint for gpt-image-1
@@ -101,6 +102,7 @@ class OpenAiService
                         'Authorization' => 'Bearer '.$this->apiKey,
                     ],
                     'multipart' => $multipart,
+                    'timeout' => 120, // 2 minutes timeout
                 ]);
             }
 

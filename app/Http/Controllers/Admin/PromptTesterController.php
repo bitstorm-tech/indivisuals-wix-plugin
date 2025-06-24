@@ -25,6 +25,9 @@ class PromptTesterController extends Controller
 
     public function testPrompt(Request $request)
     {
+        // Increase execution time limit for this request
+        set_time_limit(300); // 5 minutes
+
         $validated = $request->validate([
             'masterPrompt' => 'required|string',
             'specificPrompt' => 'required|string',
@@ -84,6 +87,14 @@ class PromptTesterController extends Controller
             ]);
 
         } catch (\Exception $e) {
+            // Check if it's a timeout error
+            if (strpos($e->getMessage(), 'cURL error 28') !== false ||
+                strpos($e->getMessage(), 'Operation timed out') !== false) {
+                return response()->json([
+                    'message' => 'The image generation request timed out. This can happen with complex prompts or high quality settings. Please try again with simpler settings.',
+                ], 504);
+            }
+
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }

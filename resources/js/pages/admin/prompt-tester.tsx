@@ -107,7 +107,20 @@ export default function PromptTester({ auth }: PromptTesterProps) {
         body: formData,
       });
 
-      const result = await response.json();
+      // Clone the response so we can read it as text if JSON parsing fails
+      const responseClone = response.clone();
+
+      let result;
+      try {
+        result = await response.json();
+      } catch {
+        // If JSON parsing fails, it's likely an HTML error page
+        const text = await responseClone.text();
+        if (text.includes('Maximum execution time')) {
+          throw new Error('The request timed out. Please try again with simpler settings or a smaller image.');
+        }
+        throw new Error('Server returned an invalid response. Please check the server logs.');
+      }
 
       if (!response.ok) {
         throw new Error(result.message || 'Failed to generate image');
@@ -192,7 +205,7 @@ export default function PromptTester({ auth }: PromptTesterProps) {
                   <Select
                     value={data.quality}
                     onValueChange={(value) => setData('quality', value as Quality)}
-                    disabled={selectedModel === 'gpt-image-1'}
+                    disabled={selectedModel === 'dall-e-2'}
                   >
                     <SelectTrigger id="quality" className="mt-1">
                       <SelectValue />
