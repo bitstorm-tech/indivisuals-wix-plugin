@@ -44,6 +44,7 @@ export default function PromptTester({ auth }: PromptTesterProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string>('');
   const [error, setError] = useState<string>('');
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
   const { data, setData } = useForm({
     masterPrompt: '',
@@ -71,6 +72,7 @@ export default function PromptTester({ auth }: PromptTesterProps) {
       setPreviewUrl(url);
       setGeneratedImage('');
       setError('');
+      setValidationErrors({});
     }
   }, []);
 
@@ -85,6 +87,7 @@ export default function PromptTester({ auth }: PromptTesterProps) {
     setIsGenerating(true);
     setError('');
     setGeneratedImage('');
+    setValidationErrors({});
 
     const formData = new FormData();
     formData.append('masterPrompt', data.masterPrompt);
@@ -124,6 +127,10 @@ export default function PromptTester({ auth }: PromptTesterProps) {
       }
 
       if (!response.ok) {
+        if (response.status === 422 && result.errors) {
+          setValidationErrors(result.errors);
+          return;
+        }
         throw new Error(result.message || 'Failed to generate image');
       }
 
@@ -157,8 +164,9 @@ export default function PromptTester({ auth }: PromptTesterProps) {
                     placeholder="Enter master prompt..."
                     value={data.masterPrompt}
                     onChange={(e) => setData('masterPrompt', e.target.value)}
-                    className="mt-1 min-h-[120px]"
+                    className={`mt-1 min-h-[120px] ${validationErrors.masterPrompt ? 'border-red-500' : ''}`}
                   />
+                  {validationErrors.masterPrompt && <p className="mt-1 text-sm text-red-600">{validationErrors.masterPrompt}</p>}
                 </div>
 
                 <div>
@@ -168,8 +176,9 @@ export default function PromptTester({ auth }: PromptTesterProps) {
                     placeholder="Enter specific prompt..."
                     value={data.specificPrompt}
                     onChange={(e) => setData('specificPrompt', e.target.value)}
-                    className="mt-1 min-h-[120px]"
+                    className={`mt-1 min-h-[120px] ${validationErrors.specificPrompt ? 'border-red-500' : ''}`}
                   />
+                  {validationErrors.specificPrompt && <p className="mt-1 text-sm text-red-600">{validationErrors.specificPrompt}</p>}
                 </div>
               </div>
 
@@ -177,7 +186,7 @@ export default function PromptTester({ auth }: PromptTesterProps) {
                 <div>
                   <Label htmlFor="model">Model</Label>
                   <Select value={selectedModel} onValueChange={(value) => setSelectedModel(value as Model)}>
-                    <SelectTrigger id="model" className="mt-1">
+                    <SelectTrigger id="model" className={`mt-1 ${validationErrors.model ? 'border-red-500' : ''}`}>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -185,6 +194,7 @@ export default function PromptTester({ auth }: PromptTesterProps) {
                       <SelectItem value="gpt-image-1">gpt-image-1</SelectItem>
                     </SelectContent>
                   </Select>
+                  {validationErrors.model && <p className="mt-1 text-sm text-red-600">{validationErrors.model}</p>}
                 </div>
 
                 <div>
@@ -194,7 +204,7 @@ export default function PromptTester({ auth }: PromptTesterProps) {
                     onValueChange={(value) => setData('background', value as Background)}
                     disabled={selectedModel === 'dall-e-2'}
                   >
-                    <SelectTrigger id="background" className="mt-1">
+                    <SelectTrigger id="background" className={`mt-1 ${validationErrors.background ? 'border-red-500' : ''}`}>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -203,6 +213,7 @@ export default function PromptTester({ auth }: PromptTesterProps) {
                       <SelectItem value="opaque">Opaque</SelectItem>
                     </SelectContent>
                   </Select>
+                  {validationErrors.background && <p className="mt-1 text-sm text-red-600">{validationErrors.background}</p>}
                 </div>
 
                 <div>
@@ -212,7 +223,7 @@ export default function PromptTester({ auth }: PromptTesterProps) {
                     onValueChange={(value) => setData('quality', value as Quality)}
                     disabled={selectedModel === 'dall-e-2'}
                   >
-                    <SelectTrigger id="quality" className="mt-1">
+                    <SelectTrigger id="quality" className={`mt-1 ${validationErrors.quality ? 'border-red-500' : ''}`}>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -221,12 +232,13 @@ export default function PromptTester({ auth }: PromptTesterProps) {
                       <SelectItem value="high">High</SelectItem>
                     </SelectContent>
                   </Select>
+                  {validationErrors.quality && <p className="mt-1 text-sm text-red-600">{validationErrors.quality}</p>}
                 </div>
 
                 <div>
                   <Label htmlFor="size">Size</Label>
                   <Select value={data.size} onValueChange={(value) => setData('size', value)}>
-                    <SelectTrigger id="size" className="mt-1">
+                    <SelectTrigger id="size" className={`mt-1 ${validationErrors.size ? 'border-red-500' : ''}`}>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -237,6 +249,7 @@ export default function PromptTester({ auth }: PromptTesterProps) {
                       ))}
                     </SelectContent>
                   </Select>
+                  {validationErrors.size && <p className="mt-1 text-sm text-red-600">{validationErrors.size}</p>}
                 </div>
               </div>
             </div>
@@ -247,7 +260,9 @@ export default function PromptTester({ auth }: PromptTesterProps) {
                 <div className="mt-1">
                   <label
                     htmlFor="image"
-                    className="flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 p-6 hover:border-gray-400"
+                    className={`flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-6 hover:border-gray-400 ${
+                      validationErrors.image ? 'border-red-500' : 'border-gray-300'
+                    }`}
                   >
                     {previewUrl ? (
                       <img src={previewUrl} alt="Preview" className="max-h-48 rounded" />
@@ -259,6 +274,7 @@ export default function PromptTester({ auth }: PromptTesterProps) {
                     )}
                     <input id="image" type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
                   </label>
+                  {validationErrors.image && <p className="mt-1 text-sm text-red-600">{validationErrors.image}</p>}
                 </div>
               </div>
             )}
