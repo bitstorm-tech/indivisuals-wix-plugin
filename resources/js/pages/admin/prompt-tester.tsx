@@ -171,103 +171,97 @@ export default function PromptTester({ auth }: PromptTesterProps) {
         <main className="flex-1 overflow-y-auto p-8">
           <h1 className="mb-8 text-3xl font-bold">Prompt Tester</h1>
 
-          <form onSubmit={handleSubmit} className="max-w-4xl space-y-6">
-            <div className="grid gap-6 md:grid-cols-2">
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="masterPrompt">Master Prompt</Label>
-                  <Textarea
-                    id="masterPrompt"
-                    placeholder="Enter master prompt..."
-                    value={data.masterPrompt}
-                    onChange={(e) => setData('masterPrompt', e.target.value)}
-                    className={`mt-1 min-h-[120px] ${validationErrors.masterPrompt ? 'border-red-500' : ''}`}
-                  />
-                  {validationErrors.masterPrompt && <p className="mt-1 text-sm text-red-600">{validationErrors.masterPrompt}</p>}
-                </div>
-
-                <div>
-                  <Label htmlFor="specificPrompt">Specific Prompt</Label>
-                  <Textarea
-                    id="specificPrompt"
-                    placeholder="Enter specific prompt..."
-                    value={data.specificPrompt}
-                    onChange={(e) => setData('specificPrompt', e.target.value)}
-                    className={`mt-1 min-h-[120px] ${validationErrors.specificPrompt ? 'border-red-500' : ''}`}
-                  />
-                  {validationErrors.specificPrompt && <p className="mt-1 text-sm text-red-600">{validationErrors.specificPrompt}</p>}
-                </div>
+          <form onSubmit={handleSubmit} className="flex max-w-4xl flex-col gap-6">
+            <div className="flex flex-wrap gap-8">
+              <div>
+                <Label htmlFor="model">Model</Label>
+                <Select value={selectedModel} onValueChange={(value) => setSelectedModel(value as Model)}>
+                  <SelectTrigger id="model" className={`mt-1 ${validationErrors.model ? 'border-red-500' : ''}`}>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="dall-e-2">dall-e-2</SelectItem>
+                    <SelectItem value="gpt-image-1">gpt-image-1</SelectItem>
+                  </SelectContent>
+                </Select>
+                {validationErrors.model && <p className="mt-1 text-sm text-red-600">{validationErrors.model}</p>}
               </div>
 
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="model">Model</Label>
-                  <Select value={selectedModel} onValueChange={(value) => setSelectedModel(value as Model)}>
-                    <SelectTrigger id="model" className={`mt-1 ${validationErrors.model ? 'border-red-500' : ''}`}>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="dall-e-2">dall-e-2</SelectItem>
-                      <SelectItem value="gpt-image-1">gpt-image-1</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  {validationErrors.model && <p className="mt-1 text-sm text-red-600">{validationErrors.model}</p>}
-                </div>
+              <div>
+                <Label htmlFor="background">Background</Label>
+                <Select
+                  value={data.background}
+                  onValueChange={(value) => setData('background', value as Background)}
+                  disabled={selectedModel === 'dall-e-2'}
+                >
+                  <SelectTrigger id="background" className={`mt-1 ${validationErrors.background ? 'border-red-500' : ''}`}>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="auto">Auto</SelectItem>
+                    <SelectItem value="transparent">Transparent</SelectItem>
+                    <SelectItem value="opaque">Opaque</SelectItem>
+                  </SelectContent>
+                </Select>
+                {validationErrors.background && <p className="mt-1 text-sm text-red-600">{validationErrors.background}</p>}
+              </div>
 
-                <div>
-                  <Label htmlFor="background">Background</Label>
-                  <Select
-                    value={data.background}
-                    onValueChange={(value) => setData('background', value as Background)}
-                    disabled={selectedModel === 'dall-e-2'}
-                  >
-                    <SelectTrigger id="background" className={`mt-1 ${validationErrors.background ? 'border-red-500' : ''}`}>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="auto">Auto</SelectItem>
-                      <SelectItem value="transparent">Transparent</SelectItem>
-                      <SelectItem value="opaque">Opaque</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  {validationErrors.background && <p className="mt-1 text-sm text-red-600">{validationErrors.background}</p>}
-                </div>
+              <div>
+                <Label htmlFor="quality">Quality</Label>
+                <Select value={data.quality} onValueChange={(value) => setData('quality', value as Quality)} disabled={selectedModel === 'dall-e-2'}>
+                  <SelectTrigger id="quality" className={`mt-1 ${validationErrors.quality ? 'border-red-500' : ''}`}>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="low">Low</SelectItem>
+                    <SelectItem value="medium">Medium</SelectItem>
+                    <SelectItem value="high">High</SelectItem>
+                  </SelectContent>
+                </Select>
+                {validationErrors.quality && <p className="mt-1 text-sm text-red-600">{validationErrors.quality}</p>}
+              </div>
 
-                <div>
-                  <Label htmlFor="quality">Quality</Label>
-                  <Select
-                    value={data.quality}
-                    onValueChange={(value) => setData('quality', value as Quality)}
-                    disabled={selectedModel === 'dall-e-2'}
-                  >
-                    <SelectTrigger id="quality" className={`mt-1 ${validationErrors.quality ? 'border-red-500' : ''}`}>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="low">Low</SelectItem>
-                      <SelectItem value="medium">Medium</SelectItem>
-                      <SelectItem value="high">High</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  {validationErrors.quality && <p className="mt-1 text-sm text-red-600">{validationErrors.quality}</p>}
-                </div>
+              <div>
+                <Label htmlFor="size">Size</Label>
+                <Select value={data.size} onValueChange={(value) => setData('size', value)}>
+                  <SelectTrigger id="size" className={`mt-1 ${validationErrors.size ? 'border-red-500' : ''}`}>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.entries(getSizeOptions()).map(([value, label]) => (
+                      <SelectItem key={value} value={value}>
+                        {label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {validationErrors.size && <p className="mt-1 text-sm text-red-600">{validationErrors.size}</p>}
+              </div>
+            </div>
 
-                <div>
-                  <Label htmlFor="size">Size</Label>
-                  <Select value={data.size} onValueChange={(value) => setData('size', value)}>
-                    <SelectTrigger id="size" className={`mt-1 ${validationErrors.size ? 'border-red-500' : ''}`}>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Object.entries(getSizeOptions()).map(([value, label]) => (
-                        <SelectItem key={value} value={value}>
-                          {label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {validationErrors.size && <p className="mt-1 text-sm text-red-600">{validationErrors.size}</p>}
-                </div>
+            <div className="flex flex-col gap-4">
+              <div>
+                <Label htmlFor="masterPrompt">Master Prompt</Label>
+                <Textarea
+                  id="masterPrompt"
+                  placeholder="Enter master prompt..."
+                  value={data.masterPrompt}
+                  onChange={(e) => setData('masterPrompt', e.target.value)}
+                  className={`mt-1 min-h-[120px] ${validationErrors.masterPrompt ? 'border-red-500' : ''}`}
+                />
+                {validationErrors.masterPrompt && <p className="mt-1 text-sm text-red-600">{validationErrors.masterPrompt}</p>}
+              </div>
+
+              <div>
+                <Label htmlFor="specificPrompt">Specific Prompt</Label>
+                <Textarea
+                  id="specificPrompt"
+                  placeholder="Enter specific prompt..."
+                  value={data.specificPrompt}
+                  onChange={(e) => setData('specificPrompt', e.target.value)}
+                  className={`mt-1 min-h-[120px] ${validationErrors.specificPrompt ? 'border-red-500' : ''}`}
+                />
+                {validationErrors.specificPrompt && <p className="mt-1 text-sm text-red-600">{validationErrors.specificPrompt}</p>}
               </div>
             </div>
 
