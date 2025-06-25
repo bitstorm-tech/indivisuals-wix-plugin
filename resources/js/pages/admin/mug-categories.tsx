@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Textarea } from '@/components/ui/Textarea';
 import { Head, router } from '@inertiajs/react';
 import { ChevronRight, Edit, Plus, Trash2 } from 'lucide-react';
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 
 interface User {
   id: number;
@@ -64,7 +64,7 @@ export default function Categories({ categories, subcategories, auth }: Categori
   const [deleteType, setDeleteType] = useState<'category' | 'subcategory' | null>(null);
   const [expandedCategories, setExpandedCategories] = useState<Set<number>>(new Set());
 
-  const handleOpenCategoryDialog = useCallback((category?: MugCategory) => {
+  const handleOpenCategoryDialog = (category?: MugCategory) => {
     if (category) {
       setEditingCategory(category);
       setCategoryFormData({
@@ -79,18 +79,18 @@ export default function Categories({ categories, subcategories, auth }: Categori
       });
     }
     setIsCategoryDialogOpen(true);
-  }, []);
+  };
 
-  const handleCloseCategoryDialog = useCallback(() => {
+  const handleCloseCategoryDialog = () => {
     setIsCategoryDialogOpen(false);
     setEditingCategory(null);
     setCategoryFormData({
       name: '',
       description: '',
     });
-  }, []);
+  };
 
-  const handleOpenSubcategoryDialog = useCallback((subcategory?: MugSubCategory, categoryId?: number) => {
+  const handleOpenSubcategoryDialog = (subcategory?: MugSubCategory, categoryId?: number) => {
     if (subcategory) {
       setEditingSubCategory(subcategory);
       setSubcategoryFormData({
@@ -107,9 +107,9 @@ export default function Categories({ categories, subcategories, auth }: Categori
       });
     }
     setIsSubcategoryDialogOpen(true);
-  }, []);
+  };
 
-  const handleCloseSubcategoryDialog = useCallback(() => {
+  const handleCloseSubcategoryDialog = () => {
     setIsSubcategoryDialogOpen(false);
     setEditingSubCategory(null);
     setSubcategoryFormData({
@@ -117,49 +117,43 @@ export default function Categories({ categories, subcategories, auth }: Categori
       description: '',
       category_id: '',
     });
-  }, []);
+  };
 
-  const handleSubmitCategory = useCallback(
-    async (e: React.FormEvent) => {
-      e.preventDefault();
+  const handleSubmitCategory = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-      if (editingCategory) {
-        router.put(`/mug-categories/${editingCategory.id}`, categoryFormData, {
-          onSuccess: handleCloseCategoryDialog,
-        });
-      } else {
-        router.post('/mug-categories', categoryFormData, {
-          onSuccess: handleCloseCategoryDialog,
-        });
-      }
-    },
-    [categoryFormData, editingCategory, handleCloseCategoryDialog],
-  );
+    if (editingCategory) {
+      router.put(`/mug-categories/${editingCategory.id}`, categoryFormData, {
+        onSuccess: handleCloseCategoryDialog,
+      });
+    } else {
+      router.post('/mug-categories', categoryFormData, {
+        onSuccess: handleCloseCategoryDialog,
+      });
+    }
+  };
 
-  const handleSubmitSubcategory = useCallback(
-    async (e: React.FormEvent) => {
-      e.preventDefault();
+  const handleSubmitSubcategory = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-      if (editingSubCategory) {
-        router.put(`/mug-sub-categories/${editingSubCategory.id}`, subcategoryFormData, {
-          onSuccess: handleCloseSubcategoryDialog,
-        });
-      } else {
-        router.post('/mug-sub-categories', subcategoryFormData, {
-          onSuccess: handleCloseSubcategoryDialog,
-        });
-      }
-    },
-    [subcategoryFormData, editingSubCategory, handleCloseSubcategoryDialog],
-  );
+    if (editingSubCategory) {
+      router.put(`/mug-sub-categories/${editingSubCategory.id}`, subcategoryFormData, {
+        onSuccess: handleCloseSubcategoryDialog,
+      });
+    } else {
+      router.post('/mug-sub-categories', subcategoryFormData, {
+        onSuccess: handleCloseSubcategoryDialog,
+      });
+    }
+  };
 
-  const handleDelete = useCallback(async (id: number, type: 'category' | 'subcategory') => {
+  const handleDelete = async (id: number, type: 'category' | 'subcategory') => {
     setDeleteId(id);
     setDeleteType(type);
     setIsDeleting(true);
-  }, []);
+  };
 
-  const confirmDelete = useCallback(() => {
+  const confirmDelete = () => {
     if (deleteId && deleteType) {
       const url = deleteType === 'category' ? `/mug-categories/${deleteId}` : `/mug-sub-categories/${deleteId}`;
       router.delete(url, {
@@ -170,15 +164,15 @@ export default function Categories({ categories, subcategories, auth }: Categori
         },
       });
     }
-  }, [deleteId, deleteType]);
+  };
 
-  const cancelDelete = useCallback(() => {
+  const cancelDelete = () => {
     setIsDeleting(false);
     setDeleteId(null);
     setDeleteType(null);
-  }, []);
+  };
 
-  const toggleCategory = useCallback((categoryId: number) => {
+  const toggleCategory = (categoryId: number) => {
     setExpandedCategories((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(categoryId)) {
@@ -188,14 +182,11 @@ export default function Categories({ categories, subcategories, auth }: Categori
       }
       return newSet;
     });
-  }, []);
+  };
 
-  const getCategorySubcategories = useCallback(
-    (categoryId: number) => {
-      return subcategories.filter((sub) => sub.category_id === categoryId);
-    },
-    [subcategories],
-  );
+  const getCategorySubcategories = (categoryId: number) => {
+    return subcategories.filter((sub) => sub.category_id === categoryId);
+  };
 
   return (
     <>
