@@ -79,3 +79,8 @@ Route::middleware('auth')->group(function () {
 
     Route::redirect('/admin', '/admin/prompts'); // Redirect old route to new location
 });
+
+// Test route for React Compiler
+if (app()->environment('local')) {
+    Route::inertia('/test-compiler', 'test-compiler')->name('test.compiler');
+}

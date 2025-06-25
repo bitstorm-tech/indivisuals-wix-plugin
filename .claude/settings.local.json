@@ -32,7 +32,10 @@
       "Bash(touch:*)",
       "Bash(sqlite3:*)",
       "Bash(mv:*)",
-      "mcp__ide__getDiagnostics"
+      "mcp__ide__getDiagnostics",
+      "WebFetch(domain:github.com)",
+      "Bash(timeout:*)",
+      "WebFetch(domain:react.dev)"
     ]
   },
   "enableAllProjectMcpServers": false
