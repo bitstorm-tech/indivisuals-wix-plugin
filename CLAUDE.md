@@ -96,7 +96,7 @@ This is a Laravel + Inertia.js + React application focused on AI-powered image p
 #### React
 
 - Follow Rules of React (https://react.dev/reference/rules) strictly
-- Use React best practices
+- Use Tailwind flex to design the layout
 - Create small, self contained components or subcomponents where it is usefull
 - Create custom hooks where it is usefull
 - Move subcomponents and custom hooks into dedicated folders
@@ -107,11 +107,9 @@ This is a Laravel + Inertia.js + React application focused on AI-powered image p
 - Format all changed files (except php) with `prettier` at the very end
 - Use `PascalCase` for components file names except page components (in page folder)
 - Use `kebab-case` for page components (in page folder)
-- Use Tailwind flex whereever usefull
 
 #### Laravel
 
-- Use Laravel best practices
 - Use as much Laravel functionallity in the backend as possible
 - Use Inertia functionallity whereever possible
 - Use PHP nullsafe syntax (`?->`) whereever it is usefull
