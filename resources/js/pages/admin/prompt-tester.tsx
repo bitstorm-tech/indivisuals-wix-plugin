@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/Textarea';
 import { Head, useForm } from '@inertiajs/react';
 import { Code, Loader2, Upload } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface User {
   id: number;
@@ -96,7 +96,7 @@ export default function PromptTester({ auth }: PromptTesterProps) {
     }
   }, [selectedModel, setData]);
 
-  const handleImageUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       setUploadedImage(file);
@@ -107,7 +107,7 @@ export default function PromptTester({ auth }: PromptTesterProps) {
       setValidationErrors({});
       setRequestParams(null);
     }
-  }, []);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
