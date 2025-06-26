@@ -48,4 +48,13 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    /**
+     * Set the user's email address.
+     * Convert email to lowercase to ensure case-insensitive storage.
+     */
+    public function setEmailAttribute(string $value): void
+    {
+        $this->attributes['email'] = strtolower($value);
+    }
 }

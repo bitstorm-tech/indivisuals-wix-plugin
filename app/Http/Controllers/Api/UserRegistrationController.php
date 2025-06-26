@@ -24,8 +24,8 @@ class UserRegistrationController extends Controller
             'phone_number' => 'nullable|string|max:50',
         ]);
 
-        // Check if user already exists
-        $user = User::where('email', $validated['email'])->first();
+        // Check if user already exists (case-insensitive)
+        $user = User::whereRaw('LOWER(email) = ?', [strtolower($validated['email'])])->first();
 
         if ($user) {
             // Update user profile if additional fields are provided

@@ -30,6 +30,9 @@ class AuthController extends Controller
             'password' => ['required'],
         ]);
 
+        // Ensure email is lowercase for consistent authentication
+        $credentials['email'] = strtolower($credentials['email']);
+
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
 
