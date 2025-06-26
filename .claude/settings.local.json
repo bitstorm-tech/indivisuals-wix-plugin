@@ -35,7 +35,8 @@
       "mcp__ide__getDiagnostics",
       "WebFetch(domain:github.com)",
       "Bash(timeout:*)",
-      "WebFetch(domain:react.dev)"
+      "WebFetch(domain:react.dev)",
+      "Bash(cp:*)"
     ]
   },
   "enableAllProjectMcpServers": false

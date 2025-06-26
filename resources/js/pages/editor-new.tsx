@@ -9,7 +9,7 @@ import UserDataStep from '@/components/editor-new/components/steps/UserDataStep'
 import { WizardStep } from '@/components/editor-new/constants';
 import { useWizardNavigation } from '@/components/editor-new/hooks/useWizardNavigation';
 import { CropData, MugOption, UserData } from '@/components/editor-new/types';
-import { usePrompts } from '@/components/editor/hooks/usePrompts';
+import { usePrompts } from '@/hooks/usePrompts';
 import { apiFetch } from '@/lib/utils';
 import { Prompt } from '@/types/prompt';
 import { useEffect, useState } from 'react';
