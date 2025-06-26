@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { STEP_INDEX, WIZARD_STEPS, WizardStep } from '../constants';
 import { WizardState } from '../types';
 
@@ -28,6 +28,11 @@ const initialState: WizardState = {
 
 export function useWizardNavigation(): UseWizardNavigationReturn {
   const [state, setState] = useState<WizardState>(initialState);
+
+  // Scroll to top when step changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [state.currentStep]);
 
   const updateState = useCallback(<K extends keyof WizardState>(key: K, value: WizardState[K]) => {
     setState((prev) => ({ ...prev, [key]: value }));
