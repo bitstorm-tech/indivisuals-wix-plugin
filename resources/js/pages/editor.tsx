@@ -12,7 +12,6 @@ import { useEditorState } from '@/components/editor/hooks/useEditorState';
 import { usePrompts } from '@/components/editor/hooks/usePrompts';
 import { useSelectedImages } from '@/components/editor/hooks/useSelectedImages';
 import { Head } from '@inertiajs/react';
-import { useCallback } from 'react';
 
 export default function EditorPage() {
   const { prompts, filteredPrompts, categories, selectedPromptId, selectedCategory, isLoading, setSelectedPromptId, setSelectedCategory } =
@@ -35,24 +34,18 @@ export default function EditorPage() {
     clearSelection,
   } = useEditorState();
 
-  const handleFileSelect = useCallback(
-    (files: File[]) => {
-      files.forEach((file) => {
-        const url = URL.createObjectURL(file);
-        addImage(url, file);
-      });
-    },
-    [addImage],
-  );
+  const handleFileSelect = (files: File[]) => {
+    files.forEach((file) => {
+      const url = URL.createObjectURL(file);
+      addImage(url, file);
+    });
+  };
 
-  const handleImageCropped = useCallback(
-    (croppedImageUrl: string, croppedFile: File) => {
-      addImage(croppedImageUrl, croppedFile);
-    },
-    [addImage],
-  );
+  const handleImageCropped = (croppedImageUrl: string, croppedFile: File) => {
+    addImage(croppedImageUrl, croppedFile);
+  };
 
-  const handleAddText = useCallback(() => {
+  const handleAddText = () => {
     const newText = {
       id: `text-${Date.now()}`,
       content: 'New Text',
@@ -69,7 +62,7 @@ export default function EditorPage() {
       zIndex: texts.length + images.length,
     };
     addText(newText);
-  }, [texts.length, images.length, addText]);
+  };
 
   return (
     <>

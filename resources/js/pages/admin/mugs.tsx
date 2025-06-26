@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Textarea } from '@/components/ui/Textarea';
 import { Head, router } from '@inertiajs/react';
 import { Edit, Image, Plus, Trash2 } from 'lucide-react';
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 
 interface User {
   id: number;
@@ -70,7 +70,7 @@ export default function Mugs({ mugs, categories, subcategories, auth }: MugsProp
 
   const filteredSubcategories = formData.category_id ? subcategories.filter((sub) => sub.category_id === parseInt(formData.category_id)) : [];
 
-  const handleOpenDialog = useCallback((mug?: Mug) => {
+  const handleOpenDialog = (mug?: Mug) => {
     if (mug) {
       setEditingMug(mug);
       setFormData({
@@ -94,13 +94,13 @@ export default function Mugs({ mugs, categories, subcategories, auth }: MugsProp
     }
     setSelectedFile(null);
     setIsDialogOpen(true);
-  }, []);
+  };
 
-  const handleCloseDialog = useCallback(() => {
+  const handleCloseDialog = () => {
     setIsDialogOpen(false);
     setEditingMug(null);
     setSelectedFile(null);
-  }, []);
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -108,48 +108,45 @@ export default function Mugs({ mugs, categories, subcategories, auth }: MugsProp
     }
   };
 
-  const handleSubmit = useCallback(
-    async (e: React.FormEvent) => {
-      e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-      const data = new FormData();
-      data.append('name', formData.name);
-      data.append('description', formData.description);
-      data.append('price', formData.price);
-      data.append('active', formData.active ? '1' : '0');
+    const data = new FormData();
+    data.append('name', formData.name);
+    data.append('description', formData.description);
+    data.append('price', formData.price);
+    data.append('active', formData.active ? '1' : '0');
 
-      if (formData.category_id) {
-        data.append('category_id', formData.category_id);
-      }
-      if (formData.subcategory_id) {
-        data.append('subcategory_id', formData.subcategory_id);
-      }
-      if (selectedFile) {
-        data.append('image', selectedFile);
-      }
+    if (formData.category_id) {
+      data.append('category_id', formData.category_id);
+    }
+    if (formData.subcategory_id) {
+      data.append('subcategory_id', formData.subcategory_id);
+    }
+    if (selectedFile) {
+      data.append('image', selectedFile);
+    }
 
-      if (editingMug) {
-        data.append('_method', 'PUT');
-        router.post(`/mugs/${editingMug.id}`, data, {
-          forceFormData: true,
-          onSuccess: handleCloseDialog,
-        });
-      } else {
-        router.post('/mugs', data, {
-          forceFormData: true,
-          onSuccess: handleCloseDialog,
-        });
-      }
-    },
-    [formData, editingMug, selectedFile, handleCloseDialog],
-  );
+    if (editingMug) {
+      data.append('_method', 'PUT');
+      router.post(`/mugs/${editingMug.id}`, data, {
+        forceFormData: true,
+        onSuccess: handleCloseDialog,
+      });
+    } else {
+      router.post('/mugs', data, {
+        forceFormData: true,
+        onSuccess: handleCloseDialog,
+      });
+    }
+  };
 
-  const handleDelete = useCallback(async (id: number) => {
+  const handleDelete = async (id: number) => {
     setDeleteId(id);
     setIsDeleting(true);
-  }, []);
+  };
 
-  const confirmDelete = useCallback(() => {
+  const confirmDelete = () => {
     if (deleteId) {
       router.delete(`/mugs/${deleteId}`, {
         onSuccess: () => {
@@ -158,14 +155,14 @@ export default function Mugs({ mugs, categories, subcategories, auth }: MugsProp
         },
       });
     }
-  }, [deleteId]);
+  };
 
-  const cancelDelete = useCallback(() => {
+  const cancelDelete = () => {
     setIsDeleting(false);
     setDeleteId(null);
-  }, []);
+  };
 
-  const handleToggleStatus = useCallback((mug: Mug) => {
+  const handleToggleStatus = (mug: Mug) => {
     router.put(`/mugs/${mug.id}`, {
       name: mug.name,
       description: mug.description || '',
@@ -174,7 +171,7 @@ export default function Mugs({ mugs, categories, subcategories, auth }: MugsProp
       subcategory_id: mug.subcategory_id,
       active: !mug.active,
     });
-  }, []);
+  };
 
   return (
     <>

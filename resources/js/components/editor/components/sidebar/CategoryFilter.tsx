@@ -1,5 +1,4 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
-import React from 'react';
 
 interface CategoryFilterProps {
   categories: string[];
@@ -7,7 +6,7 @@ interface CategoryFilterProps {
   onCategoryChange: (category: string) => void;
 }
 
-export default React.memo(function CategoryFilter({ categories, selectedCategory, onCategoryChange }: CategoryFilterProps) {
+export default function CategoryFilter({ categories, selectedCategory, onCategoryChange }: CategoryFilterProps) {
   return (
     <Select value={selectedCategory} onValueChange={onCategoryChange}>
       <SelectTrigger className="mb-3 h-8 w-full text-xs">
@@ -23,4 +22,4 @@ export default React.memo(function CategoryFilter({ categories, selectedCategory
       </SelectContent>
     </Select>
   );
-});
+}

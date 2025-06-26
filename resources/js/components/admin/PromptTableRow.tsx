@@ -2,7 +2,6 @@ import { Button } from '@/components/ui/Button';
 import { TableCell, TableRow } from '@/components/ui/Table';
 import { Prompt } from '@/types/prompt';
 import { Edit, Play, Trash2 } from 'lucide-react';
-import React from 'react';
 
 interface PromptTableRowProps {
   prompt: Prompt;
@@ -11,7 +10,7 @@ interface PromptTableRowProps {
   onTest: (promptId: number) => void;
 }
 
-const PromptTableRow = React.memo(function PromptTableRow({ prompt, onEdit, onDelete, onTest }: PromptTableRowProps) {
+function PromptTableRow({ prompt, onEdit, onDelete, onTest }: PromptTableRowProps) {
   return (
     <TableRow>
       <TableCell>
@@ -59,6 +58,6 @@ const PromptTableRow = React.memo(function PromptTableRow({ prompt, onEdit, onDe
       </TableCell>
     </TableRow>
   );
-});
+}
 
 export default PromptTableRow;

@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Label } from '@/components/ui/Label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
 import { Textarea } from '@/components/ui/Textarea';
+import { getCsrfToken } from '@/lib/utils';
 import { Head, useForm } from '@inertiajs/react';
 import { Code, Loader2, Upload } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -39,13 +40,13 @@ interface OpenAiRequestParams {
   background?: string;
 }
 
-const DALLE2_SIZES: Record<DallE2Size, string> = {
+const DALLE2_SIZES: Record = {
   '256x256': '256x256',
   '512x512': '512x512',
   '1024x1024': '1024x1024',
 };
 
-const GPT_IMAGE_1_SIZES: Record<GptImage1Size, string> = {
+const GPT_IMAGE_1_SIZES: Record = {
   '1024x1024': '1024x1024',
   '1536x1024': '1536x1024 (landscape)',
   '1024x1536': '1024x1536 (portrait)',
@@ -60,7 +61,7 @@ export default function PromptTester({ auth }: PromptTesterProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string>('');
   const [error, setError] = useState<string>('');
-  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  const [validationErrors, setValidationErrors] = useState<Record>({});
   const [requestParams, setRequestParams] = useState<OpenAiRequestParams | null>(null);
 
   const { data, setData } = useForm({
@@ -96,7 +97,7 @@ export default function PromptTester({ auth }: PromptTesterProps) {
     }
   }, [selectedModel, setData]);
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = (e: React.ChangeEvent) => {
     const file = e.target.files?.[0];
     if (file) {
       setUploadedImage(file);
@@ -138,7 +139,7 @@ export default function PromptTester({ auth }: PromptTesterProps) {
       const response = await fetch('/admin/test-prompt', {
         method: 'POST',
         headers: {
-          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+          'X-CSRF-TOKEN': getCsrfToken(),
           'X-Requested-With': 'XMLHttpRequest',
         },
         body: formData,

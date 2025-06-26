@@ -1,7 +1,6 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/Accordion';
-import React from 'react';
 
-export default React.memo(function InstructionsPanel() {
+export default function InstructionsPanel() {
   return (
     <Accordion type="single" collapsible className="w-full">
       <AccordionItem value="instructions" className="border-0">
@@ -31,4 +30,4 @@ export default React.memo(function InstructionsPanel() {
       </AccordionItem>
     </Accordion>
   );
-});
+}

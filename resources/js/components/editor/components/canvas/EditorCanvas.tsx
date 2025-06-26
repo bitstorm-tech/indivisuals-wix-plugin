@@ -1,5 +1,4 @@
 import { EditorImage, EditorText } from '@/types/editor';
-import React from 'react';
 
 interface EditorCanvasProps {
   images: EditorImage[];
@@ -14,7 +13,7 @@ interface EditorCanvasProps {
   onClearSelection: () => void;
 }
 
-export default React.memo(function EditorCanvas({
+export default function EditorCanvas({
   images,
   texts,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -47,4 +46,4 @@ export default React.memo(function EditorCanvas({
       </div>
     </div>
   );
-});
+}

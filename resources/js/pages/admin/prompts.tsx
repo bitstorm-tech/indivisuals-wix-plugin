@@ -6,7 +6,7 @@ import PromptTableHeader from '@/components/admin/PromptTableHeader';
 import TestPromptDialog from '@/components/admin/TestPromptDialog';
 import { Prompt, PromptCategory, PromptSubCategory } from '@/types/prompt';
 import { Head, router } from '@inertiajs/react';
-import { useCallback, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 interface User {
   id: number;
@@ -38,17 +38,17 @@ export default function Prompts({ prompts, categories, subcategories, auth }: Pr
     [prompts, selectedCategory],
   );
 
-  const handleEdit = useCallback((prompt: Prompt) => {
+  const handleEdit = (prompt: Prompt) => {
     setEditingPrompt(prompt);
     setIsPromptDialogOpen(true);
-  }, []);
+  };
 
-  const handleDelete = useCallback((promptId: number) => {
+  const handleDelete = (promptId: number) => {
     setPromptToDelete(promptId);
     setIsDeleteDialogOpen(true);
-  }, []);
+  };
 
-  const confirmDelete = useCallback(async () => {
+  const confirmDelete = async () => {
     if (!promptToDelete) return;
 
     try {
@@ -66,32 +66,32 @@ export default function Prompts({ prompts, categories, subcategories, auth }: Pr
       setIsDeleteDialogOpen(false);
       setPromptToDelete(undefined);
     }
-  }, [promptToDelete]);
+  };
 
-  const cancelDelete = useCallback(() => {
+  const cancelDelete = () => {
     setIsDeleteDialogOpen(false);
     setPromptToDelete(undefined);
-  }, []);
+  };
 
-  const handleTest = useCallback((promptId: number) => {
+  const handleTest = (promptId: number) => {
     setTestingPromptId(promptId);
     setIsModalOpen(true);
-  }, []);
+  };
 
-  const closeModal = useCallback(() => {
+  const closeModal = () => {
     setIsModalOpen(false);
     setTestingPromptId(undefined);
-  }, []);
+  };
 
-  const handleNewPrompt = useCallback(() => {
+  const handleNewPrompt = () => {
     setEditingPrompt(undefined);
     setIsPromptDialogOpen(true);
-  }, []);
+  };
 
-  const handleClosePromptDialog = useCallback(() => {
+  const handleClosePromptDialog = () => {
     setIsPromptDialogOpen(false);
     setEditingPrompt(undefined);
-  }, []);
+  };
 
   return (
     <>

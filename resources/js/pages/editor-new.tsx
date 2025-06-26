@@ -11,80 +11,58 @@ import { useWizardNavigation } from '@/components/editor-new/hooks/useWizardNavi
 import { CropData, MugOption, UserData } from '@/components/editor-new/types';
 import { usePrompts } from '@/components/editor/hooks/usePrompts';
 import { Prompt } from '@/types/prompt';
-import { useCallback } from 'react';
 
 export default function EditorNewPage() {
   const { prompts, isLoading, error } = usePrompts();
   const wizard = useWizardNavigation();
 
-  const handleImageUpload = useCallback(
-    (file: File, url: string) => {
-      wizard.updateState('uploadedImage', file);
-      wizard.updateState('uploadedImageUrl', url);
-    },
-    [wizard],
-  );
+  const handleImageUpload = (file: File, url: string) => {
+    wizard.updateState('uploadedImage', file);
+    wizard.updateState('uploadedImageUrl', url);
+  };
 
-  const handleCropComplete = useCallback(
-    (cropData: CropData) => {
-      wizard.updateState('cropData', cropData);
-    },
-    [wizard],
-  );
+  const handleCropComplete = (cropData: CropData) => {
+    wizard.updateState('cropData', cropData);
+  };
 
-  const handleRemoveImage = useCallback(() => {
+  const handleRemoveImage = () => {
     if (wizard.uploadedImageUrl) {
       URL.revokeObjectURL(wizard.uploadedImageUrl);
     }
     wizard.updateState('uploadedImage', null);
     wizard.updateState('uploadedImageUrl', null);
     wizard.updateState('cropData', null);
-  }, [wizard]);
+  };
 
-  const handlePromptSelect = useCallback(
-    (prompt: Prompt) => {
-      wizard.updateState('selectedPrompt', prompt);
-    },
-    [wizard],
-  );
+  const handlePromptSelect = (prompt: Prompt) => {
+    wizard.updateState('selectedPrompt', prompt);
+  };
 
-  const handleMugSelect = useCallback(
-    (mug: MugOption) => {
-      wizard.updateState('selectedMug', mug);
-    },
-    [wizard],
-  );
+  const handleMugSelect = (mug: MugOption) => {
+    wizard.updateState('selectedMug', mug);
+  };
 
-  const handleUserDataComplete = useCallback(
-    (data: UserData) => {
-      wizard.updateState('userData', data);
-    },
-    [wizard],
-  );
+  const handleUserDataComplete = (data: UserData) => {
+    wizard.updateState('userData', data);
+  };
 
-  const handleImagesGenerated = useCallback(
-    (urls: string[]) => {
-      wizard.updateState('generatedImageUrls', urls);
-    },
-    [wizard],
-  );
+  const handleImagesGenerated = (urls: string[]) => {
+    wizard.updateState('generatedImageUrls', urls);
+  };
 
-  const handleImageSelect = useCallback(
-    (url: string) => {
-      wizard.updateState('selectedGeneratedImage', url);
-    },
-    [wizard],
-  );
+  const handleImageSelect = (url: string) => {
+    wizard.updateState('selectedGeneratedImage', url);
+  };
 
-  const handleGenerationStart = useCallback(() => {
+  const handleGenerationStart = () => {
     wizard.updateState('isProcessing', true);
-  }, [wizard]);
+  };
 
-  const handleGenerationEnd = useCallback(() => {
+  const handleGenerationEnd = () => {
     wizard.updateState('isProcessing', false);
-  }, [wizard]);
+  };
 
-  const getCompletedSteps = useCallback((): WizardStep[] => {
+  const getCompletedSteps = (): WizardStep[] => {
     const completed: WizardStep[] = [];
     if (wizard.uploadedImage && wizard.cropData) completed.push('image-upload');
     if (wizard.selectedPrompt) completed.push('prompt-selection');
@@ -92,7 +70,7 @@ export default function EditorNewPage() {
     if (wizard.userData) completed.push('user-data');
     if (wizard.selectedGeneratedImage) completed.push('image-generation');
     return completed;
-  }, [wizard]);
+  };
 
   if (isLoading) {
     return (

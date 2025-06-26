@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/Button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
 import { useImageCrop } from '@/hooks/useImageCrop';
 import { Prompt } from '@/types/prompt';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ReactCrop from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import { UploadResponse } from '../../types/image-picker';
@@ -31,121 +31,115 @@ export default function ImagePicker({ defaultPromptId, storeImages = true }: Ima
     initialCropPercent: 80,
   });
 
-  const fetchPrompts = useCallback(async (): Promise<void> => {
+  const uploadImage = async (fileOverride?: File): Promise<void> => {
+    const fileToUpload = fileOverride || croppedFile || selectedFile;
+    if (!fileToUpload) {
+      return;
+    }
+
+    setIsProcessing(true);
+    setGeneratedImage(undefined);
+
     try {
-      const response = await fetch('/prompts?active_only=true', {
+      const formData = new FormData();
+      formData.append('image', fileToUpload);
+
+      if (selectedPromptId) {
+        formData.append('prompt_id', selectedPromptId.toString());
+      }
+
+      formData.append('store_images', storeImages.toString());
+
+      // Debug logging
+      console.log('Uploading file:', {
+        name: fileToUpload.name,
+        type: fileToUpload.type,
+        size: fileToUpload.size,
+        lastModified: fileToUpload.lastModified,
+      });
+
+      const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+      if (!csrfToken) {
+        throw new Error('CSRF token not found');
+      }
+
+      const response = await fetch('/upload-image', {
+        method: 'POST',
+        body: formData,
         headers: {
           'X-Requested-With': 'XMLHttpRequest',
+          'X-CSRF-TOKEN': csrfToken,
         },
       });
 
-      if (response.ok) {
-        const promptsData: Prompt[] = await response.json();
-        setPrompts(promptsData);
+      const result: UploadResponse = await response.json();
+
+      if (!response.ok) {
+        // Handle validation errors
+        if (response.status === 422 && result.errors) {
+          const errorMessages = Object.values(result.errors).flat().join(', ');
+          throw new Error(errorMessages || result.message || `HTTP error! status: ${response.status}`);
+        }
+        throw new Error(result.message || `HTTP error! status: ${response.status}`);
+      }
+
+      if (result.success && result.generated_image_url) {
+        setGeneratedImage(result.generated_image_url);
+        setSelectedFile(undefined);
+        setCroppedFile(undefined);
+        setShowCropDialog(false);
+      } else {
+        throw new Error(result.message || 'Upload failed');
       }
     } catch (error) {
-      console.error('Error fetching prompts:', error);
+      console.error('Upload error:', error);
+      alert(`Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setIsProcessing(false);
     }
-  }, []);
+  };
 
-  const uploadImage = useCallback(
-    async (fileOverride?: File): Promise<void> => {
-      const fileToUpload = fileOverride || croppedFile || selectedFile;
-      if (!fileToUpload) {
-        return;
-      }
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
 
-      setIsProcessing(true);
+    if (previewImage) {
+      URL.revokeObjectURL(previewImage);
+    }
+
+    if (file) {
+      setSelectedFile(file);
+      setPreviewImage(URL.createObjectURL(file));
       setGeneratedImage(undefined);
+      setCroppedFile(undefined);
+      setShowCropDialog(true);
+    } else {
+      setSelectedFile(undefined);
+      setPreviewImage(undefined);
+      setCroppedFile(undefined);
+    }
+  };
 
+  useEffect(() => {
+    const fetchPrompts = async (): Promise<void> => {
       try {
-        const formData = new FormData();
-        formData.append('image', fileToUpload);
-
-        if (selectedPromptId) {
-          formData.append('prompt_id', selectedPromptId.toString());
-        }
-
-        formData.append('store_images', storeImages.toString());
-
-        // Debug logging
-        console.log('Uploading file:', {
-          name: fileToUpload.name,
-          type: fileToUpload.type,
-          size: fileToUpload.size,
-          lastModified: fileToUpload.lastModified,
-        });
-
-        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-
-        if (!csrfToken) {
-          throw new Error('CSRF token not found');
-        }
-
-        const response = await fetch('/upload-image', {
-          method: 'POST',
-          body: formData,
+        const response = await fetch('/prompts?active_only=true', {
           headers: {
             'X-Requested-With': 'XMLHttpRequest',
-            'X-CSRF-TOKEN': csrfToken,
           },
         });
 
-        const result: UploadResponse = await response.json();
-
-        if (!response.ok) {
-          // Handle validation errors
-          if (response.status === 422 && result.errors) {
-            const errorMessages = Object.values(result.errors).flat().join(', ');
-            throw new Error(errorMessages || result.message || `HTTP error! status: ${response.status}`);
-          }
-          throw new Error(result.message || `HTTP error! status: ${response.status}`);
-        }
-
-        if (result.success && result.generated_image_url) {
-          setGeneratedImage(result.generated_image_url);
-          setSelectedFile(undefined);
-          setCroppedFile(undefined);
-          setShowCropDialog(false);
-        } else {
-          throw new Error(result.message || 'Upload failed');
+        if (response.ok) {
+          const promptsData: Prompt[] = await response.json();
+          setPrompts(promptsData);
         }
       } catch (error) {
-        console.error('Upload error:', error);
-        alert(`Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
-      } finally {
-        setIsProcessing(false);
+        console.error('Error fetching prompts:', error);
       }
-    },
-    [selectedFile, croppedFile, selectedPromptId, storeImages],
-  );
+    };
 
-  const handleFileChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const file = event.target.files?.[0];
-
-      if (previewImage) {
-        URL.revokeObjectURL(previewImage);
-      }
-
-      if (file) {
-        setSelectedFile(file);
-        setPreviewImage(URL.createObjectURL(file));
-        setGeneratedImage(undefined);
-        setCroppedFile(undefined);
-        setShowCropDialog(true);
-      } else {
-        setSelectedFile(undefined);
-        setPreviewImage(undefined);
-        setCroppedFile(undefined);
-      }
-    },
-    [previewImage],
-  );
-
-  useEffect(() => {
     fetchPrompts();
-  }, [fetchPrompts]);
+  }, []);
 
   // Cleanup preview URL on unmount
   useEffect(() => {
@@ -156,7 +150,7 @@ export default function ImagePicker({ defaultPromptId, storeImages = true }: Ima
     };
   }, [previewImage]);
 
-  const handleCropConfirm = useCallback(async () => {
+  const handleCropConfirm = async () => {
     try {
       const croppedImage = await getCroppedImage('cropped-image.png', 'image/png');
       if (croppedImage) {
@@ -169,16 +163,16 @@ export default function ImagePicker({ defaultPromptId, storeImages = true }: Ima
       console.error('Error cropping image:', error);
       alert('Failed to crop image. Please try again.');
     }
-  }, [getCroppedImage, uploadImage]);
+  };
 
-  const handleCropCancel = useCallback(async () => {
+  const handleCropCancel = async () => {
     setShowCropDialog(false);
     setCroppedFile(undefined);
     // Upload the original file without cropping
     if (selectedFile) {
       await uploadImage(selectedFile);
     }
-  }, [uploadImage, selectedFile]);
+  };
 
   const canUpload = (selectedFile || croppedFile) && selectedPromptId && !isProcessing;
 

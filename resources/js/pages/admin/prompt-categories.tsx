@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table';
 import { Head, router } from '@inertiajs/react';
 import { ChevronRight, Edit, Plus, Trash2 } from 'lucide-react';
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 
 interface User {
   id: number;
@@ -57,7 +57,7 @@ export default function Categories({ categories, subcategories, auth }: Categori
   const [deleteType, setDeleteType] = useState<'category' | 'subcategory' | null>(null);
   const [expandedCategories, setExpandedCategories] = useState<Set<number>>(new Set());
 
-  const handleOpenCategoryDialog = useCallback((category?: PromptCategory) => {
+  const handleOpenCategoryDialog = (category?: PromptCategory) => {
     if (category) {
       setEditingCategory(category);
       setCategoryName(category.name);
@@ -66,15 +66,15 @@ export default function Categories({ categories, subcategories, auth }: Categori
       setCategoryName('');
     }
     setIsCategoryDialogOpen(true);
-  }, []);
+  };
 
-  const handleCloseCategoryDialog = useCallback(() => {
+  const handleCloseCategoryDialog = () => {
     setIsCategoryDialogOpen(false);
     setEditingCategory(null);
     setCategoryName('');
-  }, []);
+  };
 
-  const handleOpenSubcategoryDialog = useCallback((subcategory?: PromptSubCategory, categoryId?: number) => {
+  const handleOpenSubcategoryDialog = (subcategory?: PromptSubCategory, categoryId?: number) => {
     if (subcategory) {
       setEditingSubCategory(subcategory);
       setSubcategoryFormData({
@@ -89,60 +89,54 @@ export default function Categories({ categories, subcategories, auth }: Categori
       });
     }
     setIsSubcategoryDialogOpen(true);
-  }, []);
+  };
 
-  const handleCloseSubcategoryDialog = useCallback(() => {
+  const handleCloseSubcategoryDialog = () => {
     setIsSubcategoryDialogOpen(false);
     setEditingSubCategory(null);
     setSubcategoryFormData({
       name: '',
       category_id: '',
     });
-  }, []);
+  };
 
-  const handleSubmitCategory = useCallback(
-    async (e: React.FormEvent) => {
-      e.preventDefault();
+  const handleSubmitCategory = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-      const data = { name: categoryName };
+    const data = { name: categoryName };
 
-      if (editingCategory) {
-        router.put(`/prompt-categories/${editingCategory.id}`, data, {
-          onSuccess: handleCloseCategoryDialog,
-        });
-      } else {
-        router.post('/prompt-categories', data, {
-          onSuccess: handleCloseCategoryDialog,
-        });
-      }
-    },
-    [categoryName, editingCategory, handleCloseCategoryDialog],
-  );
+    if (editingCategory) {
+      router.put(`/prompt-categories/${editingCategory.id}`, data, {
+        onSuccess: handleCloseCategoryDialog,
+      });
+    } else {
+      router.post('/prompt-categories', data, {
+        onSuccess: handleCloseCategoryDialog,
+      });
+    }
+  };
 
-  const handleSubmitSubcategory = useCallback(
-    async (e: React.FormEvent) => {
-      e.preventDefault();
+  const handleSubmitSubcategory = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-      if (editingSubCategory) {
-        router.put(`/prompt-sub-categories/${editingSubCategory.id}`, subcategoryFormData, {
-          onSuccess: handleCloseSubcategoryDialog,
-        });
-      } else {
-        router.post('/prompt-sub-categories', subcategoryFormData, {
-          onSuccess: handleCloseSubcategoryDialog,
-        });
-      }
-    },
-    [subcategoryFormData, editingSubCategory, handleCloseSubcategoryDialog],
-  );
+    if (editingSubCategory) {
+      router.put(`/prompt-sub-categories/${editingSubCategory.id}`, subcategoryFormData, {
+        onSuccess: handleCloseSubcategoryDialog,
+      });
+    } else {
+      router.post('/prompt-sub-categories', subcategoryFormData, {
+        onSuccess: handleCloseSubcategoryDialog,
+      });
+    }
+  };
 
-  const handleDelete = useCallback(async (id: number, type: 'category' | 'subcategory') => {
+  const handleDelete = async (id: number, type: 'category' | 'subcategory') => {
     setDeleteId(id);
     setDeleteType(type);
     setIsDeleting(true);
-  }, []);
+  };
 
-  const confirmDelete = useCallback(() => {
+  const confirmDelete = () => {
     if (deleteId && deleteType) {
       const url = deleteType === 'category' ? `/prompt-categories/${deleteId}` : `/prompt-sub-categories/${deleteId}`;
       router.delete(url, {
@@ -153,15 +147,15 @@ export default function Categories({ categories, subcategories, auth }: Categori
         },
       });
     }
-  }, [deleteId, deleteType]);
+  };
 
-  const cancelDelete = useCallback(() => {
+  const cancelDelete = () => {
     setIsDeleting(false);
     setDeleteId(null);
     setDeleteType(null);
-  }, []);
+  };
 
-  const toggleCategory = useCallback((categoryId: number) => {
+  const toggleCategory = (categoryId: number) => {
     setExpandedCategories((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(categoryId)) {
@@ -171,14 +165,11 @@ export default function Categories({ categories, subcategories, auth }: Categori
       }
       return newSet;
     });
-  }, []);
+  };
 
-  const getCategorySubcategories = useCallback(
-    (categoryId: number) => {
-      return subcategories.filter((sub) => sub.category_id === categoryId);
-    },
-    [subcategories],
-  );
+  const getCategorySubcategories = (categoryId: number) => {
+    return subcategories.filter((sub) => sub.category_id === categoryId);
+  };
 
   return (
     <>

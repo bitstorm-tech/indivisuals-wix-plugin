@@ -1,5 +1,5 @@
 import { ChevronDown, Download, Info, Palette } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { EditorImage, EditorSize, EditorState, EditorText, EXPORT_RESOLUTIONS, ExportResolutionId, ExportSettings } from '../../types/editor';
 import { Prompt } from '../../types/prompt';
 import EditorImageUploader from '../editor/components/EditorImageUploader';
@@ -74,7 +74,7 @@ export default function Editor({ canvasSize = DEFAULT_CANVAS_SIZE, maxImages = 3
 
   const generateId = (type: 'img' | 'txt') => `${type}_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
 
-  const findAvailablePosition = useCallback((existingElements: Array<{ position: { x: number; y: number } }>): { x: number; y: number } => {
+  const findAvailablePosition = (existingElements: Array<{ position: { x: number; y: number } }>): { x: number; y: number } => {
     const positions = [
       { x: 50, y: 50 },
       { x: 300, y: 50 },
@@ -93,49 +93,46 @@ export default function Editor({ canvasSize = DEFAULT_CANVAS_SIZE, maxImages = 3
     }
 
     return { x: 50 + existingElements.length * 30, y: 50 + existingElements.length * 30 };
-  }, []);
+  };
 
-  const handleFileSelect = useCallback(
-    (files: File[]) => {
-      setState((prevState) => {
-        const remainingSlots = prevState.maxImages - prevState.images.length;
-        const filesToAdd = files.slice(0, remainingSlots);
+  const handleFileSelect = (files: File[]) => {
+    setState((prevState) => {
+      const remainingSlots = prevState.maxImages - prevState.images.length;
+      const filesToAdd = files.slice(0, remainingSlots);
 
-        const newImages: EditorImage[] = filesToAdd.map((file, index) => {
-          const position = findAvailablePosition([...prevState.images, ...prevState.texts]);
-
-          return {
-            id: generateId('img'),
-            file,
-            url: URL.createObjectURL(file),
-            position: {
-              x: position.x + index * 30,
-              y: position.y + index * 30,
-            },
-            size: { ...DEFAULT_IMAGE_SIZE },
-            zIndex: prevState.images.length + index + 1,
-          };
-        });
+      const newImages: EditorImage[] = filesToAdd.map((file, index) => {
+        const position = findAvailablePosition([...prevState.images, ...prevState.texts]);
 
         return {
-          ...prevState,
-          images: [...prevState.images, ...newImages],
-          selectedElementId: newImages.length > 0 ? newImages[0].id : prevState.selectedElementId,
-          selectedElementType: newImages.length > 0 ? 'image' : prevState.selectedElementType,
+          id: generateId('img'),
+          file,
+          url: URL.createObjectURL(file),
+          position: {
+            x: position.x + index * 30,
+            y: position.y + index * 30,
+          },
+          size: { ...DEFAULT_IMAGE_SIZE },
+          zIndex: prevState.images.length + index + 1,
         };
       });
-    },
-    [findAvailablePosition],
-  );
 
-  const handleImageUpdate = useCallback((id: string, updates: Partial<EditorImage>) => {
+      return {
+        ...prevState,
+        images: [...prevState.images, ...newImages],
+        selectedElementId: newImages.length > 0 ? newImages[0].id : prevState.selectedElementId,
+        selectedElementType: newImages.length > 0 ? 'image' : prevState.selectedElementType,
+      };
+    });
+  };
+
+  const handleImageUpdate = (id: string, updates: Partial<EditorImage>) => {
     setState((prevState) => ({
       ...prevState,
       images: prevState.images.map((img) => (img.id === id ? { ...img, ...updates } : img)),
     }));
-  }, []);
+  };
 
-  const handleImageDelete = useCallback((id: string) => {
+  const handleImageDelete = (id: string) => {
     setState((prevState) => {
       const imageToDelete = prevState.images.find((img) => img.id === id);
       if (imageToDelete) {
@@ -149,33 +146,33 @@ export default function Editor({ canvasSize = DEFAULT_CANVAS_SIZE, maxImages = 3
         selectedElementType: prevState.selectedElementId === id ? null : prevState.selectedElementType,
       };
     });
-  }, []);
+  };
 
-  const handleTextUpdate = useCallback((id: string, updates: Partial<EditorText>) => {
+  const handleTextUpdate = (id: string, updates: Partial<EditorText>) => {
     setState((prevState) => ({
       ...prevState,
       texts: prevState.texts.map((text) => (text.id === id ? { ...text, ...updates } : text)),
     }));
-  }, []);
+  };
 
-  const handleTextDelete = useCallback((id: string) => {
+  const handleTextDelete = (id: string) => {
     setState((prevState) => ({
       ...prevState,
       texts: prevState.texts.filter((text) => text.id !== id),
       selectedElementId: prevState.selectedElementId === id ? null : prevState.selectedElementId,
       selectedElementType: prevState.selectedElementId === id ? null : prevState.selectedElementType,
     }));
-  }, []);
+  };
 
-  const handleElementSelect = useCallback((id: string | null, type: 'image' | 'text' | null) => {
+  const handleElementSelect = (id: string | null, type: 'image' | 'text' | null) => {
     setState((prevState) => ({
       ...prevState,
       selectedElementId: id,
       selectedElementType: type,
     }));
-  }, []);
+  };
 
-  const handleAddText = useCallback(() => {
+  const handleAddText = () => {
     setState((prevState) => {
       const position = findAvailablePosition([...prevState.images, ...prevState.texts]);
 
@@ -202,16 +199,16 @@ export default function Editor({ canvasSize = DEFAULT_CANVAS_SIZE, maxImages = 3
         selectedElementType: 'text',
       };
     });
-  }, [findAvailablePosition]);
+  };
 
-  const handleBackgroundColorChange = useCallback((color: string) => {
+  const handleBackgroundColorChange = (color: string) => {
     setState((prevState) => ({
       ...prevState,
       backgroundColor: color,
     }));
-  }, []);
+  };
 
-  const handleExportSettingsChange = useCallback((updates: Partial<ExportSettings>) => {
+  const handleExportSettingsChange = (updates: Partial<ExportSettings>) => {
     setState((prevState) => ({
       ...prevState,
       exportSettings: {
@@ -219,9 +216,9 @@ export default function Editor({ canvasSize = DEFAULT_CANVAS_SIZE, maxImages = 3
         ...updates,
       },
     }));
-  }, []);
+  };
 
-  const handleExport = useCallback(() => {
+  const handleExport = () => {
     // Call the onExport callback if provided
     if (onExport) {
       onExport({ images: state.images, texts: state.texts });
@@ -452,7 +449,7 @@ export default function Editor({ canvasSize = DEFAULT_CANVAS_SIZE, maxImages = 3
       };
       img.src = imageElement.url;
     });
-  }, [state.images, state.texts, state.backgroundColor, state.exportSettings, canvasSize, onExport]);
+  };
 
   return (
     <div className="space-y-6">

@@ -1,12 +1,11 @@
 import { X } from 'lucide-react';
-import React from 'react';
 
 interface ImagePreviewListProps {
   images: { url: string; file: File }[];
   onRemoveImage: (index: number) => void;
 }
 
-export default React.memo(function ImagePreviewList({ images, onRemoveImage }: ImagePreviewListProps) {
+export default function ImagePreviewList({ images, onRemoveImage }: ImagePreviewListProps) {
   if (images.length === 0) return null;
 
   return (
@@ -25,4 +24,4 @@ export default React.memo(function ImagePreviewList({ images, onRemoveImage }: I
       ))}
     </div>
   );
-});
+}

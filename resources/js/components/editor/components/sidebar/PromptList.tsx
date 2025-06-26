@@ -1,5 +1,4 @@
 import { Prompt } from '@/types/prompt';
-import React from 'react';
 
 interface PromptListProps {
   prompts: Prompt[];
@@ -7,7 +6,7 @@ interface PromptListProps {
   onSelectPrompt: (promptId: number) => void;
 }
 
-export default React.memo(function PromptList({ prompts, selectedPromptId, onSelectPrompt }: PromptListProps) {
+export default function PromptList({ prompts, selectedPromptId, onSelectPrompt }: PromptListProps) {
   if (prompts.length === 0) {
     return <p className="text-center text-xs text-gray-500">No prompts in this category</p>;
   }
@@ -33,4 +32,4 @@ export default React.memo(function PromptList({ prompts, selectedPromptId, onSel
       ))}
     </div>
   );
-});
+}
