@@ -21,8 +21,8 @@ export interface EditorProps {
 
 export default function EditorNewPage({ auth }: EditorProps) {
   const { prompts, isLoading, error } = usePrompts();
-  const wizard = useWizardNavigation();
   const [isAuthenticated, setIsAuthenticated] = useState(!!auth.user);
+  const wizard = useWizardNavigation(isAuthenticated);
   const [isRegistering, setIsRegistering] = useState(false);
   const [registrationError, setRegistrationError] = useState<string | null>(null);
 
@@ -100,7 +100,8 @@ export default function EditorNewPage({ auth }: EditorProps) {
   };
 
   const handleNext = async () => {
-    if (wizard.currentStep === 'user-data') {
+    // Only handle registration if on user-data step and not authenticated
+    if (wizard.currentStep === 'user-data' && !isAuthenticated) {
       const success = await handleUserRegistration();
       if (success) {
         wizard.goNext();
@@ -131,7 +132,8 @@ export default function EditorNewPage({ auth }: EditorProps) {
     if (wizard.uploadedImage && wizard.cropData) completed.push('image-upload');
     if (wizard.selectedPrompt) completed.push('prompt-selection');
     if (wizard.selectedMug) completed.push('mug-selection');
-    if (wizard.userData) completed.push('user-data');
+    // Mark user-data as completed if user is authenticated OR if userData is filled
+    if (isAuthenticated || wizard.userData) completed.push('user-data');
     if (wizard.selectedGeneratedImage) completed.push('image-generation');
     return completed;
   };

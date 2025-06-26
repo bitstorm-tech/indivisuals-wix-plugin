@@ -26,7 +26,7 @@ const initialState: WizardState = {
   error: null,
 };
 
-export function useWizardNavigation(): UseWizardNavigationReturn {
+export function useWizardNavigation(isAuthenticated: boolean = false): UseWizardNavigationReturn {
   const [state, setState] = useState<WizardState>(initialState);
 
   // Scroll to top when step changes
@@ -70,18 +70,30 @@ export function useWizardNavigation(): UseWizardNavigationReturn {
   const goNext = useCallback(() => {
     const currentIndex = STEP_INDEX[state.currentStep];
     if (currentIndex < WIZARD_STEPS.length - 1 && canProceedFromStep(state.currentStep)) {
-      const nextStep = WIZARD_STEPS[currentIndex + 1];
+      let nextStep = WIZARD_STEPS[currentIndex + 1];
+
+      // Skip user-data step if user is already authenticated
+      if (nextStep === 'user-data' && isAuthenticated) {
+        nextStep = 'image-generation';
+      }
+
       goToStep(nextStep);
     }
-  }, [state.currentStep, canProceedFromStep, goToStep]);
+  }, [state.currentStep, canProceedFromStep, goToStep, isAuthenticated]);
 
   const goPrevious = useCallback(() => {
     const currentIndex = STEP_INDEX[state.currentStep];
     if (currentIndex > 0) {
-      const previousStep = WIZARD_STEPS[currentIndex - 1];
+      let previousStep = WIZARD_STEPS[currentIndex - 1];
+
+      // Skip user-data step when going back if user is already authenticated
+      if (previousStep === 'user-data' && isAuthenticated) {
+        previousStep = 'mug-selection';
+      }
+
       goToStep(previousStep);
     }
-  }, [state.currentStep, goToStep]);
+  }, [state.currentStep, goToStep, isAuthenticated]);
 
   const reset = useCallback(() => {
     if (state.uploadedImageUrl) {
