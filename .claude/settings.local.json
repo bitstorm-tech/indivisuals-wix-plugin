@@ -39,7 +39,8 @@
       "Bash(cp:*)",
       "Bash(git tag:*)",
       "Bash(composer install:*)",
-      "WebFetch(domain:laravel.com)"
+      "WebFetch(domain:laravel.com)",
+      "Bash(bun prettier:*)"
     ]
   },
   "enableAllProjectMcpServers": false

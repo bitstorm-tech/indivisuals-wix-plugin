@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/Button';
 import { cn } from '@/lib/utils';
 import { Upload, X } from 'lucide-react';
-import React, { useCallback, useRef } from 'react';
+import React, { useRef } from 'react';
 import { PixelCrop } from 'react-image-crop';
 import { useImageCropper } from '../../hooks/useImageCropper';
 import { CropData } from '../../types';
@@ -20,46 +20,37 @@ export default function ImageUploadStep({ uploadedImageUrl, onImageUpload, onCro
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { crop, setCrop, setCompletedCrop, convertToCropData } = useImageCropper();
 
-  const handleFileChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      if (file && file.type.startsWith('image/')) {
-        const url = URL.createObjectURL(file);
-        onImageUpload(file, url);
-      }
-    },
-    [onImageUpload],
-  );
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && file.type.startsWith('image/')) {
+      const url = URL.createObjectURL(file);
+      onImageUpload(file, url);
+    }
+  };
 
-  const handleDragOver = useCallback((e: React.DragEvent) => {
+  const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-  }, []);
+  };
 
-  const handleDrop = useCallback(
-    (e: React.DragEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
 
-      const file = e.dataTransfer.files[0];
-      if (file && file.type.startsWith('image/')) {
-        const url = URL.createObjectURL(file);
-        onImageUpload(file, url);
-      }
-    },
-    [onImageUpload],
-  );
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith('image/')) {
+      const url = URL.createObjectURL(file);
+      onImageUpload(file, url);
+    }
+  };
 
-  const handleCropComplete = useCallback(
-    (pixelCrop: PixelCrop) => {
-      setCompletedCrop(pixelCrop);
-      if (pixelCrop.width && pixelCrop.height) {
-        const cropData = convertToCropData(pixelCrop);
-        onCropComplete(cropData);
-      }
-    },
-    [setCompletedCrop, convertToCropData, onCropComplete],
-  );
+  const handleCropComplete = (pixelCrop: PixelCrop) => {
+    setCompletedCrop(pixelCrop);
+    if (pixelCrop.width && pixelCrop.height) {
+      const cropData = convertToCropData(pixelCrop);
+      onCropComplete(cropData);
+    }
+  };
 
   if (!uploadedImageUrl) {
     return (

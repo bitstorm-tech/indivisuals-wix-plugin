@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 import { Crop, PixelCrop } from 'react-image-crop';
 import { CropData } from '../types';
 
@@ -21,7 +21,7 @@ export function useImageCropper(): UseImageCropperReturn {
   });
   const [completedCrop, setCompletedCrop] = useState<PixelCrop | null>(null);
 
-  const getCroppedImage = useCallback(async (image: HTMLImageElement, pixelCrop: PixelCrop): Promise<File> => {
+  const getCroppedImage = async (image: HTMLImageElement, pixelCrop: PixelCrop): Promise<File> => {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
 
@@ -61,9 +61,9 @@ export function useImageCropper(): UseImageCropperReturn {
         }
       }, 'image/png');
     });
-  }, []);
+  };
 
-  const convertToCropData = useCallback((pixelCrop: PixelCrop): CropData => {
+  const convertToCropData = (pixelCrop: PixelCrop): CropData => {
     return {
       unit: 'px',
       x: pixelCrop.x,
@@ -71,7 +71,7 @@ export function useImageCropper(): UseImageCropperReturn {
       width: pixelCrop.width,
       height: pixelCrop.height,
     };
-  }, []);
+  };
 
   return {
     crop,

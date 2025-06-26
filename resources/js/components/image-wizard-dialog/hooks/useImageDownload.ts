@@ -1,7 +1,5 @@
-import { useCallback } from 'react';
-
 export function useImageDownload() {
-  const handleDownload = useCallback(async (imageUrl: string, filename?: string) => {
+  const handleDownload = async (imageUrl: string, filename?: string) => {
     if (!imageUrl) return;
 
     try {
@@ -18,7 +16,7 @@ export function useImageDownload() {
     } catch (error) {
       console.error('Error downloading image:', error);
     }
-  }, []);
+  };
 
   return { handleDownload };
 }

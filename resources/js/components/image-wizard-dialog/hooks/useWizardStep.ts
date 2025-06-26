@@ -1,5 +1,5 @@
 import { Prompt } from '@/types/prompt';
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 import { STEP_INDEX, WizardStep } from '../constants';
 
 interface UseWizardStepReturn {
@@ -19,7 +19,7 @@ export function useWizardStep(): UseWizardStepReturn {
 
   const progress = ((STEP_INDEX[currentStep] + 1) / 3) * 100;
 
-  const handleTemplateSelect = useCallback((templateId: number, prompts: Prompt[]) => {
+  const handleTemplateSelect = (templateId: number, prompts: Prompt[]) => {
     setSelectedTemplateId(templateId);
     const randomPrompt = prompts[Math.floor(Math.random() * prompts.length)];
     setSelectedPromptId(randomPrompt.id);
@@ -27,13 +27,13 @@ export function useWizardStep(): UseWizardStepReturn {
     setTimeout(() => {
       setCurrentStep('upload');
     }, 300);
-  }, []);
+  };
 
-  const reset = useCallback(() => {
+  const reset = () => {
     setCurrentStep('template');
     setSelectedTemplateId(null);
     setSelectedPromptId(null);
-  }, []);
+  };
 
   return {
     currentStep,

@@ -1,16 +1,15 @@
 import { Prompt } from '@/types/prompt';
 import { motion } from 'framer-motion';
 import { Sparkles } from 'lucide-react';
-import React, { useMemo } from 'react';
 
 interface PromptSelectorProps {
   onSelectTemplate: (templateId: number) => void;
   prompts: Prompt[];
 }
 
-const PromptSelector = React.memo<PromptSelectorProps>(({ onSelectTemplate, prompts }) => {
+const PromptSelector = ({ onSelectTemplate, prompts }: PromptSelectorProps) => {
   // Filter prompts that have example images
-  const promptsWithImages = useMemo(() => prompts.filter((prompt) => prompt.example_image_url), [prompts]);
+  const promptsWithImages = prompts.filter((prompt) => prompt.example_image_url);
   return (
     <motion.div key="template" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
       <p className="text-center text-lg font-medium">
@@ -45,8 +44,6 @@ const PromptSelector = React.memo<PromptSelectorProps>(({ onSelectTemplate, prom
       </div>
     </motion.div>
   );
-});
-
-PromptSelector.displayName = 'PromptSelector';
+};
 
 export default PromptSelector;

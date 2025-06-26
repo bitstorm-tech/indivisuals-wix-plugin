@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 import { UserData } from '../types';
 
 interface UseUserDataFormReturn {
@@ -20,12 +20,12 @@ export function useUserDataForm(initialData?: UserData | null): UseUserDataFormR
   const [formData, setFormData] = useState<UserData>(initialData || initialFormData);
   const [errors, setErrors] = useState<Partial<Record<keyof UserData, string>>>({});
 
-  const handleChange = useCallback((field: keyof UserData, value: string) => {
+  const handleChange = (field: keyof UserData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     setErrors((prev) => ({ ...prev, [field]: '' }));
-  }, []);
+  };
 
-  const validateForm = useCallback((): boolean => {
+  const validateForm = (): boolean => {
     const newErrors: Partial<Record<keyof UserData, string>> = {};
 
     if (!formData.email) {
@@ -40,12 +40,12 @@ export function useUserDataForm(initialData?: UserData | null): UseUserDataFormR
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  }, [formData]);
+  };
 
-  const resetForm = useCallback(() => {
+  const resetForm = () => {
     setFormData(initialFormData);
     setErrors({});
-  }, []);
+  };
 
   return {
     formData,

@@ -1,5 +1,5 @@
 import { Prompt } from '@/types/prompt';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 
 interface UsePromptSelectionReturn {
   selectedCategory: string;
@@ -11,7 +11,7 @@ interface UsePromptSelectionReturn {
 export function usePromptSelection(prompts: Prompt[]): UsePromptSelectionReturn {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
-  const categories = useMemo(() => {
+  const categories = (() => {
     const uniqueCategories = new Set<string>();
     prompts.forEach((prompt) => {
       if (prompt.subcategory) {
@@ -22,9 +22,9 @@ export function usePromptSelection(prompts: Prompt[]): UsePromptSelectionReturn 
     });
 
     return ['all', ...Array.from(uniqueCategories).sort()];
-  }, [prompts]);
+  })();
 
-  const filteredPrompts = useMemo(() => {
+  const filteredPrompts = (() => {
     if (selectedCategory === 'all') {
       return prompts;
     }
@@ -33,7 +33,7 @@ export function usePromptSelection(prompts: Prompt[]): UsePromptSelectionReturn 
       const promptCategory = prompt.subcategory?.name || prompt.category?.name;
       return promptCategory === selectedCategory;
     });
-  }, [prompts, selectedCategory]);
+  })();
 
   return {
     selectedCategory,

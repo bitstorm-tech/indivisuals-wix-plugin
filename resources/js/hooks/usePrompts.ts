@@ -1,6 +1,6 @@
 import { apiFetch } from '@/lib/utils';
 import { Prompt } from '@/types/prompt';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export function usePrompts() {
   const [prompts, setPrompts] = useState<Prompt[]>([]);
@@ -37,21 +37,15 @@ export function usePrompts() {
     };
   }, []);
 
-  const categories = useMemo(() => {
-    return Array.from(new Set(prompts.map((p) => p.category?.name).filter((name): name is string => !!name))).sort();
-  }, [prompts]);
+  const categories = Array.from(new Set(prompts.map((p) => p.category?.name).filter((name): name is string => !!name))).sort();
 
-  const filteredPrompts = useMemo(() => {
-    return prompts.filter((p) => {
-      const hasImage = p.example_image_url;
-      const matchesCategory = selectedCategory === 'all' || p.category?.name === selectedCategory;
-      return hasImage && matchesCategory;
-    });
-  }, [prompts, selectedCategory]);
+  const filteredPrompts = prompts.filter((p) => {
+    const hasImage = p.example_image_url;
+    const matchesCategory = selectedCategory === 'all' || p.category?.name === selectedCategory;
+    return hasImage && matchesCategory;
+  });
 
-  const selectedPrompt = useMemo(() => {
-    return prompts.find((p) => p.id === selectedPromptId);
-  }, [prompts, selectedPromptId]);
+  const selectedPrompt = prompts.find((p) => p.id === selectedPromptId);
 
   return {
     prompts,

@@ -6,7 +6,7 @@ import PromptTableHeader from '@/components/admin/PromptTableHeader';
 import TestPromptDialog from '@/components/admin/TestPromptDialog';
 import { Prompt, PromptCategory, PromptSubCategory } from '@/types/prompt';
 import { Head, router } from '@inertiajs/react';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 
 interface User {
   id: number;
@@ -33,10 +33,7 @@ export default function Prompts({ prompts, categories, subcategories, auth }: Pr
   const [editingPrompt, setEditingPrompt] = useState<Prompt | undefined>(undefined);
 
   // Filter prompts based on selected category
-  const filteredPrompts = useMemo(
-    () => (selectedCategory === 'all' ? prompts : prompts.filter((prompt) => prompt.category_id === parseInt(selectedCategory))),
-    [prompts, selectedCategory],
-  );
+  const filteredPrompts = selectedCategory === 'all' ? prompts : prompts.filter((prompt) => prompt.category_id === parseInt(selectedCategory));
 
   const handleEdit = (prompt: Prompt) => {
     setEditingPrompt(prompt);

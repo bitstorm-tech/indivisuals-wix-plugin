@@ -1,5 +1,5 @@
 import { apiFetch } from '@/lib/utils';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface UseImageUploadReturn {
   uploadedImage: File | null;
@@ -35,70 +35,61 @@ export function useImageUpload({ onImageGenerated, onFileUploaded }: UseImageUpl
     };
   }, [uploadedImageUrl]);
 
-  const handleFileUpload = useCallback(
-    (file: File) => {
-      if (file && file.type.startsWith('image/')) {
-        setUploadedImage(file);
-        const url = URL.createObjectURL(file);
-        setUploadedImageUrl(url);
-        onFileUploaded?.(file);
-      }
-    },
-    [onFileUploaded],
-  );
+  const handleFileUpload = (file: File) => {
+    if (file && file.type.startsWith('image/')) {
+      setUploadedImage(file);
+      const url = URL.createObjectURL(file);
+      setUploadedImageUrl(url);
+      onFileUploaded?.(file);
+    }
+  };
 
-  const processImage = useCallback(
-    async (file: File, selectedPromptId: number) => {
-      setIsProcessing(true);
+  const processImage = async (file: File, selectedPromptId: number) => {
+    setIsProcessing(true);
 
-      const formData = new FormData();
-      formData.append('image', file);
-      formData.append('prompt_id', selectedPromptId.toString());
+    const formData = new FormData();
+    formData.append('image', file);
+    formData.append('prompt_id', selectedPromptId.toString());
 
-      try {
-        const response = await apiFetch('/upload-image', {
-          method: 'POST',
-          body: formData,
-        });
+    try {
+      const response = await apiFetch('/upload-image', {
+        method: 'POST',
+        body: formData,
+      });
 
-        if (response.ok) {
-          const data = await response.json();
-          setGeneratedImageUrl(data.generated_image_url);
+      if (response.ok) {
+        const data = await response.json();
+        setGeneratedImageUrl(data.generated_image_url);
 
-          if (onImageGenerated && uploadedImage) {
-            onImageGenerated(data.generated_image_url, uploadedImage);
-          }
+        if (onImageGenerated && uploadedImage) {
+          onImageGenerated(data.generated_image_url, uploadedImage);
         }
-      } catch (error) {
-        console.error('Error processing image:', error);
-      } finally {
-        setIsProcessing(false);
       }
-    },
-    [uploadedImage, onImageGenerated],
-  );
+    } catch (error) {
+      console.error('Error processing image:', error);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
-  const handleDragOver = useCallback((e: React.DragEvent) => {
+  const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(true);
-  }, []);
+  };
 
-  const handleDragLeave = useCallback(() => {
+  const handleDragLeave = () => {
     setIsDragging(false);
-  }, []);
+  };
 
-  const handleDrop = useCallback(
-    (e: React.DragEvent) => {
-      e.preventDefault();
-      setIsDragging(false);
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
 
-      const file = e.dataTransfer.files[0];
-      handleFileUpload(file);
-    },
-    [handleFileUpload],
-  );
+    const file = e.dataTransfer.files[0];
+    handleFileUpload(file);
+  };
 
-  const reset = useCallback(() => {
+  const reset = () => {
     setUploadedImage(null);
     if (uploadedImageUrl) {
       URL.revokeObjectURL(uploadedImageUrl);
@@ -106,7 +97,7 @@ export function useImageUpload({ onImageGenerated, onFileUploaded }: UseImageUpl
     setUploadedImageUrl(null);
     setGeneratedImageUrl(null);
     setIsProcessing(false);
-  }, [uploadedImageUrl]);
+  };
 
   return {
     uploadedImage,

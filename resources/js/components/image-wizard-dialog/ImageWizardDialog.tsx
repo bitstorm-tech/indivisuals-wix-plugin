@@ -1,7 +1,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
 import { useWizardSounds } from '@/hooks/useWizardSounds';
 import { AnimatePresence, motion } from 'framer-motion';
-import React, { useCallback } from 'react';
+import React from 'react';
 
 // Hooks
 import { useImageDownload } from './hooks/useImageDownload';
@@ -56,35 +56,29 @@ export default function ImageWizardDialog({ isOpen, onClose, prompts, onImageGen
   const { handleDownload } = useImageDownload();
 
   // Enhanced handlers
-  const handleTemplateSelect = useCallback(
-    (templateId: number) => {
-      sounds.playSelect();
-      handleTemplateSelectBase(templateId, prompts);
-    },
-    [sounds, handleTemplateSelectBase, prompts],
-  );
+  const handleTemplateSelect = (templateId: number) => {
+    sounds.playSelect();
+    handleTemplateSelectBase(templateId, prompts);
+  };
 
-  const handleFileUpload = useCallback(
-    (file: File) => {
-      sounds.playUpload();
-      handleFileUploadBase(file);
+  const handleFileUpload = (file: File) => {
+    sounds.playUpload();
+    handleFileUploadBase(file);
 
-      setTimeout(() => {
-        setCurrentStep('result');
-        sounds.playMagic();
-        processImage(file, selectedPromptId!);
-      }, 500);
-    },
-    [sounds, handleFileUploadBase, setCurrentStep, processImage, selectedPromptId],
-  );
+    setTimeout(() => {
+      setCurrentStep('result');
+      sounds.playMagic();
+      processImage(file, selectedPromptId!);
+    }, 500);
+  };
 
-  const handleCompleteDownload = useCallback(() => {
+  const handleCompleteDownload = () => {
     if (generatedImageUrl) {
       handleDownload(generatedImageUrl);
     }
-  }, [generatedImageUrl, handleDownload]);
+  };
 
-  const handleUseInEditor = useCallback(() => {
+  const handleUseInEditor = () => {
     if (generatedImageUrl && uploadedImage && onImageGenerated) {
       sounds.playComplete();
       onImageGenerated(generatedImageUrl, uploadedImage);
@@ -92,18 +86,18 @@ export default function ImageWizardDialog({ isOpen, onClose, prompts, onImageGen
       resetStep();
       resetUpload();
     }
-  }, [generatedImageUrl, uploadedImage, onImageGenerated, sounds, onClose, resetStep, resetUpload]);
+  };
 
-  const handleTryAgain = useCallback(() => {
+  const handleTryAgain = () => {
     resetStep();
     resetUpload();
-  }, [resetStep, resetUpload]);
+  };
 
-  const handleClose = useCallback(() => {
+  const handleClose = () => {
     onClose();
     resetStep();
     resetUpload();
-  }, [onClose, resetStep, resetUpload]);
+  };
 
   // Effects
   React.useEffect(() => {

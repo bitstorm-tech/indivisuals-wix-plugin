@@ -1,5 +1,5 @@
 import { apiFetch } from '@/lib/utils';
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 
 interface UseImageGenerationReturn {
   isGenerating: boolean;
@@ -11,7 +11,7 @@ export function useImageGeneration(): UseImageGenerationReturn {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const generateImages = useCallback(async (file: File, promptId: number): Promise<string[] | null> => {
+  const generateImages = async (file: File, promptId: number): Promise<string[] | null> => {
     setIsGenerating(true);
     setError(null);
 
@@ -46,7 +46,7 @@ export function useImageGeneration(): UseImageGenerationReturn {
     } finally {
       setIsGenerating(false);
     }
-  }, []);
+  };
 
   return {
     isGenerating,
