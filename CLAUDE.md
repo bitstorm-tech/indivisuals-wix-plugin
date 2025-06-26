@@ -9,11 +9,17 @@ When setting up a new server or development environment, run these commands:
 ```bash
 composer install
 cp .env.example .env
+touch database/database.sqlite  # Create SQLite database file
 php artisan key:generate
 php artisan migrate
+php artisan db:seed  # Seeds database with categories and prompts
 php artisan storage:link  # IMPORTANT: Creates symlink for public file access
 bun install
 ```
+
+### Required Environment Variables
+
+- `OPENAI_API_KEY` - Required for AI image generation functionality
 
 ## Development Commands
 
@@ -22,11 +28,14 @@ bun install
 - `composer run dev` - Start development environment (Laravel server + queue + logs + Vite)
 - `composer run dev:ssr` - Start with SSR support
 - `composer run test` - Run PHP tests (uses Pest)
+- `php artisan test` - Alternative command to run tests
 - `php artisan serve` - Start Laravel server only
 - `php artisan queue:listen --tries=1` - Start queue worker
 - `php artisan pail -vv --timeout=0` - Start log viewer
 - `php artisan migrate` - Run database migrations
 - `php artisan tinker` - Laravel REPL
+- `php artisan config:clear` - Clear config cache (useful before tests)
+- `php artisan inertia:start-ssr` - Start SSR server (used with dev:ssr command)
 
 ### Frontend Commands
 
@@ -42,7 +51,9 @@ bun install
 
 - Laravel Pint is configured for PHP formatting
 - ESLint + Prettier for JavaScript/TypeScript
-- TypeScript strict mode enabled
+  - Prettier: 150 char line width, single quotes, semicolons
+  - ESLint: TypeScript support, React hooks rules enforced
+- TypeScript strict mode enabled with path aliases (@/_ for resources/js/_)
 
 ## Architecture Overview
 
@@ -50,13 +61,12 @@ This is a Laravel + Inertia.js + React application focused on AI-powered image p
 
 ### Tech Stack
 
-- **Backend**: Laravel 12 with PHP 8.2+
+- **Backend**: Laravel 12.17.0 with PHP 8.2+
 - **Frontend**: React 19 with TypeScript
 - **Bridge**: Inertia.js 2.0 for SPA behavior
 - **Styling**: Tailwind CSS 4 + shadcn-ui
-- **AI Integration**: OpenAI API via `openai-php/laravel`
+- **AI Integration**: Custom OpenAiService using Guzzle HTTP client (DALL-E 2 and GPT-Image-1 models)
 - **Testing**: Pest (PHP), no frontend tests configured
-- **Database**: SQLite (development)
 
 ### Key Architectural Patterns
 
@@ -115,3 +125,51 @@ This is a Laravel + Inertia.js + React application focused on AI-powered image p
 - Use Inertia functionallity whereever possible
 - Use PHP nullsafe syntax (`?->`) whereever it is usefull
 - Use `Laravel Pint` after changing php files
+
+## Authentication Pattern
+
+This application uses passwordless authentication:
+
+- Email-based registration and login (case-insensitive)
+- User profiles include: first_name, last_name, phone_number
+- Registration integrated into multi-step wizard flow
+
+## AI Image Generation
+
+### OpenAI Integration
+
+- Custom `OpenAiService` class for image generation
+- Supports DALL-E 2 and GPT-Image-1 models
+- Master prompt system for consistent image stylization
+- Automatic PNG format conversion
+- Base64 JSON response format
+
+### Image Handling
+
+- Original images: `storage/app/private/images/`
+- Generated images: `storage/app/private/generated/`
+- React Image Crop integration for user image editing
+- Secure controller-based image serving (no direct access)
+
+## Wizard/Multi-Step Forms
+
+The application uses a custom wizard pattern:
+
+- `useWizardNavigation` hook for state management
+- Step validation before navigation allowed
+- Sticky mobile navigation buttons
+- Progress indicators and step labels
+- Integrated with user registration flow
+
+## API Patterns
+
+- `apiFetch` utility for CSRF-protected API requests
+- API resource controllers for prompts and mugs
+- Consistent error handling and validation
+
+## Key Dependencies
+
+- **framer-motion**: Animation library for UI transitions
+- **react-image-crop**: Image cropping functionality
+- **Guzzle HTTP**: HTTP client for OpenAI API calls
+- **clsx + tailwind-merge**: Utility for dynamic class names
