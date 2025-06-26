@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/Button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
 import { useImageCrop } from '@/hooks/useImageCrop';
+import { apiFetch } from '@/lib/utils';
 import { Prompt } from '@/types/prompt';
 import React, { useEffect, useState } from 'react';
 import ReactCrop from 'react-image-crop';
@@ -58,19 +59,9 @@ export default function ImagePicker({ defaultPromptId, storeImages = true }: Ima
         lastModified: fileToUpload.lastModified,
       });
 
-      const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-
-      if (!csrfToken) {
-        throw new Error('CSRF token not found');
-      }
-
-      const response = await fetch('/upload-image', {
+      const response = await apiFetch('/upload-image', {
         method: 'POST',
         body: formData,
-        headers: {
-          'X-Requested-With': 'XMLHttpRequest',
-          'X-CSRF-TOKEN': csrfToken,
-        },
       });
 
       const result: UploadResponse = await response.json();
@@ -123,11 +114,7 @@ export default function ImagePicker({ defaultPromptId, storeImages = true }: Ima
   useEffect(() => {
     const fetchPrompts = async (): Promise<void> => {
       try {
-        const response = await fetch('/prompts?active_only=true', {
-          headers: {
-            'X-Requested-With': 'XMLHttpRequest',
-          },
-        });
+        const response = await apiFetch('/prompts?active_only=true');
 
         if (response.ok) {
           const promptsData: Prompt[] = await response.json();

@@ -1,3 +1,4 @@
+import { apiFetch } from '@/lib/utils';
 import { Prompt } from '@/types/prompt';
 import { useState } from 'react';
 
@@ -27,18 +28,9 @@ export default function ImageGenerationSection({ selectedImages, selectedPromptI
       formData.append('prompt_id', selectedPromptId!.toString());
       formData.append('n', '4');
 
-      const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-      if (!csrfToken) {
-        throw new Error('CSRF token not found');
-      }
-
-      const response = await fetch('/upload-image', {
+      const response = await apiFetch('/upload-image', {
         method: 'POST',
         body: formData,
-        headers: {
-          'X-Requested-With': 'XMLHttpRequest',
-          'X-CSRF-TOKEN': csrfToken,
-        },
       });
 
       if (!response.ok) {

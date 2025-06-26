@@ -1,3 +1,4 @@
+import { apiFetch } from '@/lib/utils';
 import { useCallback, useEffect, useState } from 'react';
 
 interface UseImageUploadReturn {
@@ -55,14 +56,8 @@ export function useImageUpload({ onImageGenerated, onFileUploaded }: UseImageUpl
       formData.append('prompt_id', selectedPromptId.toString());
 
       try {
-        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-
-        const response = await fetch('/upload-image', {
+        const response = await apiFetch('/upload-image', {
           method: 'POST',
-          headers: {
-            'X-CSRF-TOKEN': csrfToken || '',
-            Accept: 'application/json',
-          },
           body: formData,
         });
 

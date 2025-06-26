@@ -1,4 +1,4 @@
-import { getCsrfToken } from '@/lib/utils';
+import { apiFetch } from '@/lib/utils';
 import { useCallback, useState } from 'react';
 
 interface UseImageGenerationReturn {
@@ -22,11 +22,8 @@ export function useImageGeneration(): UseImageGenerationReturn {
       formData.append('store_images', 'false');
       formData.append('n', '4');
 
-      const response = await fetch('/upload-image', {
+      const response = await apiFetch('/upload-image', {
         method: 'POST',
-        headers: {
-          'X-CSRF-TOKEN': getCsrfToken(),
-        },
         body: formData,
       });
 

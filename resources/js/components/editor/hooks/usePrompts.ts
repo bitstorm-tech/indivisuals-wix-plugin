@@ -1,3 +1,4 @@
+import { apiFetch } from '@/lib/utils';
 import { Prompt } from '@/types/prompt';
 import { useEffect, useMemo, useState } from 'react';
 
@@ -13,7 +14,7 @@ export function usePrompts() {
     setIsLoading(true);
     setError(null);
 
-    fetch('/prompts', { signal: controller.signal })
+    apiFetch('/prompts', { signal: controller.signal })
       .then((response) => {
         if (!response.ok) {
           throw new Error('Failed to fetch prompts');

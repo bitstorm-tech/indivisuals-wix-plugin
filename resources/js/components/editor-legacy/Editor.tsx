@@ -1,3 +1,4 @@
+import { apiFetch } from '@/lib/utils';
 import { ChevronDown, Download, Info, Palette } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { EditorImage, EditorSize, EditorState, EditorText, EXPORT_RESOLUTIONS, ExportResolutionId, ExportSettings } from '../../types/editor';
@@ -53,7 +54,7 @@ export default function Editor({ canvasSize = DEFAULT_CANVAS_SIZE, maxImages = 3
   useEffect(() => {
     const controller = new AbortController();
 
-    fetch('/prompts', { signal: controller.signal })
+    apiFetch('/prompts', { signal: controller.signal })
       .then((response) => {
         if (!response.ok) {
           throw new Error('Failed to fetch prompts');

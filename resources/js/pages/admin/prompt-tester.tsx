@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Label } from '@/components/ui/Label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
 import { Textarea } from '@/components/ui/Textarea';
-import { getCsrfToken } from '@/lib/utils';
+import { apiFetch } from '@/lib/utils';
 import { Head, useForm } from '@inertiajs/react';
 import { Code, Loader2, Upload } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -136,12 +136,8 @@ export default function PromptTester({ auth }: PromptTesterProps) {
     }
 
     try {
-      const response = await fetch('/admin/test-prompt', {
+      const response = await apiFetch('/admin/test-prompt', {
         method: 'POST',
-        headers: {
-          'X-CSRF-TOKEN': getCsrfToken(),
-          'X-Requested-With': 'XMLHttpRequest',
-        },
         body: formData,
       });
 
