@@ -48,24 +48,20 @@ export default function Prompts({ prompts, categories, subcategories, auth }: Pr
     setIsDeleteDialogOpen(true);
   };
 
-  const confirmDelete = async () => {
+  const confirmDelete = () => {
     if (!promptToDelete) return;
 
-    try {
-      await fetch(`/prompts/${promptToDelete}`, {
-        method: 'DELETE',
-        headers: {
-          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
-        },
-      });
-
-      router.reload({ only: ['prompts'] });
-    } catch (error) {
-      console.error('Error deleting prompt:', error);
-    } finally {
-      setIsDeleteDialogOpen(false);
-      setPromptToDelete(undefined);
-    }
+    router.delete(`/prompts/${promptToDelete}`, {
+      onSuccess: () => {
+        setIsDeleteDialogOpen(false);
+        setPromptToDelete(undefined);
+      },
+      onError: (errors) => {
+        console.error('Error deleting prompt:', errors);
+        setIsDeleteDialogOpen(false);
+        setPromptToDelete(undefined);
+      },
+    });
   };
 
   const cancelDelete = () => {
