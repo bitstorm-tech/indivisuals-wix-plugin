@@ -40,7 +40,6 @@ class UserRegistrationController extends Controller
             // Create new user
             $user = User::create([
                 'email' => $validated['email'],
-                'name' => trim(($validated['first_name'] ?? '').' '.($validated['last_name'] ?? '')) ?: $validated['email'],
                 'first_name' => $validated['first_name'],
                 'last_name' => $validated['last_name'],
                 'phone_number' => $validated['phone_number'],

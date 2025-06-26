@@ -37,7 +37,8 @@
       "Bash(timeout:*)",
       "WebFetch(domain:react.dev)",
       "Bash(cp:*)",
-      "Bash(git tag:*)"
+      "Bash(git tag:*)",
+      "Bash(composer install:*)"
     ]
   },
   "enableAllProjectMcpServers": false
