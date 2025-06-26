@@ -95,7 +95,7 @@ export default function EditorNewPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="mx-auto max-w-5xl px-4 py-8">
+      <div className="mx-auto max-w-5xl px-4 py-8 pb-24 sm:pb-8">
         <div className="mb-8">
           <h1 className="mb-2 text-center text-3xl font-bold">Create Your Custom Mug</h1>
           <p className="text-center text-gray-600">Follow the steps below to design your personalized mug</p>
@@ -142,20 +142,25 @@ export default function EditorNewPage() {
             <PreviewStep selectedMug={wizard.selectedMug} selectedGeneratedImage={wizard.selectedGeneratedImage} userData={wizard.userData} />
           )}
         </div>
+      </div>
 
-        <WizardNavigationButtons
-          currentStep={wizard.currentStep}
-          canGoNext={wizard.canGoNext}
-          canGoPrevious={wizard.canGoPrevious}
-          onNext={wizard.goNext}
-          onPrevious={wizard.goPrevious}
-          isProcessing={wizard.isProcessing}
-          wizardData={{
-            selectedMug: wizard.selectedMug,
-            selectedGeneratedImage: wizard.selectedGeneratedImage,
-            userData: wizard.userData,
-          }}
-        />
+      {/* Sticky navigation for mobile */}
+      <div className="fixed right-0 bottom-0 left-0 p-4 sm:static sm:p-0">
+        <div className="mx-auto max-w-5xl sm:px-4">
+          <WizardNavigationButtons
+            currentStep={wizard.currentStep}
+            canGoNext={wizard.canGoNext}
+            canGoPrevious={wizard.canGoPrevious}
+            onNext={wizard.goNext}
+            onPrevious={wizard.goPrevious}
+            isProcessing={wizard.isProcessing}
+            wizardData={{
+              selectedMug: wizard.selectedMug,
+              selectedGeneratedImage: wizard.selectedGeneratedImage,
+              userData: wizard.userData,
+            }}
+          />
+        </div>
       </div>
     </div>
   );
