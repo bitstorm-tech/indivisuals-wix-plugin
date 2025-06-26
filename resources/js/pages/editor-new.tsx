@@ -10,11 +10,39 @@ import { WizardStep } from '@/components/editor-new/constants';
 import { useWizardNavigation } from '@/components/editor-new/hooks/useWizardNavigation';
 import { CropData, MugOption, UserData } from '@/components/editor-new/types';
 import { usePrompts } from '@/components/editor/hooks/usePrompts';
+import { apiFetch } from '@/lib/utils';
 import { Prompt } from '@/types/prompt';
+import { useEffect, useState } from 'react';
 
 export default function EditorNewPage() {
   const { prompts, isLoading, error } = usePrompts();
   const wizard = useWizardNavigation();
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [isRegistering, setIsRegistering] = useState(false);
+  const [registrationError, setRegistrationError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const checkAuthentication = async () => {
+      try {
+        const response = await apiFetch('/api/auth/check');
+        const data = await response.json();
+        setIsAuthenticated(data.authenticated);
+
+        if (!data.authenticated && wizard.currentStep === 'image-generation') {
+          // Go back to user data step if not authenticated
+          wizard.goToStep('user-data');
+        }
+      } catch (error) {
+        console.error('Authentication check failed:', error);
+        setIsAuthenticated(false);
+      }
+    };
+
+    // Check if user is authenticated when navigating to step 5
+    if (wizard.currentStep === 'image-generation' && isAuthenticated === null) {
+      checkAuthentication();
+    }
+  }, [wizard.currentStep, isAuthenticated, wizard]);
 
   const handleImageUpload = (file: File, url: string) => {
     wizard.updateState('uploadedImage', file);
@@ -44,6 +72,55 @@ export default function EditorNewPage() {
 
   const handleUserDataComplete = (data: UserData) => {
     wizard.updateState('userData', data);
+  };
+
+  const handleUserRegistration = async (): Promise<boolean> => {
+    if (wizard.currentStep !== 'user-data' || !wizard.userData) {
+      return true; // Not on user data step, proceed normally
+    }
+
+    setIsRegistering(true);
+    setRegistrationError(null);
+
+    try {
+      const response = await apiFetch('/api/register-or-login', {
+        method: 'POST',
+        body: JSON.stringify({
+          email: wizard.userData.email,
+          first_name: wizard.userData.firstName || null,
+          last_name: wizard.userData.lastName || null,
+          phone_number: wizard.userData.phoneNumber || null,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Registration failed');
+      }
+
+      const data = await response.json();
+      if (data.authenticated) {
+        setIsAuthenticated(true);
+        return true; // Success, allow navigation
+      }
+      return false;
+    } catch (error) {
+      setRegistrationError(error instanceof Error ? error.message : 'An error occurred during registration');
+      return false; // Error, prevent navigation
+    } finally {
+      setIsRegistering(false);
+    }
+  };
+
+  const handleNext = async () => {
+    if (wizard.currentStep === 'user-data') {
+      const success = await handleUserRegistration();
+      if (success) {
+        wizard.goNext();
+      }
+    } else {
+      wizard.goNext();
+    }
   };
 
   const handleImagesGenerated = (urls: string[]) => {
@@ -123,7 +200,16 @@ export default function EditorNewPage() {
 
           {wizard.currentStep === 'mug-selection' && <MugSelectionStep selectedMug={wizard.selectedMug} onMugSelect={handleMugSelect} />}
 
-          {wizard.currentStep === 'user-data' && <UserDataStep userData={wizard.userData} onUserDataComplete={handleUserDataComplete} />}
+          {wizard.currentStep === 'user-data' && (
+            <>
+              <UserDataStep userData={wizard.userData} onUserDataComplete={handleUserDataComplete} />
+              {registrationError && (
+                <div className="mt-4 rounded-md bg-red-50 p-4">
+                  <p className="text-sm text-red-800">{registrationError}</p>
+                </div>
+              )}
+            </>
+          )}
 
           {wizard.currentStep === 'image-generation' && (
             <ImageGenerationStep
@@ -151,9 +237,9 @@ export default function EditorNewPage() {
             currentStep={wizard.currentStep}
             canGoNext={wizard.canGoNext}
             canGoPrevious={wizard.canGoPrevious}
-            onNext={wizard.goNext}
+            onNext={handleNext}
             onPrevious={wizard.goPrevious}
-            isProcessing={wizard.isProcessing}
+            isProcessing={wizard.isProcessing || isRegistering}
             wizardData={{
               selectedMug: wizard.selectedMug,
               selectedGeneratedImage: wizard.selectedGeneratedImage,
@@ -162,6 +248,17 @@ export default function EditorNewPage() {
           />
         </div>
       </div>
+
+      {isRegistering && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="rounded-lg bg-white p-6 shadow-xl">
+            <div className="flex items-center gap-3">
+              <div className="h-5 w-5 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600" />
+              <p className="text-sm font-medium">Creating your account...</p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

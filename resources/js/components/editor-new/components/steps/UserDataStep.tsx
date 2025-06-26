@@ -2,7 +2,6 @@ import { Alert, AlertDescription } from '@/components/ui/Alert';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 import { Info, Lock } from 'lucide-react';
-import { useCallback } from 'react';
 import { useUserDataForm } from '../../hooks/useUserDataForm';
 import { UserData } from '../../types';
 
@@ -14,23 +13,20 @@ interface UserDataStepProps {
 export default function UserDataStep({ userData, onUserDataComplete }: UserDataStepProps) {
   const { formData, errors, handleChange, validateForm } = useUserDataForm(userData);
 
-  const handleEmailChange = useCallback(
-    (value: string) => {
-      handleChange('email', value);
-      // Check if email is valid and update parent state immediately
-      const isValidEmail = value && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-      if (isValidEmail) {
-        onUserDataComplete({ ...formData, email: value });
-      }
-    },
-    [formData, handleChange, onUserDataComplete],
-  );
+  const handleEmailChange = (value: string) => {
+    handleChange('email', value);
+    // Check if email is valid and update parent state immediately
+    const isValidEmail = value && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+    if (isValidEmail) {
+      onUserDataComplete({ ...formData, email: value });
+    }
+  };
 
-  const handleBlur = useCallback(() => {
+  const handleBlur = () => {
     if (validateForm()) {
       onUserDataComplete(formData);
     }
-  }, [formData, validateForm, onUserDataComplete]);
+  };
 
   return (
     <div className="mx-auto max-w-md space-y-6">

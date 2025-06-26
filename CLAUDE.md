@@ -95,6 +95,7 @@ This is a Laravel + Inertia.js + React application focused on AI-powered image p
 
 #### React
 
+- Don't use `React.memo`, `useCallback` or `useMemo` since the React compiler handles these optimizations automatically
 - Follow Rules of React (https://react.dev/reference/rules) strictly
 - Use Tailwind flex to design the layout
 - Create small, self contained components or subcomponents where it is usefull

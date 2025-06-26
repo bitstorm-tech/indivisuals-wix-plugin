@@ -16,9 +16,13 @@ Route::inertia('/checkout', 'checkout')->name('checkout');
 
 Route::post('/upload-image', [ImageController::class, 'store'])->middleware('auth')->name('image.upload');
 Route::get('/images/{filename}', [ImageController::class, 'show'])->name('image.show');
-Route::post('/generate-image', [ImageController::class, 'generateImage'])->name('image.generate');
+Route::post('/generate-image', [ImageController::class, 'generateImage'])->middleware('auth')->name('image.generate');
 
 Route::apiResource('prompts', PromptController::class);
+
+// User registration
+Route::post('/api/register-or-login', [\App\Http\Controllers\Api\UserRegistrationController::class, 'registerOrLogin'])->name('api.register-or-login');
+Route::get('/api/auth/check', [\App\Http\Controllers\Api\UserRegistrationController::class, 'check'])->name('api.auth.check');
 
 // Prompt categories
 Route::get('prompt-categories', [PromptController::class, 'indexCategories']);
