@@ -50,6 +50,8 @@ export default function WizardStepIndicator({ currentStep, onStepClick, complete
                   isActive && 'text-primary',
                   !isActive && isCompleted && 'text-gray-700',
                   !isActive && !isCompleted && 'text-gray-500',
+                  // Show labels for all steps on desktop, but only current step on mobile
+                  !isActive && 'hidden sm:block',
                 )}
               >
                 {STEP_LABELS[step]}
