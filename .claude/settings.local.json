@@ -38,7 +38,8 @@
       "WebFetch(domain:react.dev)",
       "Bash(cp:*)",
       "Bash(git tag:*)",
-      "Bash(composer install:*)"
+      "Bash(composer install:*)",
+      "WebFetch(domain:laravel.com)"
     ]
   },
   "enableAllProjectMcpServers": false

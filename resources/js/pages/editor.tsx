@@ -11,36 +11,25 @@ import { useWizardNavigation } from '@/components/editor/hooks/useWizardNavigati
 import { CropData, MugOption, UserData } from '@/components/editor/types';
 import { usePrompts } from '@/hooks/usePrompts';
 import { apiFetch } from '@/lib/utils';
+import type { Auth } from '@/types';
 import { Prompt } from '@/types/prompt';
 import { useEffect, useState } from 'react';
 
-export default function EditorNewPage() {
+export interface EditorProps {
+  auth: Auth;
+}
+
+export default function EditorNewPage({ auth }: EditorProps) {
   const { prompts, isLoading, error } = usePrompts();
   const wizard = useWizardNavigation();
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(!!auth.user);
   const [isRegistering, setIsRegistering] = useState(false);
   const [registrationError, setRegistrationError] = useState<string | null>(null);
 
   useEffect(() => {
-    const checkAuthentication = async () => {
-      try {
-        const response = await apiFetch('/api/auth/check');
-        const data = await response.json();
-        setIsAuthenticated(data.authenticated);
-
-        if (!data.authenticated && wizard.currentStep === 'image-generation') {
-          // Go back to user data step if not authenticated
-          wizard.goToStep('user-data');
-        }
-      } catch (error) {
-        console.error('Authentication check failed:', error);
-        setIsAuthenticated(false);
-      }
-    };
-
-    // Check if user is authenticated when navigating to step 5
-    if (wizard.currentStep === 'image-generation' && isAuthenticated === null) {
-      checkAuthentication();
+    // If user is not authenticated and tries to access image generation step, redirect back
+    if (!isAuthenticated && wizard.currentStep === 'image-generation') {
+      wizard.goToStep('user-data');
     }
   }, [wizard.currentStep, isAuthenticated, wizard]);
 
@@ -99,11 +88,9 @@ export default function EditorNewPage() {
       }
 
       const data = await response.json();
-      if (data.authenticated) {
-        setIsAuthenticated(true);
-        return true; // Success, allow navigation
-      }
-      return false;
+      setIsAuthenticated(data.authenticated);
+
+      return data.authenticated;
     } catch (error) {
       setRegistrationError(error instanceof Error ? error.message : 'An error occurred during registration');
       return false; // Error, prevent navigation
