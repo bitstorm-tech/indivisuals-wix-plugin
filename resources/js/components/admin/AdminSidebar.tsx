@@ -137,7 +137,7 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
         {/* Editor - Opens in new tab */}
         <div className="mt-2">
           <button
-            onClick={() => window.open('/editor-new', '_blank')}
+            onClick={() => window.open('/editor', '_blank')}
             className="flex w-full items-center gap-2 rounded-md px-3 py-2 transition-colors hover:bg-gray-100"
           >
             <Palette className="h-4 w-4" />

@@ -10,7 +10,7 @@ use App\Http\Controllers\Auth\AuthController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'index')->name('home');
-Route::inertia('/editor-new', 'editor-new')->name('editor-new');
+Route::inertia('/editor', 'editor')->name('editor');
 Route::inertia('/checkout', 'checkout')->name('checkout');
 
 Route::post('/upload-image', [ImageController::class, 'store'])->middleware('auth')->name('image.upload');
