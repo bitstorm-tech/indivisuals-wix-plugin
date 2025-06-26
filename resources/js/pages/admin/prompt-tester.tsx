@@ -25,8 +25,6 @@ interface PromptTesterProps {
 type Model = 'dall-e-2' | 'gpt-image-1';
 type Background = 'auto' | 'transparent' | 'opaque';
 type Quality = 'low' | 'medium' | 'high';
-type DallE2Size = '256x256' | '512x512' | '1024x1024';
-type GptImage1Size = '1024x1024' | '1536x1024' | '1024x1536';
 
 interface OpenAiRequestParams {
   model: string;
@@ -40,13 +38,13 @@ interface OpenAiRequestParams {
   background?: string;
 }
 
-const DALLE2_SIZES: Record = {
+const DALLE2_SIZES: Record<string, string> = {
   '256x256': '256x256',
   '512x512': '512x512',
   '1024x1024': '1024x1024',
 };
 
-const GPT_IMAGE_1_SIZES: Record = {
+const GPT_IMAGE_1_SIZES: Record<string, string> = {
   '1024x1024': '1024x1024',
   '1536x1024': '1536x1024 (landscape)',
   '1024x1536': '1024x1536 (portrait)',
@@ -61,7 +59,7 @@ export default function PromptTester({ auth }: PromptTesterProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string>('');
   const [error, setError] = useState<string>('');
-  const [validationErrors, setValidationErrors] = useState<Record>({});
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [requestParams, setRequestParams] = useState<OpenAiRequestParams | null>(null);
 
   const { data, setData } = useForm({
@@ -97,7 +95,7 @@ export default function PromptTester({ auth }: PromptTesterProps) {
     }
   }, [selectedModel, setData]);
 
-  const handleImageUpload = (e: React.ChangeEvent) => {
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       setUploadedImage(file);
@@ -173,7 +171,7 @@ export default function PromptTester({ auth }: PromptTesterProps) {
     }
   };
 
-  const getSizeOptions = () => {
+  const getSizeOptions = (): Record<string, string> => {
     return selectedModel === 'dall-e-2' ? DALLE2_SIZES : GPT_IMAGE_1_SIZES;
   };
 
