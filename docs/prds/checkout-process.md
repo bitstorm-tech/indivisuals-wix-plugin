@@ -96,6 +96,11 @@ proceeds through cart management to the point of initiating payment.
 - Usability: The entire process should be intuitive and require minimal clicks. Error states (e.g., invalid form input) must be clearly communicated to the user.
 - State Management: The user's cart contents must be preserved if they navigate away and then return to the page within the same session.
 
+## Data Model
+
+- Cart model: id, user_id
+- CartItem model: id, cart_id, mug_id, original_image, generated_image, quantity
+
 ## Assumptions and Dependencies
 
 - A mechanism exists to capture and store the final mug design configuration (e.g., generated image URL, chosen mug style).
