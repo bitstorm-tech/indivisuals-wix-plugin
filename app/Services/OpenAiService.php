@@ -23,7 +23,7 @@ class OpenAiService
         $this->apiKey = env('OPENAI_API_KEY');
     }
 
-    public function generateImage(string $imagePath, string $prompt, int $n = 1, string $size = '1024x1024'): string|array
+    public function generateImage(string $imagePath, string $prompt, int $n = 1, string $size = '1536x1024'): string|array
     {
         $result = $this->generateImageWithParams($imagePath, $prompt, 'gpt-image-1', 'low', 'auto', $size, $n);
 
