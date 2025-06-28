@@ -144,7 +144,7 @@ class OpenAiService
                 'Authorization' => 'Bearer '.$this->apiKey,
             ],
             'multipart' => $multipart,
-            'timeout' => 120, // 2 minutes timeout
+            'timeout' => 60, // 1 minute timeout
         ]);
     }
 
@@ -214,7 +214,7 @@ class OpenAiService
                 'Authorization' => 'Bearer '.$this->apiKey,
             ],
             'multipart' => $multipart,
-            'timeout' => 120, // 2 minutes timeout
+            'timeout' => 60, // 1 minute timeout
         ]);
     }
 
