@@ -59,7 +59,7 @@ export default function ImagePicker({ defaultPromptId, storeImages = true }: Ima
         lastModified: fileToUpload.lastModified,
       });
 
-      const response = await apiFetch('/upload-image', {
+      const response = await apiFetch('/api/upload-image', {
         method: 'POST',
         body: formData,
       });
@@ -114,7 +114,7 @@ export default function ImagePicker({ defaultPromptId, storeImages = true }: Ima
   useEffect(() => {
     const fetchPrompts = async (): Promise<void> => {
       try {
-        const response = await apiFetch('/prompts?active_only=true');
+        const response = await apiFetch('/api/prompts?active_only=true');
 
         if (response.ok) {
           const promptsData: Prompt[] = await response.json();

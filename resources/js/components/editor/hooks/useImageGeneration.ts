@@ -22,7 +22,7 @@ export function useImageGeneration(): UseImageGenerationReturn {
       formData.append('store_images', 'false');
       formData.append('n', '4');
 
-      const response = await apiFetch('/upload-image', {
+      const response = await apiFetch('/api/upload-image', {
         method: 'POST',
         body: formData,
       });

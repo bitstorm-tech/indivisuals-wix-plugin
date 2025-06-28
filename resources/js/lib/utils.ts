@@ -41,12 +41,15 @@ export async function apiFetch(url: string, options: FetchOptions = {}): Promise
   }
 
   // Add Content-Type for JSON payloads
-  if (restOptions.body && typeof restOptions.body === 'string' && !defaultHeaders['Content-Type']) {
-    try {
-      JSON.parse(restOptions.body);
-      defaultHeaders['Content-Type'] = 'application/json';
-    } catch {
-      // Not JSON, let browser set Content-Type
+  // Don't set Content-Type for FormData - browser will set it with boundary
+  if (restOptions.body && !(restOptions.body instanceof FormData)) {
+    if (typeof restOptions.body === 'string' && !defaultHeaders['Content-Type']) {
+      try {
+        JSON.parse(restOptions.body);
+        defaultHeaders['Content-Type'] = 'application/json';
+      } catch {
+        // Not JSON, let browser set Content-Type
+      }
     }
   }
 

@@ -3,13 +3,12 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreImageRequest;
 use App\Models\Prompt;
 use App\Services\ImageConverterService;
 use App\Services\OpenAiService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -20,22 +19,8 @@ class ImageController extends Controller
         private ImageConverterService $imageConverter
     ) {}
 
-    public function store(Request $request): JsonResponse
+    public function store(StoreImageRequest $request): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:4096',
-            'prompt_id' => 'required|exists:prompts,id',
-            'store_images' => 'nullable|in:true,false,1,0',
-            'n' => 'nullable|integer|min:1|max:4',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $validator->errors(),
-            ], 422);
-        }
 
         try {
             $image = $request->file('image');

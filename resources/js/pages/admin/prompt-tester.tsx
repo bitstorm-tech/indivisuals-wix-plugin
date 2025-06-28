@@ -134,7 +134,7 @@ export default function PromptTester({ auth }: PromptTesterProps) {
     }
 
     try {
-      const response = await apiFetch('/admin/test-prompt', {
+      const response = await apiFetch('/api/admin/test-prompt', {
         method: 'POST',
         body: formData,
       });

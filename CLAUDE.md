@@ -2,6 +2,14 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Important: PHP Configuration Requirements
+
+This application requires PHP to be configured with specific upload limits:
+- `upload_max_filesize = 4M` (minimum)
+- `post_max_size = 8M` (should be larger than upload_max_filesize)
+
+See `docs/PHP_UPLOAD_CONFIGURATION.md` for detailed setup instructions for different environments.
+
 ## Initial Setup
 
 When setting up a new server or development environment, run these commands:

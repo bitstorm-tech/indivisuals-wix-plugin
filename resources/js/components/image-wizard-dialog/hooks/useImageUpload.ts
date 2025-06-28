@@ -52,7 +52,7 @@ export function useImageUpload({ onImageGenerated, onFileUploaded }: UseImageUpl
     formData.append('prompt_id', selectedPromptId.toString());
 
     try {
-      const response = await apiFetch('/upload-image', {
+      const response = await apiFetch('/api/upload-image', {
         method: 'POST',
         body: formData,
       });

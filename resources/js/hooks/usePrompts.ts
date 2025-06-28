@@ -14,7 +14,7 @@ export function usePrompts() {
     setIsLoading(true);
     setError(null);
 
-    apiFetch('/prompts', { signal: controller.signal })
+    apiFetch('/api/prompts', { signal: controller.signal })
       .then((response) => {
         if (!response.ok) {
           throw new Error('Failed to fetch prompts');
