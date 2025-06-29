@@ -51,13 +51,13 @@ export function useWizardNavigation(isAuthenticated: boolean = false): UseWizard
       case 'image-generation':
         return state.selectedGeneratedImage !== null;
       case 'preview':
-        return true;
+        return state.selectedMug !== null && state.selectedGeneratedImage !== null;
       default:
         return false;
     }
   };
 
-  const canGoNext = state.currentStep !== 'preview' && canProceedFromStep(state.currentStep);
+  const canGoNext = canProceedFromStep(state.currentStep);
   const canGoPrevious = state.currentStep !== 'image-upload';
 
   const goToStep = (step: WizardStep) => {
