@@ -1,14 +1,11 @@
 import { cn } from '@/lib/utils';
 import { Check } from 'lucide-react';
-import { STEP_INDEX, STEP_LABELS, WIZARD_STEPS, WizardStep } from '../constants';
+import { STEP_INDEX, STEP_LABELS, WIZARD_STEPS } from '../constants';
+import { useWizard } from '../contexts/WizardContext';
 
-interface WizardStepIndicatorProps {
-  currentStep: WizardStep;
-  onStepClick?: (step: WizardStep) => void;
-  completedSteps?: WizardStep[];
-}
-
-export default function WizardStepIndicator({ currentStep, onStepClick, completedSteps = [] }: WizardStepIndicatorProps) {
+export default function WizardStepIndicator() {
+  const { currentStep, getCompletedSteps } = useWizard();
+  const completedSteps = getCompletedSteps();
   const currentStepIndex = STEP_INDEX[currentStep];
 
   return (
@@ -26,14 +23,9 @@ export default function WizardStepIndicator({ currentStep, onStepClick, complete
         {WIZARD_STEPS.map((step, index) => {
           const isActive = step === currentStep;
           const isCompleted = completedSteps.includes(step) || index < currentStepIndex;
-          const isClickable = onStepClick && (isCompleted || index <= currentStepIndex);
 
           return (
-            <div
-              key={step}
-              className={cn('flex flex-col items-center', isClickable && 'cursor-pointer')}
-              onClick={() => isClickable && onStepClick?.(step)}
-            >
+            <div key={step} className="flex flex-col items-center">
               <div
                 className={cn(
                   'relative z-10 flex h-10 w-10 items-center justify-center rounded-full border-2 bg-white transition-all',

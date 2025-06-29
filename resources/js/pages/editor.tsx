@@ -7,7 +7,6 @@ import PreviewStep from '@/components/editor/components/steps/PreviewStep';
 import PromptSelectionStep from '@/components/editor/components/steps/PromptSelectionStep';
 import UserDataStep from '@/components/editor/components/steps/UserDataStep';
 import { WizardProvider, useWizard } from '@/components/editor/contexts/WizardContext';
-import { usePrompts } from '@/hooks/usePrompts';
 import type { Auth } from '@/types';
 
 export interface EditorProps {
@@ -15,8 +14,28 @@ export interface EditorProps {
 }
 
 function EditorContent() {
-  const { prompts } = usePrompts();
   const wizard = useWizard();
+
+  if (wizard.promptsLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent"></div>
+          <p className="mt-2 text-sm text-gray-600">Loading editor...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (wizard.promptsError) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600">Error loading editor: {wizard.promptsError}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -27,13 +46,13 @@ function EditorContent() {
         </div>
 
         <div className="mb-8">
-          <WizardStepIndicator currentStep={wizard.currentStep} completedSteps={wizard.getCompletedSteps()} />
+          <WizardStepIndicator />
         </div>
 
         <div className="mb-8 min-h-[400px] rounded-lg bg-white p-6 shadow-sm">
           {wizard.currentStep === 'image-upload' && <ImageUploadStep />}
 
-          {wizard.currentStep === 'prompt-selection' && <PromptSelectionStep prompts={prompts} />}
+          {wizard.currentStep === 'prompt-selection' && <PromptSelectionStep />}
 
           {wizard.currentStep === 'mug-selection' && <MugSelectionStep />}
 
@@ -76,29 +95,6 @@ function EditorContent() {
 }
 
 export default function EditorNewPage({ auth }: EditorProps) {
-  const { isLoading, error } = usePrompts();
-
-  if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="text-center">
-          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent"></div>
-          <p className="mt-2 text-sm text-gray-600">Loading editor...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="text-center">
-          <p className="text-red-600">Error loading editor: {error}</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <WizardProvider auth={auth}>
       <EditorContent />

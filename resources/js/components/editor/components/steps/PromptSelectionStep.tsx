@@ -1,17 +1,12 @@
 import { cn } from '@/lib/utils';
-import { Prompt } from '@/types/prompt';
 import { Check } from 'lucide-react';
 import { useWizard } from '../../contexts/WizardContext';
 import { usePromptSelection } from '../../hooks/usePromptSelection';
 import PromptCategoryFilter from '../shared/PromptCategoryFilter';
 
-interface PromptSelectionStepProps {
-  prompts: Prompt[];
-}
-
-export default function PromptSelectionStep({ prompts }: PromptSelectionStepProps) {
+export default function PromptSelectionStep() {
   const wizard = useWizard();
-  const { selectedCategory, setSelectedCategory, filteredPrompts, categories } = usePromptSelection(prompts);
+  const { selectedCategory, setSelectedCategory, filteredPrompts, categories } = usePromptSelection(wizard.prompts);
 
   return (
     <div className="space-y-6">

@@ -14,6 +14,11 @@ interface WizardContextValue extends WizardState {
   isRegistering: boolean;
   registrationError: string | null;
 
+  // Prompts data
+  prompts: Prompt[];
+  promptsLoading: boolean;
+  promptsError: string | null;
+
   // Navigation methods
   goToStep: (step: WizardStep) => void;
   goNext: () => void;
@@ -69,6 +74,40 @@ export function WizardProvider({ children, auth }: WizardProviderProps) {
   const [isAuthenticated, setIsAuthenticated] = useState(!!auth.user);
   const [isRegistering, setIsRegistering] = useState(false);
   const [registrationError, setRegistrationError] = useState<string | null>(null);
+
+  // Prompts state
+  const [prompts, setPrompts] = useState<Prompt[]>([]);
+  const [promptsLoading, setPromptsLoading] = useState(true);
+  const [promptsError, setPromptsError] = useState<string | null>(null);
+
+  // Fetch prompts on mount
+  useEffect(() => {
+    const controller = new AbortController();
+    setPromptsLoading(true);
+    setPromptsError(null);
+
+    apiFetch('/api/prompts', { signal: controller.signal })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch prompts');
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setPrompts(data);
+        setPromptsLoading(false);
+      })
+      .catch((error) => {
+        if (error.name !== 'AbortError') {
+          setPromptsError(error.message);
+          setPromptsLoading(false);
+        }
+      });
+
+    return () => {
+      controller.abort();
+    };
+  }, []);
 
   // Scroll to top when step changes
   useEffect(() => {
@@ -262,6 +301,9 @@ export function WizardProvider({ children, auth }: WizardProviderProps) {
     auth,
     isRegistering,
     registrationError,
+    prompts,
+    promptsLoading,
+    promptsError,
     goToStep,
     goNext,
     goPrevious,
