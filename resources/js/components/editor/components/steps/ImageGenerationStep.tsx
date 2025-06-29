@@ -1,9 +1,22 @@
 import { Alert, AlertDescription } from '@/components/ui/Alert';
 import { Loader2, Sparkles } from 'lucide-react';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useWizard } from '../../contexts/WizardContext';
 import { useImageGeneration } from '../../hooks/useImageGeneration';
 import ImageVariantSelector from '../shared/ImageVariantSelector';
+
+const funnyMessages = [
+  'Teaching pixels to dance in perfect formation...',
+  'Bribing the AI with virtual cookies for better results...',
+  'Convincing the neural network this is its masterpiece...',
+  'Sprinkling digital fairy dust on your image...',
+  'Having a serious conversation with the algorithm...',
+  'Mixing artistic genius with a pinch of chaos...',
+  'Asking the AI nicely to make it extra special...',
+  "Channeling the spirit of famous artists (they're on speed dial)...",
+  'Performing ancient rituals to summon creativity...',
+  'Whispering sweet nothings to the machine learning models...',
+];
 
 export default function ImageGenerationStep() {
   const {
@@ -18,6 +31,17 @@ export default function ImageGenerationStep() {
   } = useWizard();
   const { isGenerating, error, generateImages } = useImageGeneration();
   const hasStartedGeneration = useRef(false);
+  const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
+
+  useEffect(() => {
+    if (isGenerating) {
+      const interval = setInterval(() => {
+        setCurrentMessageIndex((prevIndex) => (prevIndex + 1) % funnyMessages.length);
+      }, 5000);
+
+      return () => clearInterval(interval);
+    }
+  }, [isGenerating]);
 
   useEffect(() => {
     if (!generatedImageUrls && uploadedImage && selectedPrompt?.id && !hasStartedGeneration.current) {
@@ -41,8 +65,8 @@ export default function ImageGenerationStep() {
           <Loader2 className="text-primary h-16 w-16 animate-spin" />
           <Sparkles className="absolute inset-0 h-16 w-16 animate-pulse text-yellow-500" />
         </div>
-        <h3 className="mt-6 text-lg font-semibold">Creating Your Magic Designs</h3>
-        <p className="mt-2 text-sm text-gray-600">Our AI is working hard to generate 4 unique variations of your image...</p>
+        <h3 className="mt-6 text-lg font-semibold">Creating Your Magic Designs (this can take up to 30 seconds)</h3>
+        <p className="mt-2 animate-pulse text-gray-600">{funnyMessages[currentMessageIndex]}</p>
       </div>
     );
   }
