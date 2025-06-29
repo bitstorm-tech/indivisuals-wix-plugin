@@ -2,29 +2,25 @@ import { Alert, AlertDescription } from '@/components/ui/Alert';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 import { Info, Lock } from 'lucide-react';
+import { useWizard } from '../../contexts/WizardContext';
 import { useUserDataForm } from '../../hooks/useUserDataForm';
-import { UserData } from '../../types';
 
-interface UserDataStepProps {
-  userData: UserData | null;
-  onUserDataComplete: (data: UserData) => void;
-}
-
-export default function UserDataStep({ userData, onUserDataComplete }: UserDataStepProps) {
-  const { formData, errors, handleChange, validateForm } = useUserDataForm(userData);
+export default function UserDataStep() {
+  const wizard = useWizard();
+  const { formData, errors, handleChange, validateForm } = useUserDataForm(wizard.userData);
 
   const handleEmailChange = (value: string) => {
     handleChange('email', value);
     // Check if email is valid and update parent state immediately
     const isValidEmail = value && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
     if (isValidEmail) {
-      onUserDataComplete({ ...formData, email: value });
+      wizard.handleUserDataComplete({ ...formData, email: value });
     }
   };
 
   const handleBlur = () => {
     if (validateForm()) {
-      onUserDataComplete(formData);
+      wizard.handleUserDataComplete(formData);
     }
   };
 

@@ -1,14 +1,9 @@
 import { CheckCircle } from 'lucide-react';
-import { MugOption, UserData } from '../../types';
+import { useWizard } from '../../contexts/WizardContext';
 import MugPreview from '../shared/MugPreview';
 
-interface PreviewStepProps {
-  selectedMug: MugOption | null;
-  selectedGeneratedImage: string | null;
-  userData: UserData | null;
-}
-
-export default function PreviewStep({ selectedMug, selectedGeneratedImage, userData }: PreviewStepProps) {
+export default function PreviewStep() {
+  const { selectedMug, selectedGeneratedImage, userData } = useWizard();
   if (!selectedMug || !selectedGeneratedImage) {
     return (
       <div className="py-8 text-center text-gray-500">

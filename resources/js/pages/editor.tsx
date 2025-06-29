@@ -6,137 +6,77 @@ import MugSelectionStep from '@/components/editor/components/steps/MugSelectionS
 import PreviewStep from '@/components/editor/components/steps/PreviewStep';
 import PromptSelectionStep from '@/components/editor/components/steps/PromptSelectionStep';
 import UserDataStep from '@/components/editor/components/steps/UserDataStep';
-import { WizardStep } from '@/components/editor/constants';
-import { useWizardNavigation } from '@/components/editor/hooks/useWizardNavigation';
-import { CropData, MugOption, UserData } from '@/components/editor/types';
+import { WizardProvider, useWizard } from '@/components/editor/contexts/WizardContext';
 import { usePrompts } from '@/hooks/usePrompts';
-import { apiFetch } from '@/lib/utils';
 import type { Auth } from '@/types';
-import { Prompt } from '@/types/prompt';
-import { useEffect, useState } from 'react';
 
 export interface EditorProps {
   auth: Auth;
 }
 
+function EditorContent() {
+  const { prompts } = usePrompts();
+  const wizard = useWizard();
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <div className="mx-auto max-w-5xl px-4 py-8 pb-24 sm:pb-8">
+        <div className="mb-8">
+          <h1 className="mb-2 text-center text-3xl font-bold">Create Your Custom Mug</h1>
+          <p className="text-center text-gray-600">Follow the steps below to design your personalized mug</p>
+        </div>
+
+        <div className="mb-8">
+          <WizardStepIndicator currentStep={wizard.currentStep} completedSteps={wizard.getCompletedSteps()} />
+        </div>
+
+        <div className="mb-8 min-h-[400px] rounded-lg bg-white p-6 shadow-sm">
+          {wizard.currentStep === 'image-upload' && <ImageUploadStep />}
+
+          {wizard.currentStep === 'prompt-selection' && <PromptSelectionStep prompts={prompts} />}
+
+          {wizard.currentStep === 'mug-selection' && <MugSelectionStep />}
+
+          {wizard.currentStep === 'user-data' && (
+            <>
+              <UserDataStep />
+              {wizard.registrationError && (
+                <div className="mt-4 rounded-md bg-red-50 p-4">
+                  <p className="text-sm text-red-800">{wizard.registrationError}</p>
+                </div>
+              )}
+            </>
+          )}
+
+          {wizard.currentStep === 'image-generation' && <ImageGenerationStep />}
+
+          {wizard.currentStep === 'preview' && <PreviewStep />}
+        </div>
+      </div>
+
+      {/* Sticky navigation for mobile */}
+      <div className="fixed right-0 bottom-0 left-0 p-4 sm:static sm:p-0">
+        <div className="mx-auto max-w-5xl sm:px-4">
+          <WizardNavigationButtons />
+        </div>
+      </div>
+
+      {wizard.isRegistering && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="rounded-lg bg-white p-6 shadow-xl">
+            <div className="flex items-center gap-3">
+              <div className="h-5 w-5 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600" />
+              <p className="text-sm font-medium">Creating your account...</p>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function EditorNewPage({ auth }: EditorProps) {
-  const { prompts, isLoading, error } = usePrompts();
-  const [isAuthenticated, setIsAuthenticated] = useState(!!auth.user);
-  const wizard = useWizardNavigation(isAuthenticated);
-  const [isRegistering, setIsRegistering] = useState(false);
-  const [registrationError, setRegistrationError] = useState<string | null>(null);
-
-  useEffect(() => {
-    // If user is not authenticated and tries to access image generation step, redirect back
-    if (!isAuthenticated && wizard.currentStep === 'image-generation') {
-      wizard.goToStep('user-data');
-    }
-  }, [wizard.currentStep, isAuthenticated, wizard]);
-
-  const handleImageUpload = (file: File, url: string) => {
-    wizard.updateState('uploadedImage', file);
-    wizard.updateState('uploadedImageUrl', url);
-  };
-
-  const handleCropComplete = (cropData: CropData) => {
-    wizard.updateState('cropData', cropData);
-  };
-
-  const handleRemoveImage = () => {
-    if (wizard.uploadedImageUrl) {
-      URL.revokeObjectURL(wizard.uploadedImageUrl);
-    }
-    wizard.updateState('uploadedImage', null);
-    wizard.updateState('uploadedImageUrl', null);
-    wizard.updateState('cropData', null);
-  };
-
-  const handlePromptSelect = (prompt: Prompt) => {
-    wizard.updateState('selectedPrompt', prompt);
-  };
-
-  const handleMugSelect = (mug: MugOption) => {
-    wizard.updateState('selectedMug', mug);
-  };
-
-  const handleUserDataComplete = (data: UserData) => {
-    wizard.updateState('userData', data);
-  };
-
-  const handleUserRegistration = async (): Promise<boolean> => {
-    if (wizard.currentStep !== 'user-data' || !wizard.userData) {
-      return true; // Not on user data step, proceed normally
-    }
-
-    setIsRegistering(true);
-    setRegistrationError(null);
-
-    try {
-      const response = await apiFetch('/api/register-or-login', {
-        method: 'POST',
-        body: JSON.stringify({
-          email: wizard.userData.email,
-          first_name: wizard.userData.firstName || null,
-          last_name: wizard.userData.lastName || null,
-          phone_number: wizard.userData.phoneNumber || null,
-        }),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Registration failed');
-      }
-
-      const data = await response.json();
-      setIsAuthenticated(data.authenticated);
-
-      return data.authenticated;
-    } catch (error) {
-      setRegistrationError(error instanceof Error ? error.message : 'An error occurred during registration');
-      return false; // Error, prevent navigation
-    } finally {
-      setIsRegistering(false);
-    }
-  };
-
-  const handleNext = async () => {
-    // Only handle registration if on user-data step and not authenticated
-    if (wizard.currentStep === 'user-data' && !isAuthenticated) {
-      const success = await handleUserRegistration();
-      if (success) {
-        wizard.goNext();
-      }
-    } else {
-      wizard.goNext();
-    }
-  };
-
-  const handleImagesGenerated = (urls: string[]) => {
-    wizard.updateState('generatedImageUrls', urls);
-  };
-
-  const handleImageSelect = (url: string) => {
-    wizard.updateState('selectedGeneratedImage', url);
-  };
-
-  const handleGenerationStart = () => {
-    wizard.updateState('isProcessing', true);
-  };
-
-  const handleGenerationEnd = () => {
-    wizard.updateState('isProcessing', false);
-  };
-
-  const getCompletedSteps = (): WizardStep[] => {
-    const completed: WizardStep[] = [];
-    if (wizard.uploadedImage && wizard.cropData) completed.push('image-upload');
-    if (wizard.selectedPrompt) completed.push('prompt-selection');
-    if (wizard.selectedMug) completed.push('mug-selection');
-    // Mark user-data as completed if user is authenticated OR if userData is filled
-    if (isAuthenticated || wizard.userData) completed.push('user-data');
-    if (wizard.selectedGeneratedImage) completed.push('image-generation');
-    return completed;
-  };
+  const { isLoading, error } = usePrompts();
 
   if (isLoading) {
     return (
@@ -160,97 +100,8 @@ export default function EditorNewPage({ auth }: EditorProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="mx-auto max-w-5xl px-4 py-8 pb-24 sm:pb-8">
-        <div className="mb-8">
-          <h1 className="mb-2 text-center text-3xl font-bold">Create Your Custom Mug</h1>
-          <p className="text-center text-gray-600">Follow the steps below to design your personalized mug</p>
-        </div>
-
-        <div className="mb-8">
-          <WizardStepIndicator currentStep={wizard.currentStep} completedSteps={getCompletedSteps()} />
-        </div>
-
-        <div className="mb-8 min-h-[400px] rounded-lg bg-white p-6 shadow-sm">
-          {wizard.currentStep === 'image-upload' && (
-            <ImageUploadStep
-              uploadedImage={wizard.uploadedImage}
-              uploadedImageUrl={wizard.uploadedImageUrl}
-              cropData={wizard.cropData}
-              onImageUpload={handleImageUpload}
-              onCropComplete={handleCropComplete}
-              onRemoveImage={handleRemoveImage}
-            />
-          )}
-
-          {wizard.currentStep === 'prompt-selection' && (
-            <PromptSelectionStep prompts={prompts} selectedPrompt={wizard.selectedPrompt} onPromptSelect={handlePromptSelect} />
-          )}
-
-          {wizard.currentStep === 'mug-selection' && <MugSelectionStep selectedMug={wizard.selectedMug} onMugSelect={handleMugSelect} />}
-
-          {wizard.currentStep === 'user-data' && (
-            <>
-              <UserDataStep userData={wizard.userData} onUserDataComplete={handleUserDataComplete} />
-              {registrationError && (
-                <div className="mt-4 rounded-md bg-red-50 p-4">
-                  <p className="text-sm text-red-800">{registrationError}</p>
-                </div>
-              )}
-            </>
-          )}
-
-          {wizard.currentStep === 'image-generation' && (
-            <ImageGenerationStep
-              uploadedImage={wizard.uploadedImage}
-              promptId={wizard.selectedPrompt?.id || null}
-              generatedImageUrls={wizard.generatedImageUrls}
-              selectedGeneratedImage={wizard.selectedGeneratedImage}
-              onImagesGenerated={handleImagesGenerated}
-              onImageSelect={handleImageSelect}
-              onGenerationStart={handleGenerationStart}
-              onGenerationEnd={handleGenerationEnd}
-            />
-          )}
-
-          {wizard.currentStep === 'preview' && (
-            <PreviewStep selectedMug={wizard.selectedMug} selectedGeneratedImage={wizard.selectedGeneratedImage} userData={wizard.userData} />
-          )}
-        </div>
-      </div>
-
-      {/* Sticky navigation for mobile */}
-      <div className="fixed right-0 bottom-0 left-0 p-4 sm:static sm:p-0">
-        <div className="mx-auto max-w-5xl sm:px-4">
-          <WizardNavigationButtons
-            currentStep={wizard.currentStep}
-            canGoNext={wizard.canGoNext}
-            canGoPrevious={wizard.canGoPrevious}
-            onNext={handleNext}
-            onPrevious={wizard.goPrevious}
-            isProcessing={wizard.isProcessing || isRegistering}
-            wizardData={{
-              selectedMug: wizard.selectedMug,
-              selectedGeneratedImage: wizard.selectedGeneratedImage,
-              userData: wizard.userData,
-              uploadedImageUrl: wizard.uploadedImageUrl,
-              cropData: wizard.cropData,
-              selectedPromptId: wizard.selectedPrompt?.id || null,
-            }}
-          />
-        </div>
-      </div>
-
-      {isRegistering && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="rounded-lg bg-white p-6 shadow-xl">
-            <div className="flex items-center gap-3">
-              <div className="h-5 w-5 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600" />
-              <p className="text-sm font-medium">Creating your account...</p>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+    <WizardProvider auth={auth}>
+      <EditorContent />
+    </WizardProvider>
   );
 }

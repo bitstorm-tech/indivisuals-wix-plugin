@@ -1,47 +1,38 @@
 import { Alert, AlertDescription } from '@/components/ui/Alert';
 import { Loader2, Sparkles } from 'lucide-react';
 import { useEffect, useRef } from 'react';
+import { useWizard } from '../../contexts/WizardContext';
 import { useImageGeneration } from '../../hooks/useImageGeneration';
 import ImageVariantSelector from '../shared/ImageVariantSelector';
 
-interface ImageGenerationStepProps {
-  uploadedImage: File | null;
-  promptId: number | null;
-  generatedImageUrls: string[] | null;
-  selectedGeneratedImage: string | null;
-  onImagesGenerated: (urls: string[]) => void;
-  onImageSelect: (url: string) => void;
-  onGenerationStart: () => void;
-  onGenerationEnd: () => void;
-}
-
-export default function ImageGenerationStep({
-  uploadedImage,
-  promptId,
-  generatedImageUrls,
-  selectedGeneratedImage,
-  onImagesGenerated,
-  onImageSelect,
-  onGenerationStart,
-  onGenerationEnd,
-}: ImageGenerationStepProps) {
+export default function ImageGenerationStep() {
+  const {
+    uploadedImage,
+    selectedPrompt,
+    generatedImageUrls,
+    selectedGeneratedImage,
+    handleImagesGenerated,
+    handleImageSelect,
+    handleGenerationStart,
+    handleGenerationEnd,
+  } = useWizard();
   const { isGenerating, error, generateImages } = useImageGeneration();
   const hasStartedGeneration = useRef(false);
 
   useEffect(() => {
-    if (!generatedImageUrls && uploadedImage && promptId && !hasStartedGeneration.current) {
+    if (!generatedImageUrls && uploadedImage && selectedPrompt?.id && !hasStartedGeneration.current) {
       hasStartedGeneration.current = true;
       const performGeneration = async () => {
-        onGenerationStart();
-        const urls = await generateImages(uploadedImage, promptId);
+        handleGenerationStart();
+        const urls = await generateImages(uploadedImage, selectedPrompt.id);
         if (urls) {
-          onImagesGenerated(urls);
+          handleImagesGenerated(urls);
         }
-        onGenerationEnd();
+        handleGenerationEnd();
       };
       performGeneration();
     }
-  }, [uploadedImage, promptId, generatedImageUrls, generateImages, onGenerationStart, onGenerationEnd, onImagesGenerated]);
+  }, [uploadedImage, selectedPrompt?.id, generatedImageUrls, generateImages, handleGenerationStart, handleGenerationEnd, handleImagesGenerated]);
 
   if (isGenerating) {
     return (
@@ -78,7 +69,7 @@ export default function ImageGenerationStep({
         <p className="text-sm text-gray-600">Select the design that best captures your vision from these AI-generated variations</p>
       </div>
 
-      <ImageVariantSelector variants={generatedImageUrls} selectedVariant={selectedGeneratedImage} onVariantSelect={onImageSelect} />
+      <ImageVariantSelector variants={generatedImageUrls} selectedVariant={selectedGeneratedImage} onVariantSelect={handleImageSelect} />
 
       {selectedGeneratedImage && (
         <div className="rounded-lg bg-green-50 p-4">

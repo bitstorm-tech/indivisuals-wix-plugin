@@ -1,16 +1,16 @@
 import { cn } from '@/lib/utils';
 import { Prompt } from '@/types/prompt';
 import { Check } from 'lucide-react';
+import { useWizard } from '../../contexts/WizardContext';
 import { usePromptSelection } from '../../hooks/usePromptSelection';
 import PromptCategoryFilter from '../shared/PromptCategoryFilter';
 
 interface PromptSelectionStepProps {
   prompts: Prompt[];
-  selectedPrompt: Prompt | null;
-  onPromptSelect: (prompt: Prompt) => void;
 }
 
-export default function PromptSelectionStep({ prompts, selectedPrompt, onPromptSelect }: PromptSelectionStepProps) {
+export default function PromptSelectionStep({ prompts }: PromptSelectionStepProps) {
+  const wizard = useWizard();
   const { selectedCategory, setSelectedCategory, filteredPrompts, categories } = usePromptSelection(prompts);
 
   return (
@@ -24,12 +24,12 @@ export default function PromptSelectionStep({ prompts, selectedPrompt, onPromptS
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {filteredPrompts.map((prompt) => {
-          const isSelected = selectedPrompt?.id === prompt.id;
+          const isSelected = wizard.selectedPrompt?.id === prompt.id;
 
           return (
             <div
               key={prompt.id}
-              onClick={() => onPromptSelect(prompt)}
+              onClick={() => wizard.handlePromptSelect(prompt)}
               className={cn(
                 'group relative cursor-pointer overflow-hidden rounded-lg border-2 transition-all duration-300',
                 isSelected ? 'border-primary shadow-md' : 'border-gray-200 hover:-translate-y-1 hover:border-gray-300 hover:shadow-xl',

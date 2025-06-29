@@ -1,14 +1,10 @@
 import { cn } from '@/lib/utils';
 import { Check, Star } from 'lucide-react';
 import { MUG_OPTIONS } from '../../constants';
-import { MugOption } from '../../types';
+import { useWizard } from '../../contexts/WizardContext';
 
-interface MugSelectionStepProps {
-  selectedMug: MugOption | null;
-  onMugSelect: (mug: MugOption) => void;
-}
-
-export default function MugSelectionStep({ selectedMug, onMugSelect }: MugSelectionStepProps) {
+export default function MugSelectionStep() {
+  const { selectedMug, handleMugSelect } = useWizard();
   return (
     <div className="space-y-6">
       <div>
@@ -23,7 +19,7 @@ export default function MugSelectionStep({ selectedMug, onMugSelect }: MugSelect
           return (
             <div
               key={mug.id}
-              onClick={() => onMugSelect(mug)}
+              onClick={() => handleMugSelect(mug)}
               className={cn(
                 'relative cursor-pointer overflow-hidden rounded-lg border-2 transition-all',
                 isSelected ? 'border-primary shadow-lg' : 'border-gray-200 hover:border-gray-300 hover:shadow-md',
