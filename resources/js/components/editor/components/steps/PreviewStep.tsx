@@ -9,8 +9,16 @@ interface PreviewStepProps {
 }
 
 export default function PreviewStep({ selectedMug, selectedGeneratedImage, userData }: PreviewStepProps) {
-  if (!selectedMug || !selectedGeneratedImage || !userData) {
-    return null;
+  if (!selectedMug || !selectedGeneratedImage) {
+    return (
+      <div className="py-8 text-center text-gray-500">
+        <p>Missing required data. Please complete all previous steps.</p>
+        <p className="mt-2 text-sm">
+          {!selectedMug && 'Mug not selected. '}
+          {!selectedGeneratedImage && 'Generated image not selected. '}
+        </p>
+      </div>
+    );
   }
 
   return (
@@ -23,7 +31,11 @@ export default function PreviewStep({ selectedMug, selectedGeneratedImage, userD
         <p className="text-gray-600">Here's how your personalized design will look on the {selectedMug.name}</p>
       </div>
 
-      <MugPreview mug={selectedMug} imageUrl={selectedGeneratedImage} className="mx-auto" />
+      <MugPreview
+        mug={selectedMug}
+        imageUrl={selectedGeneratedImage.startsWith('data:') ? selectedGeneratedImage : `/api/images/${selectedGeneratedImage}`}
+        className="mx-auto"
+      />
 
       <div className="mx-auto max-w-md space-y-4 rounded-lg bg-gray-50 p-6">
         <h4 className="font-semibold">Order Summary</h4>
@@ -43,12 +55,14 @@ export default function PreviewStep({ selectedMug, selectedGeneratedImage, userD
               <span className="font-medium">{selectedMug.special}</span>
             </div>
           )}
-          <div className="flex justify-between">
-            <span className="text-gray-600">Customer:</span>
-            <span className="font-medium">
-              {userData.firstName || userData.lastName ? `${userData.firstName || ''} ${userData.lastName || ''}`.trim() : userData.email}
-            </span>
-          </div>
+          {userData && (
+            <div className="flex justify-between">
+              <span className="text-gray-600">Customer:</span>
+              <span className="font-medium">
+                {userData.firstName || userData.lastName ? `${userData.firstName || ''} ${userData.lastName || ''}`.trim() : userData.email}
+              </span>
+            </div>
+          )}
         </div>
 
         <div className="border-t pt-4">

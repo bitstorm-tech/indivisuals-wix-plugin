@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\CartService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -12,6 +13,13 @@ use Illuminate\Support\Str;
 
 class UserRegistrationController extends Controller
 {
+    protected CartService $cartService;
+
+    public function __construct(CartService $cartService)
+    {
+        $this->cartService = $cartService;
+    }
+
     /**
      * Register or login a user from the editor
      */
@@ -49,6 +57,9 @@ class UserRegistrationController extends Controller
 
         // Log the user in
         Auth::login($user);
+
+        // Transfer session cart to the logged-in user
+        $this->cartService->transferSessionCartToUser($user->id);
 
         return response()->json([
             'user' => [
