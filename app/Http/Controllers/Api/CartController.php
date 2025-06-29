@@ -35,15 +35,15 @@ class CartController extends Controller
                         'generated_image_path' => $item->generated_image_path,
                         'original_image_path' => $item->original_image_path,
                         'quantity' => $item->quantity,
-                        'price' => $item->price,
-                        'subtotal' => $item->subtotal,
+                        'price' => (float) $item->price,
+                        'subtotal' => (float) $item->subtotal,
                         'prompt' => $item->prompt ? [
                             'id' => $item->prompt->id,
                             'text' => $item->prompt->text,
                         ] : null,
                     ];
                 }),
-                'subtotal' => $cart->subtotal,
+                'subtotal' => (float) $cart->subtotal,
                 'total_items' => $cart->total_items,
             ],
         ]);
@@ -76,15 +76,15 @@ class CartController extends Controller
                 'generated_image_path' => $item->generated_image_path,
                 'original_image_path' => $item->original_image_path,
                 'quantity' => $item->quantity,
-                'price' => $item->price,
-                'subtotal' => $item->subtotal,
+                'price' => (float) $item->price,
+                'subtotal' => (float) $item->subtotal,
                 'prompt' => $item->prompt ? [
                     'id' => $item->prompt->id,
                     'text' => $item->prompt->text,
                 ] : null,
             ],
             'cart_total_items' => $this->cartService->getItemCount(),
-            'cart_subtotal' => $this->cartService->getSubtotal(),
+            'cart_subtotal' => (float) $this->cartService->getSubtotal(),
         ], 201);
     }
 
@@ -104,7 +104,7 @@ class CartController extends Controller
             return response()->json([
                 'message' => 'Item removed from cart',
                 'cart_total_items' => $this->cartService->getItemCount(),
-                'cart_subtotal' => $this->cartService->getSubtotal(),
+                'cart_subtotal' => (float) $this->cartService->getSubtotal(),
             ]);
         }
 
@@ -122,15 +122,15 @@ class CartController extends Controller
                 'generated_image_path' => $item->generated_image_path,
                 'original_image_path' => $item->original_image_path,
                 'quantity' => $item->quantity,
-                'price' => $item->price,
-                'subtotal' => $item->subtotal,
+                'price' => (float) $item->price,
+                'subtotal' => (float) $item->subtotal,
                 'prompt' => $item->prompt ? [
                     'id' => $item->prompt->id,
                     'text' => $item->prompt->text,
                 ] : null,
             ],
             'cart_total_items' => $this->cartService->getItemCount(),
-            'cart_subtotal' => $this->cartService->getSubtotal(),
+            'cart_subtotal' => (float) $this->cartService->getSubtotal(),
         ]);
     }
 
@@ -145,7 +145,7 @@ class CartController extends Controller
         return response()->json([
             'message' => 'Item removed from cart',
             'cart_total_items' => $this->cartService->getItemCount(),
-            'cart_subtotal' => $this->cartService->getSubtotal(),
+            'cart_subtotal' => (float) $this->cartService->getSubtotal(),
         ]);
     }
 
