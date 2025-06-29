@@ -2,7 +2,7 @@ import { Prompt } from '@/types/prompt';
 import { WizardStep } from './constants';
 
 export interface MugOption {
-  id: string;
+  id: number;
   name: string;
   price: number;
   image: string;

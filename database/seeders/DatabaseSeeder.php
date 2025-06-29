@@ -20,5 +20,10 @@ class DatabaseSeeder extends Seeder
             'last_name' => 'User',
             'email' => 'test@example.com',
         ]);
+
+        $this->call([
+            PromptCategorySeeder::class,
+            MugSeeder::class,
+        ]);
     }
 }

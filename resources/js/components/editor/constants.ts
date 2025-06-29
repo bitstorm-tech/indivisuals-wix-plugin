@@ -22,7 +22,7 @@ export const STEP_INDEX: Record<WizardStep, number> = {
 
 export const MUG_OPTIONS = [
   {
-    id: 'classic-white',
+    id: 3,
     name: 'Classic White Mug',
     price: 12.99,
     image: '/images/mugs/classic-white.jpg',
@@ -30,7 +30,7 @@ export const MUG_OPTIONS = [
     special: undefined,
   },
   {
-    id: 'black-matte',
+    id: 4,
     name: 'Black Matte Mug',
     price: 14.99,
     image: '/images/mugs/black-matte.jpg',
@@ -38,7 +38,7 @@ export const MUG_OPTIONS = [
     special: undefined,
   },
   {
-    id: 'color-changing',
+    id: 5,
     name: 'Color Changing Mug',
     price: 19.99,
     image: '/images/mugs/color-changing.jpg',
@@ -46,7 +46,7 @@ export const MUG_OPTIONS = [
     special: 'Heat Reactive',
   },
   {
-    id: 'travel-mug',
+    id: 6,
     name: 'Travel Mug',
     price: 24.99,
     image: '/images/mugs/travel-mug.jpg',
