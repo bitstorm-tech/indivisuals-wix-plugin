@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'index')->name('home');
 Route::inertia('/editor', 'editor')->name('editor');
+Route::inertia('/cart', 'cart')->name('cart');
 Route::inertia('/checkout', 'checkout')->name('checkout');
 
 // Authentication routes

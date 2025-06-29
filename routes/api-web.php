@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\Admin\MugController;
 use App\Http\Controllers\Admin\PromptTesterController;
+use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\ImageController;
+use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\PromptController;
 use App\Http\Controllers\Api\UserRegistrationController;
 use Illuminate\Support\Facades\Route;
@@ -37,6 +39,22 @@ Route::prefix('api')->group(function () {
 
     // Prompts API
     Route::apiResource('prompts', PromptController::class);
+
+    // Cart API routes
+    Route::prefix('cart')->group(function () {
+        Route::get('/', [CartController::class, 'index'])->name('api.cart.index');
+        Route::post('/items', [CartController::class, 'store'])->name('api.cart.store');
+        Route::put('/items/{itemId}', [CartController::class, 'update'])->name('api.cart.update');
+        Route::delete('/items/{itemId}', [CartController::class, 'destroy'])->name('api.cart.destroy');
+        Route::post('/clear', [CartController::class, 'clear'])->name('api.cart.clear');
+    });
+
+    // Order API routes
+    Route::middleware('auth')->group(function () {
+        Route::get('/orders', [OrderController::class, 'index'])->name('api.orders.index');
+        Route::post('/orders', [OrderController::class, 'store'])->name('api.orders.store');
+        Route::get('/orders/{order}', [OrderController::class, 'show'])->name('api.orders.show');
+    });
 
     // Prompt categories
     Route::prefix('prompt-categories')->group(function () {

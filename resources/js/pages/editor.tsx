@@ -233,6 +233,9 @@ export default function EditorNewPage({ auth }: EditorProps) {
               selectedMug: wizard.selectedMug,
               selectedGeneratedImage: wizard.selectedGeneratedImage,
               userData: wizard.userData,
+              uploadedImageUrl: wizard.uploadedImageUrl,
+              cropData: wizard.cropData,
+              selectedPromptId: wizard.selectedPrompt?.id || null,
             }}
           />
         </div>
