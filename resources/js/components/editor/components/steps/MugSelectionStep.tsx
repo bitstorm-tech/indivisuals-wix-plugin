@@ -50,7 +50,28 @@ export default function MugSelectionStep() {
 
               <div className="p-4">
                 <h4 className="mb-1 font-medium">{mug.name}</h4>
-                <p className="mb-2 text-sm text-gray-600">{mug.capacity}</p>
+                <p className="mb-2 text-sm text-gray-600">
+                  {mug.filling_quantity || mug.capacity}
+                  {mug.height_mm && mug.diameter_mm && (
+                    <span>
+                      {' '}
+                      · {mug.height_mm}×{mug.diameter_mm}mm
+                    </span>
+                  )}
+                </p>
+                {mug.description_short && <p className="mb-2 text-xs text-gray-500">{mug.description_short}</p>}
+                <div className="mb-2 flex items-center gap-2 text-xs text-gray-500">
+                  {mug.dishwasher_safe !== undefined && (
+                    <span
+                      className={cn(
+                        'inline-flex items-center rounded-full px-2 py-0.5',
+                        mug.dishwasher_safe ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-600',
+                      )}
+                    >
+                      {mug.dishwasher_safe ? '✓ Dishwasher Safe' : 'Hand Wash Only'}
+                    </span>
+                  )}
+                </div>
                 <p className="text-primary text-lg font-semibold">${mug.price}</p>
               </div>
             </div>

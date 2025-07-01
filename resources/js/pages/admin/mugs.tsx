@@ -31,7 +31,14 @@ interface MugSubCategory {
 interface Mug {
   id: number;
   name: string;
-  description?: string;
+  description_long?: string;
+  description_short?: string;
+  height_mm?: number;
+  diameter_mm?: number;
+  print_template_width_mm?: number;
+  print_template_height_mm?: number;
+  filling_quantity?: string;
+  dishwasher_safe: boolean;
   price: number;
   category_id?: number;
   subcategory_id?: number;
@@ -58,7 +65,14 @@ export default function Mugs({ mugs, categories, subcategories, auth }: MugsProp
   const [editingMug, setEditingMug] = useState<Mug | null>(null);
   const [formData, setFormData] = useState({
     name: '',
-    description: '',
+    description_long: '',
+    description_short: '',
+    height_mm: '',
+    diameter_mm: '',
+    print_template_width_mm: '',
+    print_template_height_mm: '',
+    filling_quantity: '',
+    dishwasher_safe: true,
     price: '',
     category_id: '',
     subcategory_id: '',
@@ -75,7 +89,14 @@ export default function Mugs({ mugs, categories, subcategories, auth }: MugsProp
       setEditingMug(mug);
       setFormData({
         name: mug.name,
-        description: mug.description || '',
+        description_long: mug.description_long || '',
+        description_short: mug.description_short || '',
+        height_mm: mug.height_mm?.toString() || '',
+        diameter_mm: mug.diameter_mm?.toString() || '',
+        print_template_width_mm: mug.print_template_width_mm?.toString() || '',
+        print_template_height_mm: mug.print_template_height_mm?.toString() || '',
+        filling_quantity: mug.filling_quantity || '',
+        dishwasher_safe: mug.dishwasher_safe,
         price: mug.price.toString(),
         category_id: mug.category_id?.toString() || '',
         subcategory_id: mug.subcategory_id?.toString() || '',
@@ -85,7 +106,14 @@ export default function Mugs({ mugs, categories, subcategories, auth }: MugsProp
       setEditingMug(null);
       setFormData({
         name: '',
-        description: '',
+        description_long: '',
+        description_short: '',
+        height_mm: '',
+        diameter_mm: '',
+        print_template_width_mm: '',
+        print_template_height_mm: '',
+        filling_quantity: '',
+        dishwasher_safe: true,
         price: '',
         category_id: '',
         subcategory_id: '',
@@ -113,10 +141,27 @@ export default function Mugs({ mugs, categories, subcategories, auth }: MugsProp
 
     const data = new FormData();
     data.append('name', formData.name);
-    data.append('description', formData.description);
+    data.append('description_long', formData.description_long);
+    data.append('description_short', formData.description_short);
     data.append('price', formData.price);
     data.append('active', formData.active ? '1' : '0');
+    data.append('dishwasher_safe', formData.dishwasher_safe ? '1' : '0');
 
+    if (formData.height_mm) {
+      data.append('height_mm', formData.height_mm);
+    }
+    if (formData.diameter_mm) {
+      data.append('diameter_mm', formData.diameter_mm);
+    }
+    if (formData.print_template_width_mm) {
+      data.append('print_template_width_mm', formData.print_template_width_mm);
+    }
+    if (formData.print_template_height_mm) {
+      data.append('print_template_height_mm', formData.print_template_height_mm);
+    }
+    if (formData.filling_quantity) {
+      data.append('filling_quantity', formData.filling_quantity);
+    }
     if (formData.category_id) {
       data.append('category_id', formData.category_id);
     }
@@ -165,7 +210,14 @@ export default function Mugs({ mugs, categories, subcategories, auth }: MugsProp
   const handleToggleStatus = (mug: Mug) => {
     router.put(`/mugs/${mug.id}`, {
       name: mug.name,
-      description: mug.description || '',
+      description_long: mug.description_long || '',
+      description_short: mug.description_short || '',
+      height_mm: mug.height_mm,
+      diameter_mm: mug.diameter_mm,
+      print_template_width_mm: mug.print_template_width_mm,
+      print_template_height_mm: mug.print_template_height_mm,
+      filling_quantity: mug.filling_quantity || '',
+      dishwasher_safe: mug.dishwasher_safe,
       price: mug.price,
       category_id: mug.category_id,
       subcategory_id: mug.subcategory_id,
@@ -196,6 +248,7 @@ export default function Mugs({ mugs, categories, subcategories, auth }: MugsProp
                     <TableHead className="w-16">Image</TableHead>
                     <TableHead>Name</TableHead>
                     <TableHead>Category</TableHead>
+                    <TableHead>Dimensions</TableHead>
                     <TableHead>Price</TableHead>
                     <TableHead>Active</TableHead>
                     <TableHead>Created At</TableHead>
@@ -205,7 +258,7 @@ export default function Mugs({ mugs, categories, subcategories, auth }: MugsProp
                 <TableBody>
                   {mugs.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={7} className="text-center text-gray-500">
+                      <TableCell colSpan={8} className="text-center text-gray-500">
                         No mugs found
                       </TableCell>
                     </TableRow>
@@ -226,6 +279,7 @@ export default function Mugs({ mugs, categories, subcategories, auth }: MugsProp
                           {mug.category?.name || '-'}
                           {mug.subcategory && <span className="text-sm text-gray-500"> / {mug.subcategory.name}</span>}
                         </TableCell>
+                        <TableCell>{mug.height_mm && mug.diameter_mm ? `${mug.height_mm}×${mug.diameter_mm}mm` : '-'}</TableCell>
                         <TableCell>${mug.price}</TableCell>
                         <TableCell>
                           <Switch checked={mug.active} onCheckedChange={() => handleToggleStatus(mug)} />
@@ -267,15 +321,29 @@ export default function Mugs({ mugs, categories, subcategories, auth }: MugsProp
                       />
                     </div>
                     <div className="grid grid-cols-4 items-start gap-4">
-                      <Label htmlFor="description" className="mt-2 text-right">
-                        Description
+                      <Label htmlFor="description_short" className="mt-2 text-right">
+                        Short Description
                       </Label>
                       <Textarea
-                        id="description"
-                        value={formData.description}
-                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                        id="description_short"
+                        value={formData.description_short}
+                        onChange={(e) => setFormData({ ...formData, description_short: e.target.value })}
                         className="col-span-3"
-                        rows={3}
+                        rows={2}
+                        placeholder="Brief description for listings"
+                      />
+                    </div>
+                    <div className="grid grid-cols-4 items-start gap-4">
+                      <Label htmlFor="description_long" className="mt-2 text-right">
+                        Long Description
+                      </Label>
+                      <Textarea
+                        id="description_long"
+                        value={formData.description_long}
+                        onChange={(e) => setFormData({ ...formData, description_long: e.target.value })}
+                        className="col-span-3"
+                        rows={4}
+                        placeholder="Detailed product description"
                       />
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
@@ -291,6 +359,92 @@ export default function Mugs({ mugs, categories, subcategories, auth }: MugsProp
                         className="col-span-3"
                         required
                       />
+                    </div>
+
+                    <div className="col-span-full mt-4">
+                      <h3 className="mb-3 text-lg font-semibold">Dimensions</h3>
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="height_mm" className="text-right">
+                        Height (mm)
+                      </Label>
+                      <Input
+                        id="height_mm"
+                        type="number"
+                        value={formData.height_mm}
+                        onChange={(e) => setFormData({ ...formData, height_mm: e.target.value })}
+                        className="col-span-3"
+                        placeholder="e.g., 95"
+                      />
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="diameter_mm" className="text-right">
+                        Diameter (mm)
+                      </Label>
+                      <Input
+                        id="diameter_mm"
+                        type="number"
+                        value={formData.diameter_mm}
+                        onChange={(e) => setFormData({ ...formData, diameter_mm: e.target.value })}
+                        className="col-span-3"
+                        placeholder="e.g., 82"
+                      />
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="print_template_width_mm" className="text-right">
+                        Print Width (mm)
+                      </Label>
+                      <Input
+                        id="print_template_width_mm"
+                        type="number"
+                        value={formData.print_template_width_mm}
+                        onChange={(e) => setFormData({ ...formData, print_template_width_mm: e.target.value })}
+                        className="col-span-3"
+                        placeholder="Template width"
+                      />
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="print_template_height_mm" className="text-right">
+                        Print Height (mm)
+                      </Label>
+                      <Input
+                        id="print_template_height_mm"
+                        type="number"
+                        value={formData.print_template_height_mm}
+                        onChange={(e) => setFormData({ ...formData, print_template_height_mm: e.target.value })}
+                        className="col-span-3"
+                        placeholder="Template height"
+                      />
+                    </div>
+
+                    <div className="col-span-full mt-4">
+                      <h3 className="mb-3 text-lg font-semibold">Specifications</h3>
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="filling_quantity" className="text-right">
+                        Filling Quantity
+                      </Label>
+                      <Input
+                        id="filling_quantity"
+                        value={formData.filling_quantity}
+                        onChange={(e) => setFormData({ ...formData, filling_quantity: e.target.value })}
+                        className="col-span-3"
+                        placeholder="e.g., 325ml"
+                      />
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="dishwasher_safe" className="text-right">
+                        Dishwasher Safe
+                      </Label>
+                      <Switch
+                        id="dishwasher_safe"
+                        checked={formData.dishwasher_safe}
+                        onCheckedChange={(checked) => setFormData({ ...formData, dishwasher_safe: checked })}
+                      />
+                    </div>
+
+                    <div className="col-span-full mt-4">
+                      <h3 className="mb-3 text-lg font-semibold">Categories</h3>
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
                       <Label htmlFor="category" className="text-right">

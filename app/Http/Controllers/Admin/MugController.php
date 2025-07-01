@@ -37,7 +37,14 @@ class MugController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
+            'description_long' => 'nullable|string',
+            'description_short' => 'nullable|string',
+            'height_mm' => 'nullable|integer|min:0',
+            'diameter_mm' => 'nullable|integer|min:0',
+            'print_template_width_mm' => 'nullable|integer|min:0',
+            'print_template_height_mm' => 'nullable|integer|min:0',
+            'filling_quantity' => 'nullable|string|max:255',
+            'dishwasher_safe' => 'required|boolean',
             'price' => 'required|numeric|min:0',
             'category_id' => 'nullable|exists:mug_categories,id',
             'subcategory_id' => 'nullable|exists:mug_sub_categories,id',
@@ -59,7 +66,14 @@ class MugController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
+            'description_long' => 'nullable|string',
+            'description_short' => 'nullable|string',
+            'height_mm' => 'nullable|integer|min:0',
+            'diameter_mm' => 'nullable|integer|min:0',
+            'print_template_width_mm' => 'nullable|integer|min:0',
+            'print_template_height_mm' => 'nullable|integer|min:0',
+            'filling_quantity' => 'nullable|string|max:255',
+            'dishwasher_safe' => 'required|boolean',
             'price' => 'required|numeric|min:0',
             'category_id' => 'nullable|exists:mug_categories,id',
             'subcategory_id' => 'nullable|exists:mug_sub_categories,id',

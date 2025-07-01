@@ -20,7 +20,9 @@ export const STEP_INDEX: Record<WizardStep, number> = {
   preview: 5,
 } as const;
 
-export const MUG_OPTIONS = [
+import { MugOption } from './types';
+
+export const MUG_OPTIONS: MugOption[] = [
   {
     id: 3,
     name: 'Classic White Mug',
@@ -28,6 +30,11 @@ export const MUG_OPTIONS = [
     image: '/images/mugs/classic-white.jpg',
     capacity: '11oz',
     special: undefined,
+    dishwasher_safe: true,
+    height_mm: 95,
+    diameter_mm: 82,
+    filling_quantity: '325ml',
+    description_short: undefined,
   },
   {
     id: 4,
@@ -36,6 +43,11 @@ export const MUG_OPTIONS = [
     image: '/images/mugs/black-matte.jpg',
     capacity: '11oz',
     special: undefined,
+    dishwasher_safe: true,
+    height_mm: 95,
+    diameter_mm: 82,
+    filling_quantity: '325ml',
+    description_short: undefined,
   },
   {
     id: 5,
@@ -44,6 +56,11 @@ export const MUG_OPTIONS = [
     image: '/images/mugs/color-changing.jpg',
     capacity: '11oz',
     special: 'Heat Reactive',
+    dishwasher_safe: false,
+    height_mm: 95,
+    diameter_mm: 82,
+    filling_quantity: '325ml',
+    description_short: undefined,
   },
   {
     id: 6,
@@ -52,8 +69,13 @@ export const MUG_OPTIONS = [
     image: '/images/mugs/travel-mug.jpg',
     capacity: '16oz',
     special: 'Insulated',
+    dishwasher_safe: true,
+    height_mm: 150,
+    diameter_mm: 75,
+    filling_quantity: '470ml',
+    description_short: undefined,
   },
-] as const;
+];
 
 export const CROP_ASPECT_RATIOS = [
   { label: 'Square (1:1)', value: 1 },

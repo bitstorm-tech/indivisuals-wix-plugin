@@ -8,7 +8,14 @@ class Mug extends Model
 {
     protected $fillable = [
         'name',
-        'description',
+        'description_long',
+        'description_short',
+        'height_mm',
+        'diameter_mm',
+        'print_template_width_mm',
+        'print_template_height_mm',
+        'filling_quantity',
+        'dishwasher_safe',
         'price',
         'category_id',
         'subcategory_id',
@@ -18,6 +25,7 @@ class Mug extends Model
 
     protected $casts = [
         'active' => 'boolean',
+        'dishwasher_safe' => 'boolean',
     ];
 
     /**

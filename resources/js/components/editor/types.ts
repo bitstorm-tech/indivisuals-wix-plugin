@@ -8,6 +8,14 @@ export interface MugOption {
   image: string;
   capacity: string;
   special?: string;
+  description_short?: string;
+  description_long?: string;
+  height_mm?: number;
+  diameter_mm?: number;
+  print_template_width_mm?: number;
+  print_template_height_mm?: number;
+  filling_quantity?: string;
+  dishwasher_safe?: boolean;
 }
 
 export interface CropData {
