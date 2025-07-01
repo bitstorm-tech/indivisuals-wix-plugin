@@ -6,12 +6,18 @@ use App\Http\Controllers\Controller;
 use App\Models\Mug;
 use App\Models\MugCategory;
 use App\Models\MugSubCategory;
+use App\Services\ImageConverterService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class MugController extends Controller
 {
+    public function __construct(
+        private ImageConverterService $imageConverter
+    ) {}
+
     public function index()
     {
         $mugs = Mug::with(['category', 'subcategory'])
@@ -67,8 +73,18 @@ class MugController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('mugs', 'public');
-            $validated['image_path'] = $path;
+            $file = $request->file('image');
+
+            // Convert to WebP
+            $webpData = $this->imageConverter->convertToWebp($file->getRealPath());
+
+            // Generate UUID filename
+            $filename = Str::uuid().'.webp';
+
+            // Store the WebP image
+            Storage::disk('public')->put('mugs/'.$filename, $webpData);
+
+            $validated['image_path'] = 'mugs/'.$filename;
         }
 
         Mug::create($validated);
@@ -101,8 +117,18 @@ class MugController extends Controller
                 Storage::disk('public')->delete($mug->image_path);
             }
 
-            $path = $request->file('image')->store('mugs', 'public');
-            $validated['image_path'] = $path;
+            $file = $request->file('image');
+
+            // Convert to WebP
+            $webpData = $this->imageConverter->convertToWebp($file->getRealPath());
+
+            // Generate UUID filename
+            $filename = Str::uuid().'.webp';
+
+            // Store the WebP image
+            Storage::disk('public')->put('mugs/'.$filename, $webpData);
+
+            $validated['image_path'] = 'mugs/'.$filename;
         }
 
         $mug->update($validated);
