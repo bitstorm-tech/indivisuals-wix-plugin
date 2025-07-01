@@ -41,7 +41,9 @@
       "Bash(composer install:*)",
       "WebFetch(domain:laravel.com)",
       "Bash(bun prettier:*)",
-      "Bash(chmod:*)"
+      "Bash(chmod:*)",
+      "mcp__puppeteer__puppeteer_fill",
+      "mcp__puppeteer__puppeteer_click"
     ]
   },
   "enableAllProjectMcpServers": false
