@@ -193,7 +193,7 @@ export default function Mugs({ mugs, categories, subcategories, auth }: MugsProp
 
   const confirmDelete = () => {
     if (deleteId) {
-      router.delete(`/mugs/${deleteId}`, {
+      router.delete(`/api/mugs/${deleteId}`, {
         onSuccess: () => {
           setIsDeleting(false);
           setDeleteId(null);
