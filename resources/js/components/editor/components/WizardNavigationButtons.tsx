@@ -10,7 +10,7 @@ export default function WizardNavigationButtons() {
     currentStep,
     canGoNext,
     canGoPrevious,
-    handleNext: onNext,
+    handleNext: proceedToNextStep,
     goPrevious,
     isProcessing,
     isRegistering,
@@ -23,7 +23,7 @@ export default function WizardNavigationButtons() {
   } = useWizardContext();
   const [isAddingToCart, setIsAddingToCart] = useState(false);
 
-  const handleNext = async () => {
+  const handleNextStep = async () => {
     if (currentStep === 'preview' && canGoNext) {
       setIsAddingToCart(true);
 
@@ -67,7 +67,7 @@ export default function WizardNavigationButtons() {
         setIsAddingToCart(false);
       }
     } else {
-      onNext();
+      proceedToNextStep();
     }
   };
 
@@ -78,7 +78,7 @@ export default function WizardNavigationButtons() {
         Back
       </Button>
 
-      <Button onClick={handleNext} disabled={!canGoNext || isProcessing || isRegistering || isAddingToCart} className="gap-2">
+      <Button onClick={handleNextStep} disabled={!canGoNext || isProcessing || isRegistering || isAddingToCart} className="gap-2">
         {isProcessing || isRegistering || isAddingToCart ? (
           <>
             <Loader2 className="h-4 w-4 animate-spin" />

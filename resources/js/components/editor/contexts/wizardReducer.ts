@@ -1,8 +1,6 @@
-import { WizardStep } from '../constants';
+import { WIZARD_STEPS, WizardStep } from '../constants';
 import { WizardState } from '../types';
 import { WIZARD_ACTIONS, WizardAction } from './wizardActions';
-
-const WIZARD_STEPS: WizardStep[] = ['image-upload', 'prompt-selection', 'mug-selection', 'user-data', 'image-generation', 'preview'];
 
 export function createInitialWizardState(isAuthenticated: boolean): WizardState {
   const state = {

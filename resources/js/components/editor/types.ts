@@ -55,12 +55,3 @@ export interface WizardState {
   canGoNext: boolean;
   canGoPrevious: boolean;
 }
-
-export interface WizardNavigationProps {
-  currentStep: WizardStep;
-  canGoNext: boolean;
-  canGoPrevious: boolean;
-  onNext: () => void;
-  onPrevious: () => void;
-  isProcessing?: boolean;
-}
