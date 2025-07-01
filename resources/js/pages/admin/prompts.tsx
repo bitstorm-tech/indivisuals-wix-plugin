@@ -1,4 +1,4 @@
-import AdminSidebar from '@/components/admin/AdminSidebar';
+import AdminLayout from '@/components/admin/AdminLayout';
 import DeleteConfirmationDialog from '@/components/admin/DeleteConfirmationDialog';
 import PromptTable from '@/components/admin/PromptTable';
 import PromptTableHeader from '@/components/admin/PromptTableHeader';
@@ -79,26 +79,22 @@ export default function Prompts({ prompts, categories, auth }: PromptsProps) {
   return (
     <>
       <Head title="Admin - Prompts" />
-      <div className="flex h-screen">
-        <AdminSidebar user={auth.user} />
+      <AdminLayout user={auth.user}>
+        <div className="container mx-auto p-6">
+          <PromptTableHeader
+            categories={categories}
+            selectedCategory={selectedCategory}
+            onCategoryChange={setSelectedCategory}
+            onNewPrompt={handleNewPrompt}
+          />
 
-        <div className="flex-1 overflow-auto">
-          <div className="container mx-auto p-6">
-            <PromptTableHeader
-              categories={categories}
-              selectedCategory={selectedCategory}
-              onCategoryChange={setSelectedCategory}
-              onNewPrompt={handleNewPrompt}
-            />
+          <PromptTable prompts={filteredPrompts} onEdit={handleEdit} onDelete={handleDelete} onTest={handleTest} />
 
-            <PromptTable prompts={filteredPrompts} onEdit={handleEdit} onDelete={handleDelete} onTest={handleTest} />
+          <TestPromptDialog isOpen={isModalOpen} testingPromptId={testingPromptId} onClose={closeModal} />
 
-            <TestPromptDialog isOpen={isModalOpen} testingPromptId={testingPromptId} onClose={closeModal} />
-
-            <DeleteConfirmationDialog isOpen={isDeleteDialogOpen} onConfirm={confirmDelete} onCancel={cancelDelete} />
-          </div>
+          <DeleteConfirmationDialog isOpen={isDeleteDialogOpen} onConfirm={confirmDelete} onCancel={cancelDelete} />
         </div>
-      </div>
+      </AdminLayout>
     </>
   );
 }

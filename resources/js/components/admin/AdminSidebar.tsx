@@ -12,9 +12,10 @@ interface User {
 
 interface AdminSidebarProps {
   user: User;
+  onNavigate?: () => void;
 }
 
-export default function AdminSidebar({ user }: AdminSidebarProps) {
+export default function AdminSidebar({ user, onNavigate }: AdminSidebarProps) {
   const { url } = usePage();
   const [openItems, setOpenItems] = useState<string[]>(['prompts', 'mugs', 'orders']);
 
@@ -24,12 +25,15 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
 
   const handleNavigate = (route: string) => {
     router.visit(route);
+    if (onNavigate) {
+      onNavigate();
+    }
   };
 
   const isActive = (path: string) => url === path;
 
   return (
-    <aside className="flex h-screen w-64 flex-col border-r bg-gray-50">
+    <aside className="flex h-full w-64 flex-col border-r bg-gray-50 md:h-screen">
       <div className="flex h-16 items-center border-b px-6">
         <h2 className="text-xl font-semibold">Admin Panel</h2>
       </div>

@@ -43,7 +43,8 @@
       "Bash(bun prettier:*)",
       "Bash(chmod:*)",
       "mcp__puppeteer__puppeteer_fill",
-      "mcp__puppeteer__puppeteer_click"
+      "mcp__puppeteer__puppeteer_click",
+      "mcp__puppeteer__puppeteer_evaluate"
     ]
   },
   "enableAllProjectMcpServers": false

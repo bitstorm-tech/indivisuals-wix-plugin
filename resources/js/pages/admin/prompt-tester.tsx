@@ -1,4 +1,4 @@
-import AdminSidebar from '@/components/admin/AdminSidebar';
+import AdminLayout from '@/components/admin/AdminLayout';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/Accordion';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
@@ -178,9 +178,8 @@ export default function PromptTester({ auth }: PromptTesterProps) {
   return (
     <>
       <Head title="Admin - Prompt Tester" />
-      <div className="flex h-screen">
-        <AdminSidebar user={auth.user} />
-        <main className="flex-1 overflow-y-auto p-8">
+      <AdminLayout user={auth.user}>
+        <main className="p-8">
           <h1 className="mb-8 text-3xl font-bold">Prompt Tester</h1>
 
           <form onSubmit={handleSubmit} className="flex max-w-4xl flex-col gap-6">
@@ -393,7 +392,7 @@ export default function PromptTester({ auth }: PromptTesterProps) {
             </div>
           )}
         </main>
-      </div>
+      </AdminLayout>
     </>
   );
 }
