@@ -60,6 +60,6 @@ class Mug extends Model
             return null;
         }
 
-        return route('image.show', ['filename' => basename($this->image_path)]);
+        return \Storage::disk('public')->url($this->image_path);
     }
 }

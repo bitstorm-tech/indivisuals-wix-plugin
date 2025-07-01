@@ -67,7 +67,7 @@ class MugController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('mugs', 'local');
+            $path = $request->file('image')->store('mugs', 'public');
             $validated['image_path'] = $path;
         }
 
@@ -98,10 +98,10 @@ class MugController extends Controller
         if ($request->hasFile('image')) {
             // Delete old image if exists
             if ($mug->image_path) {
-                Storage::disk('local')->delete($mug->image_path);
+                Storage::disk('public')->delete($mug->image_path);
             }
 
-            $path = $request->file('image')->store('mugs', 'local');
+            $path = $request->file('image')->store('mugs', 'public');
             $validated['image_path'] = $path;
         }
 
@@ -114,7 +114,7 @@ class MugController extends Controller
     {
         // Delete image if exists
         if ($mug->image_path) {
-            Storage::disk('local')->delete($mug->image_path);
+            Storage::disk('public')->delete($mug->image_path);
         }
 
         $mug->delete();
