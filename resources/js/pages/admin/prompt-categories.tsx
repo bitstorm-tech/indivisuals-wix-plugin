@@ -106,11 +106,11 @@ export default function Categories({ categories, subcategories, auth }: Categori
     const data = { name: categoryName };
 
     if (editingCategory) {
-      router.put(`/prompt-categories/${editingCategory.id}`, data, {
+      router.put(`/api/prompt-categories/${editingCategory.id}`, data, {
         onSuccess: handleCloseCategoryDialog,
       });
     } else {
-      router.post('/prompt-categories', data, {
+      router.post('/api/prompt-categories', data, {
         onSuccess: handleCloseCategoryDialog,
       });
     }
@@ -120,11 +120,11 @@ export default function Categories({ categories, subcategories, auth }: Categori
     e.preventDefault();
 
     if (editingSubCategory) {
-      router.put(`/prompt-sub-categories/${editingSubCategory.id}`, subcategoryFormData, {
+      router.put(`/api/prompt-sub-categories/${editingSubCategory.id}`, subcategoryFormData, {
         onSuccess: handleCloseSubcategoryDialog,
       });
     } else {
-      router.post('/prompt-sub-categories', subcategoryFormData, {
+      router.post('/api/prompt-sub-categories', subcategoryFormData, {
         onSuccess: handleCloseSubcategoryDialog,
       });
     }
@@ -138,7 +138,7 @@ export default function Categories({ categories, subcategories, auth }: Categori
 
   const confirmDelete = () => {
     if (deleteId && deleteType) {
-      const url = deleteType === 'category' ? `/prompt-categories/${deleteId}` : `/prompt-sub-categories/${deleteId}`;
+      const url = deleteType === 'category' ? `/api/prompt-categories/${deleteId}` : `/api/prompt-sub-categories/${deleteId}`;
       router.delete(url, {
         onSuccess: () => {
           setIsDeleting(false);

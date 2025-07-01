@@ -48,7 +48,7 @@ export default function Prompts({ prompts, categories, subcategories, auth }: Pr
   const confirmDelete = () => {
     if (!promptToDelete) return;
 
-    router.delete(`/prompts/${promptToDelete}`, {
+    router.delete(`/api/prompts/${promptToDelete}`, {
       onSuccess: () => {
         setIsDeleteDialogOpen(false);
         setPromptToDelete(undefined);

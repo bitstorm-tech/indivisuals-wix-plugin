@@ -162,7 +162,7 @@ export default function NewOrEditPromptDialog({ isOpen, editingPrompt, categorie
     if (editingPrompt) {
       // Update existing prompt
       router.post(
-        `/prompts/${editingPrompt.id}`,
+        `/api/prompts/${editingPrompt.id}`,
         {
           ...submissionData,
           _method: 'put',
@@ -184,7 +184,7 @@ export default function NewOrEditPromptDialog({ isOpen, editingPrompt, categorie
       );
     } else {
       // Create new prompt
-      router.post('/prompts', submissionData, {
+      router.post('/api/prompts', submissionData, {
         forceFormData: true, // Always use FormData for consistent handling
         preserveScroll: true,
         onSuccess: () => {

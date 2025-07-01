@@ -123,11 +123,11 @@ export default function Categories({ categories, subcategories, auth }: Categori
     e.preventDefault();
 
     if (editingCategory) {
-      router.put(`/mug-categories/${editingCategory.id}`, categoryFormData, {
+      router.put(`/api/mug-categories/${editingCategory.id}`, categoryFormData, {
         onSuccess: handleCloseCategoryDialog,
       });
     } else {
-      router.post('/mug-categories', categoryFormData, {
+      router.post('/api/mug-categories', categoryFormData, {
         onSuccess: handleCloseCategoryDialog,
       });
     }
@@ -137,11 +137,11 @@ export default function Categories({ categories, subcategories, auth }: Categori
     e.preventDefault();
 
     if (editingSubCategory) {
-      router.put(`/mug-sub-categories/${editingSubCategory.id}`, subcategoryFormData, {
+      router.put(`/api/mug-sub-categories/${editingSubCategory.id}`, subcategoryFormData, {
         onSuccess: handleCloseSubcategoryDialog,
       });
     } else {
-      router.post('/mug-sub-categories', subcategoryFormData, {
+      router.post('/api/mug-sub-categories', subcategoryFormData, {
         onSuccess: handleCloseSubcategoryDialog,
       });
     }
@@ -155,7 +155,7 @@ export default function Categories({ categories, subcategories, auth }: Categori
 
   const confirmDelete = () => {
     if (deleteId && deleteType) {
-      const url = deleteType === 'category' ? `/mug-categories/${deleteId}` : `/mug-sub-categories/${deleteId}`;
+      const url = deleteType === 'category' ? `/api/mug-categories/${deleteId}` : `/api/mug-sub-categories/${deleteId}`;
       router.delete(url, {
         onSuccess: () => {
           setIsDeleting(false);

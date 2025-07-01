@@ -174,12 +174,12 @@ export default function Mugs({ mugs, categories, subcategories, auth }: MugsProp
 
     if (editingMug) {
       data.append('_method', 'PUT');
-      router.post(`/mugs/${editingMug.id}`, data, {
+      router.post(`/api/mugs/${editingMug.id}`, data, {
         forceFormData: true,
         onSuccess: handleCloseDialog,
       });
     } else {
-      router.post('/mugs', data, {
+      router.post('/api/mugs', data, {
         forceFormData: true,
         onSuccess: handleCloseDialog,
       });
@@ -208,7 +208,7 @@ export default function Mugs({ mugs, categories, subcategories, auth }: MugsProp
   };
 
   const handleToggleStatus = (mug: Mug) => {
-    router.put(`/mugs/${mug.id}`, {
+    router.put(`/api/mugs/${mug.id}`, {
       name: mug.name,
       description_long: mug.description_long || '',
       description_short: mug.description_short || '',
