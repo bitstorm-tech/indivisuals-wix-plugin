@@ -109,7 +109,7 @@ export default function MugForm({ mug, categories, subcategories, onSuccess, onC
         const croppedImage = await getCroppedImage('cropped-mug-image.jpg', 'image/jpeg');
         if (croppedImage) {
           finalImageFile = croppedImage.file;
-          console.log('Cropped image size:', finalImageFile.size, 'bytes (', (finalImageFile.size / 1024).toFixed(2), 'KB)');
+          // Cropped image size: finalImageFile.size bytes
 
           // Check if the cropped image is too large
           const maxSize = 2 * 1024 * 1024; // 2MB in bytes
@@ -141,13 +141,7 @@ export default function MugForm({ mug, categories, subcategories, onSuccess, onC
       image: finalImageFile,
     };
 
-    // Log for debugging
-    console.log('Submitting form:', {
-      data: submissionData,
-      hasImage: !!submissionData.image,
-      imageType: submissionData.image ? submissionData.image.constructor.name : 'no image',
-      imageSize: submissionData.image ? (submissionData.image as File).size : 0,
-    });
+    // Form submission data prepared
 
     if (mug) {
       // Update existing mug
@@ -167,11 +161,11 @@ export default function MugForm({ mug, categories, subcategories, onSuccess, onC
               router.visit('/admin/mugs');
             }
           },
-          onError: (errors: Record<string, string>) => {
-            console.error('Update validation errors:', errors);
+          onError: () => {
+            // Update validation errors occurred
           },
-          onProgress: (progress) => {
-            console.log('Upload progress:', progress);
+          onProgress: () => {
+            // Upload progress tracking
           },
         },
       );
@@ -187,13 +181,8 @@ export default function MugForm({ mug, categories, subcategories, onSuccess, onC
             router.visit('/admin/mugs');
           }
         },
-        onError: (errors: Record<string, string>) => {
-          console.error('Create validation errors:', errors);
-          console.error('Full error response:', {
-            errors: form.errors,
-            processing: form.processing,
-            progress: form.progress,
-          });
+        onError: () => {
+          // Create validation errors occurred
         },
       });
     }

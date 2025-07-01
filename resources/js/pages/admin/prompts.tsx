@@ -76,7 +76,6 @@ export default function Prompts({ prompts, categories, auth }: PromptsProps) {
     router.visit('/admin/prompts/new');
   };
 
-
   return (
     <>
       <Head title="Admin - Prompts" />

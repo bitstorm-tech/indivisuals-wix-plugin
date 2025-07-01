@@ -35,7 +35,7 @@ export default function PromptFormPage({ prompt, categories, subcategories, auth
               <p className="text-gray-600">{isEditing ? 'Update the prompt details below.' : 'Create a new prompt for your collection.'}</p>
             </div>
 
-            <div className="max-w-4xl mx-auto">
+            <div className="mx-auto max-w-4xl">
               <PromptForm prompt={prompt} categories={categories} subcategories={subcategories} />
             </div>
           </div>

@@ -35,7 +35,7 @@ export default function MugFormPage({ mug, categories, subcategories, auth }: Mu
               <p className="text-gray-600">{isEditing ? 'Update the mug details below.' : 'Create a new mug for your catalog.'}</p>
             </div>
 
-            <div className="max-w-4xl mx-auto">
+            <div className="mx-auto max-w-4xl">
               <MugForm mug={mug} categories={categories} subcategories={subcategories} />
             </div>
           </div>
