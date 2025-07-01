@@ -24,6 +24,8 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 Route::middleware('auth')->group(function () {
     // Prompt management
     Route::get('/admin/prompts', [AdminPromptController::class, 'prompts'])->name('admin.prompts');
+    Route::get('/admin/prompts/new', [AdminPromptController::class, 'create'])->name('admin.prompts.create');
+    Route::get('/admin/prompts/{prompt}/edit', [AdminPromptController::class, 'edit'])->name('admin.prompts.edit');
     Route::get('/admin/prompt-categories', [AdminPromptController::class, 'promptCategories'])->name('admin.prompt-categories');
 
     // Mug management

@@ -1,6 +1,5 @@
 import AdminSidebar from '@/components/admin/AdminSidebar';
 import DeleteConfirmationDialog from '@/components/admin/DeleteConfirmationDialog';
-import NewOrEditPromptDialog from '@/components/admin/NewOrEditPromptDialog';
 import PromptTable from '@/components/admin/PromptTable';
 import PromptTableHeader from '@/components/admin/PromptTableHeader';
 import TestPromptDialog from '@/components/admin/TestPromptDialog';
@@ -23,21 +22,18 @@ interface PromptsProps {
   };
 }
 
-export default function Prompts({ prompts, categories, subcategories, auth }: PromptsProps) {
+export default function Prompts({ prompts, categories, auth }: PromptsProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [testingPromptId, setTestingPromptId] = useState<number | undefined>(undefined);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const [promptToDelete, setPromptToDelete] = useState<number | undefined>(undefined);
-  const [isPromptDialogOpen, setIsPromptDialogOpen] = useState<boolean>(false);
-  const [editingPrompt, setEditingPrompt] = useState<Prompt | undefined>(undefined);
 
   // Filter prompts based on selected category
   const filteredPrompts = selectedCategory === 'all' ? prompts : prompts.filter((prompt) => prompt.category_id === parseInt(selectedCategory));
 
   const handleEdit = (prompt: Prompt) => {
-    setEditingPrompt(prompt);
-    setIsPromptDialogOpen(true);
+    router.visit(`/admin/prompts/${prompt.id}/edit`);
   };
 
   const handleDelete = (promptId: number) => {
@@ -77,14 +73,9 @@ export default function Prompts({ prompts, categories, subcategories, auth }: Pr
   };
 
   const handleNewPrompt = () => {
-    setEditingPrompt(undefined);
-    setIsPromptDialogOpen(true);
+    router.visit('/admin/prompts/new');
   };
 
-  const handleClosePromptDialog = () => {
-    setIsPromptDialogOpen(false);
-    setEditingPrompt(undefined);
-  };
 
   return (
     <>
@@ -106,14 +97,6 @@ export default function Prompts({ prompts, categories, subcategories, auth }: Pr
             <TestPromptDialog isOpen={isModalOpen} testingPromptId={testingPromptId} onClose={closeModal} />
 
             <DeleteConfirmationDialog isOpen={isDeleteDialogOpen} onConfirm={confirmDelete} onCancel={cancelDelete} />
-
-            <NewOrEditPromptDialog
-              isOpen={isPromptDialogOpen}
-              editingPrompt={editingPrompt}
-              categories={categories}
-              subcategories={subcategories}
-              onClose={handleClosePromptDialog}
-            />
           </div>
         </div>
       </div>
