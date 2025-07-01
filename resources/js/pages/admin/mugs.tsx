@@ -1,9 +1,8 @@
 import AdminSidebar from '@/components/admin/AdminSidebar';
-import NewOrEditMugDialog from '@/components/admin/NewOrEditMugDialog';
 import { Button } from '@/components/ui/Button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table';
-import { Mug, MugCategory, MugSubCategory } from '@/types/mug';
+import { Mug } from '@/types/mug';
 import { Head, router } from '@inertiajs/react';
 import { Edit, Image, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
@@ -16,28 +15,14 @@ interface User {
 
 interface MugsProps {
   mugs: Mug[];
-  categories: MugCategory[];
-  subcategories: MugSubCategory[];
   auth: {
     user: User;
   };
 }
 
-export default function Mugs({ mugs, categories, subcategories, auth }: MugsProps) {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingMug, setEditingMug] = useState<Mug | undefined>(undefined);
+export default function Mugs({ mugs, auth }: MugsProps) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteId, setDeleteId] = useState<number | null>(null);
-
-  const handleOpenDialog = (mug?: Mug) => {
-    setEditingMug(mug);
-    setIsDialogOpen(true);
-  };
-
-  const handleCloseDialog = () => {
-    setIsDialogOpen(false);
-    setEditingMug(undefined);
-  };
 
   const handleDelete = async (id: number) => {
     setDeleteId(id);
@@ -70,7 +55,7 @@ export default function Mugs({ mugs, categories, subcategories, auth }: MugsProp
           <div className="container mx-auto p-6">
             <div className="mb-6 flex items-center justify-between">
               <h1 className="text-2xl font-bold">Mugs</h1>
-              <Button onClick={() => handleOpenDialog()}>
+              <Button onClick={() => router.visit('/admin/mugs/new')}>
                 <Plus className="mr-2 h-4 w-4" />
                 New Mug
               </Button>
@@ -117,7 +102,7 @@ export default function Mugs({ mugs, categories, subcategories, auth }: MugsProp
                         <TableCell>${mug.price}</TableCell>
                         <TableCell>{new Date(mug.created_at).toLocaleDateString()}</TableCell>
                         <TableCell className="text-right">
-                          <Button variant="ghost" size="sm" onClick={() => handleOpenDialog(mug)} className="mr-2">
+                          <Button variant="ghost" size="sm" onClick={() => router.visit(`/admin/mugs/${mug.id}/edit`)} className="mr-2">
                             <Edit className="h-4 w-4" />
                           </Button>
                           <Button variant="ghost" size="sm" onClick={() => handleDelete(mug.id)}>
@@ -130,14 +115,6 @@ export default function Mugs({ mugs, categories, subcategories, auth }: MugsProp
                 </TableBody>
               </Table>
             </div>
-
-            <NewOrEditMugDialog
-              isOpen={isDialogOpen}
-              editingMug={editingMug}
-              categories={categories}
-              subcategories={subcategories}
-              onClose={handleCloseDialog}
-            />
 
             <Dialog open={isDeleting} onOpenChange={setIsDeleting}>
               <DialogContent>

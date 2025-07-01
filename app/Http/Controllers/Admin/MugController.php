@@ -35,13 +35,8 @@ class MugController extends Controller
             return response()->json($mugs);
         }
 
-        $categories = MugCategory::orderBy('name')->get();
-        $subcategories = MugSubCategory::orderBy('name')->get();
-
         return Inertia::render('admin/mugs', [
             'mugs' => $mugs,
-            'categories' => $categories,
-            'subcategories' => $subcategories,
         ]);
     }
 
@@ -51,6 +46,33 @@ class MugController extends Controller
         $mug->image_url = $mug->getImageUrl();
 
         return response()->json($mug);
+    }
+
+    public function create()
+    {
+        $categories = MugCategory::orderBy('name')->get();
+        $subcategories = MugSubCategory::orderBy('name')->get();
+
+        return Inertia::render('admin/mug-form', [
+            'mug' => null,
+            'categories' => $categories,
+            'subcategories' => $subcategories,
+        ]);
+    }
+
+    public function edit(Mug $mug)
+    {
+        $mug->load(['category', 'subcategory']);
+        $mug->image_url = $mug->getImageUrl();
+
+        $categories = MugCategory::orderBy('name')->get();
+        $subcategories = MugSubCategory::orderBy('name')->get();
+
+        return Inertia::render('admin/mug-form', [
+            'mug' => $mug,
+            'categories' => $categories,
+            'subcategories' => $subcategories,
+        ]);
     }
 
     public function store(Request $request)

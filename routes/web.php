@@ -28,6 +28,8 @@ Route::middleware('auth')->group(function () {
 
     // Mug management
     Route::get('/admin/mugs', [MugController::class, 'index'])->name('admin.mugs');
+    Route::get('/admin/mugs/new', [MugController::class, 'create'])->name('admin.mugs.create');
+    Route::get('/admin/mugs/{mug}/edit', [MugController::class, 'edit'])->name('admin.mugs.edit');
     Route::get('/admin/mug-categories', [MugController::class, 'categories'])->name('admin.mug-categories');
 
     // Order management
