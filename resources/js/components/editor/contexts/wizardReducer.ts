@@ -168,7 +168,7 @@ export function wizardReducer(state: WizardState, action: WizardAction): WizardS
         return state; // Can't proceed, return unchanged
       }
 
-      const nextStep = getNextStep(state.currentStep, action.payload?.skipUserData || false);
+      const nextStep = getNextStep(state.currentStep, state.isAuthenticated);
       if (!nextStep) return state;
 
       newState = { ...state, currentStep: nextStep };
@@ -176,7 +176,7 @@ export function wizardReducer(state: WizardState, action: WizardAction): WizardS
     }
 
     case WIZARD_ACTIONS.GO_PREVIOUS: {
-      const previousStep = getPreviousStep(state.currentStep, action.payload?.skipUserData || false);
+      const previousStep = getPreviousStep(state.currentStep, state.isAuthenticated);
       if (!previousStep) return state;
 
       newState = { ...state, currentStep: previousStep };

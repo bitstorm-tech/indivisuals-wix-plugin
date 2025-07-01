@@ -97,8 +97,8 @@ export function WizardProvider({ children, auth }: WizardProviderProps) {
 
   // Action functions that encapsulate dispatch calls
   const goToStep = (step: WizardStep) => dispatch(wizardActions.setStep(step));
-  const goNext = () => dispatch(wizardActions.goNext(state.isAuthenticated));
-  const goPrevious = () => dispatch(wizardActions.goPrevious(state.isAuthenticated));
+  const goNext = () => dispatch(wizardActions.goNext());
+  const goPrevious = () => dispatch(wizardActions.goPrevious());
   const reset = () => dispatch(wizardActions.reset());
 
   const uploadImage = (file: File, url: string) => dispatch(wizardActions.uploadImage(file, url));

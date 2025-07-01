@@ -40,8 +40,8 @@ export type WizardAction =
   | { type: typeof WIZARD_ACTIONS.SET_PROCESSING; payload: boolean }
   | { type: typeof WIZARD_ACTIONS.SET_ERROR; payload: string | null }
   | { type: typeof WIZARD_ACTIONS.RESET }
-  | { type: typeof WIZARD_ACTIONS.GO_NEXT; payload?: { skipUserData: boolean } }
-  | { type: typeof WIZARD_ACTIONS.GO_PREVIOUS; payload?: { skipUserData: boolean } }
+  | { type: typeof WIZARD_ACTIONS.GO_NEXT }
+  | { type: typeof WIZARD_ACTIONS.GO_PREVIOUS }
   // Authentication actions
   | { type: typeof WIZARD_ACTIONS.SET_AUTHENTICATED; payload: boolean }
   | { type: typeof WIZARD_ACTIONS.SET_REGISTERING; payload: boolean }
@@ -111,14 +111,12 @@ export const wizardActions = {
     type: WIZARD_ACTIONS.RESET,
   }),
 
-  goNext: (skipUserData = false): WizardAction => ({
+  goNext: (): WizardAction => ({
     type: WIZARD_ACTIONS.GO_NEXT,
-    payload: { skipUserData },
   }),
 
-  goPrevious: (skipUserData = false): WizardAction => ({
+  goPrevious: (): WizardAction => ({
     type: WIZARD_ACTIONS.GO_PREVIOUS,
-    payload: { skipUserData },
   }),
 
   // Authentication action creators
