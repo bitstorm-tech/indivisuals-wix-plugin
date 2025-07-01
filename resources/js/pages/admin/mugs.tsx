@@ -7,9 +7,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/Switch';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table';
 import { Textarea } from '@/components/ui/Textarea';
+import { useImageCrop } from '@/hooks/useImageCrop';
 import { Head, router } from '@inertiajs/react';
 import { Edit, Image, Plus, Trash2 } from 'lucide-react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import ReactCrop from 'react-image-crop';
+import 'react-image-crop/dist/ReactCrop.css';
 
 interface User {
   id: number;
@@ -79,8 +82,15 @@ export default function Mugs({ mugs, categories, subcategories, auth }: MugsProp
     active: true,
   });
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteId, setDeleteId] = useState<number | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const { crop, setCrop, completedCrop, setCompletedCrop, imgRef, getCroppedImage, setInitialCrop, resetCrop } = useImageCrop({
+    aspectRatio: 1, // Square aspect ratio for mugs
+    initialCropPercent: 80,
+  });
 
   const filteredSubcategories = formData.category_id ? subcategories.filter((sub) => sub.category_id === parseInt(formData.category_id)) : [];
 
@@ -102,6 +112,9 @@ export default function Mugs({ mugs, categories, subcategories, auth }: MugsProp
         subcategory_id: mug.subcategory_id?.toString() || '',
         active: mug.active,
       });
+      if (mug.image_url) {
+        setImagePreview(mug.image_url);
+      }
     } else {
       setEditingMug(null);
       setFormData({
@@ -121,6 +134,11 @@ export default function Mugs({ mugs, categories, subcategories, auth }: MugsProp
       });
     }
     setSelectedFile(null);
+    setImagePreview(null);
+    resetCrop();
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
     setIsDialogOpen(true);
   };
 
@@ -128,16 +146,61 @@ export default function Mugs({ mugs, categories, subcategories, auth }: MugsProp
     setIsDialogOpen(false);
     setEditingMug(null);
     setSelectedFile(null);
+    setImagePreview(null);
+    resetCrop();
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setSelectedFile(e.target.files[0]);
+    const file = e.target.files?.[0];
+    if (file) {
+      // Check file size (2MB limit due to PHP upload_max_filesize)
+      const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+      if (file.size > maxSize) {
+        alert('Image file size must be less than 2MB. Please choose a smaller image or compress it.');
+        e.target.value = ''; // Clear the input
+        return;
+      }
+
+      setSelectedFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+        resetCrop();
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setSelectedFile(null);
+      setImagePreview(null);
+      resetCrop();
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // If there's a completed crop and an image, apply the crop
+    let finalImageFile = selectedFile;
+    if (completedCrop && selectedFile) {
+      try {
+        const croppedImage = await getCroppedImage('cropped-mug-image.jpg', 'image/jpeg');
+        if (croppedImage) {
+          finalImageFile = croppedImage.file;
+          console.log('Cropped image size:', finalImageFile.size, 'bytes (', (finalImageFile.size / 1024).toFixed(2), 'KB)');
+
+          // Check if the cropped image is too large
+          const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+          if (finalImageFile.size > maxSize) {
+            alert('The cropped image is too large (over 2MB). Please select a smaller area or use a lower quality image.');
+            return;
+          }
+        }
+      } catch (error) {
+        console.error('Error cropping image:', error);
+      }
+    }
 
     const data = new FormData();
     data.append('name', formData.name);
@@ -168,8 +231,8 @@ export default function Mugs({ mugs, categories, subcategories, auth }: MugsProp
     if (formData.subcategory_id) {
       data.append('subcategory_id', formData.subcategory_id);
     }
-    if (selectedFile) {
-      data.append('image', selectedFile);
+    if (finalImageFile) {
+      data.append('image', finalImageFile);
     }
 
     if (editingMug) {
@@ -469,7 +532,53 @@ export default function Mugs({ mugs, categories, subcategories, auth }: MugsProp
                       <Label htmlFor="image" className="sm:text-right">
                         Image
                       </Label>
-                      <Input id="image" type="file" accept="image/*" onChange={handleFileChange} className="sm:col-span-3" />
+                      <div className="sm:col-span-3">
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp"
+                          onChange={handleFileChange}
+                          className="hidden"
+                        />
+                        <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>
+                          Choose Mug Image
+                        </Button>
+                        {imagePreview && (
+                          <div className="mt-4 space-y-2">
+                            {selectedFile ? (
+                              <>
+                                <p className="text-sm text-gray-600">Select the area to crop for a square image:</p>
+                                <div className="flex justify-center rounded border p-2">
+                                  <div className="max-h-64 overflow-hidden">
+                                    <ReactCrop
+                                      crop={crop}
+                                      onChange={(c) => setCrop(c)}
+                                      onComplete={(c) => setCompletedCrop(c)}
+                                      aspect={1}
+                                      keepSelection
+                                    >
+                                      <img
+                                        ref={imgRef}
+                                        src={imagePreview}
+                                        alt="Crop preview"
+                                        onLoad={(e) => {
+                                          const img = e.currentTarget;
+                                          setInitialCrop(img);
+                                        }}
+                                        style={{ maxHeight: '256px', width: 'auto' }}
+                                      />
+                                    </ReactCrop>
+                                  </div>
+                                </div>
+                              </>
+                            ) : (
+                              <div className="relative">
+                                <img src={imagePreview} alt="Preview" className="h-32 w-32 rounded object-cover" />
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
                     </div>
                     <div className="grid grid-cols-1 items-start gap-2 sm:grid-cols-4 sm:items-center sm:gap-4">
                       <Label htmlFor="active" className="sm:text-right">
