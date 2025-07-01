@@ -5,7 +5,7 @@ import { ReactNode, createContext, useContext, useEffect, useReducer } from 'rea
 import { WizardStep } from '../constants';
 import { CropData, MugOption, UserData, WizardState } from '../types';
 import { wizardActions } from './wizardActions';
-import { createInitialWizardState, withLogger, wizardReducer } from './wizardReducer';
+import { createInitialWizardState, wizardReducer } from './wizardReducer';
 
 interface WizardContextValue extends WizardState {
   // Additional context-only values
@@ -48,11 +48,8 @@ interface WizardProviderProps {
   auth: Auth;
 }
 
-// Use the reducer with logging in development
-const enhancedReducer = process.env.NODE_ENV === 'development' ? withLogger(wizardReducer) : wizardReducer;
-
 export function WizardProvider({ children, auth }: WizardProviderProps) {
-  const [state, dispatch] = useReducer(enhancedReducer, createInitialWizardState(!!auth.user));
+  const [state, dispatch] = useReducer(wizardReducer, createInitialWizardState(!!auth.user));
 
   // Fetch prompts on mount
   useEffect(() => {

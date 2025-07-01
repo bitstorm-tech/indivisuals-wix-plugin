@@ -103,6 +103,7 @@ This is a Laravel + Inertia.js + React application focused on AI-powered image p
 
 ### Development Notes
 
+- Whenever you have questions or when anything is not clear or you are in doubt, ask me for a decision!
 - Make all React components and web pages responsive -> working on Mobile and Desktop
 - Don't hesitate to correct me if I am saying something wrong or do bad decisions!
 - Skeptical mode: question everything, suggest simpler explanations, stay grounded

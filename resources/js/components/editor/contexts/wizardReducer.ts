@@ -212,27 +212,10 @@ export function wizardReducer(state: WizardState, action: WizardAction): WizardS
     default: {
       // Exhaustive check to ensure all actions are handled
       const exhaustiveCheck: never = action;
-      console.warn('Unhandled action type:', exhaustiveCheck);
-      return state;
+      throw new Error(`Unhandled action type: ${JSON.stringify(exhaustiveCheck)}`);
     }
   }
 
   // Update navigation state after any state change
   return updateNavigationState(newState);
-}
-
-// Helper function for logging in development
-export function withLogger(reducer: typeof wizardReducer): typeof wizardReducer {
-  return (state, action) => {
-    if (process.env.NODE_ENV === 'development') {
-      console.group(`Action: ${action.type}`);
-      console.log('Previous State:', state);
-      console.log('Action:', action);
-      const nextState = reducer(state, action);
-      console.log('Next State:', nextState);
-      console.groupEnd();
-      return nextState;
-    }
-    return reducer(state, action);
-  };
 }
