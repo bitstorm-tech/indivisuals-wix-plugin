@@ -207,24 +207,6 @@ export default function Mugs({ mugs, categories, subcategories, auth }: MugsProp
     setDeleteId(null);
   };
 
-  const handleToggleStatus = (mug: Mug) => {
-    router.put(`/api/mugs/${mug.id}`, {
-      name: mug.name,
-      description_long: mug.description_long || '',
-      description_short: mug.description_short || '',
-      height_mm: mug.height_mm,
-      diameter_mm: mug.diameter_mm,
-      print_template_width_mm: mug.print_template_width_mm,
-      print_template_height_mm: mug.print_template_height_mm,
-      filling_quantity: mug.filling_quantity || '',
-      dishwasher_safe: mug.dishwasher_safe,
-      price: mug.price,
-      category_id: mug.category_id,
-      subcategory_id: mug.subcategory_id,
-      active: !mug.active,
-    });
-  };
-
   return (
     <>
       <Head title="Admin - Mugs" />
@@ -250,7 +232,6 @@ export default function Mugs({ mugs, categories, subcategories, auth }: MugsProp
                     <TableHead>Category</TableHead>
                     <TableHead>Dimensions</TableHead>
                     <TableHead>Price</TableHead>
-                    <TableHead>Active</TableHead>
                     <TableHead>Created At</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
@@ -258,7 +239,7 @@ export default function Mugs({ mugs, categories, subcategories, auth }: MugsProp
                 <TableBody>
                   {mugs.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={8} className="text-center text-gray-500">
+                      <TableCell colSpan={7} className="text-center text-gray-500">
                         No mugs found
                       </TableCell>
                     </TableRow>
@@ -281,9 +262,6 @@ export default function Mugs({ mugs, categories, subcategories, auth }: MugsProp
                         </TableCell>
                         <TableCell>{mug.height_mm && mug.diameter_mm ? `${mug.height_mm}×${mug.diameter_mm}mm` : '-'}</TableCell>
                         <TableCell>${mug.price}</TableCell>
-                        <TableCell>
-                          <Switch checked={mug.active} onCheckedChange={() => handleToggleStatus(mug)} />
-                        </TableCell>
                         <TableCell>{new Date(mug.created_at).toLocaleDateString()}</TableCell>
                         <TableCell className="text-right">
                           <Button variant="ghost" size="sm" onClick={() => handleOpenDialog(mug)} className="mr-2">
