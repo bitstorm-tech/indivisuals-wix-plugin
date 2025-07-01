@@ -127,6 +127,11 @@ class ImageController extends Controller
             // Fall back to original images folder
             $path = 'images/'.$filename;
         }
+        
+        if (! Storage::disk('local')->exists($path)) {
+            // Check in mugs folder
+            $path = 'mugs/'.$filename;
+        }
 
         if (! Storage::disk('local')->exists($path)) {
             abort(404);
