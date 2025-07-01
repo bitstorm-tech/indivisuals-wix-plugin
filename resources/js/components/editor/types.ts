@@ -37,6 +37,12 @@ export interface WizardState {
   selectedGeneratedImage: string | null;
   isProcessing: boolean;
   error: string | null;
+  isAuthenticated: boolean;
+  isRegistering: boolean;
+  registrationError: string | null;
+  prompts: Prompt[];
+  promptsLoading: boolean;
+  promptsError: string | null;
 }
 
 export interface WizardNavigationProps {

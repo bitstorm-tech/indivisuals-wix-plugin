@@ -5,6 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Important: PHP Configuration Requirements
 
 This application requires PHP to be configured with specific upload limits:
+
 - `upload_max_filesize = 4M` (minimum)
 - `post_max_size = 8M` (should be larger than upload_max_filesize)
 
@@ -109,7 +110,7 @@ This is a Laravel + Inertia.js + React application focused on AI-powered image p
 - ALWAYS read the latest documentation from context7
 - Concurrent development setup runs all services simultaneously
 - Use `git mv` to move files that are under version control
-- Avoid useless or unnecessary comments
+- Don't write useless, unnecessary or redundat comments -> only use comments to describe complex logic
 
 #### React
 

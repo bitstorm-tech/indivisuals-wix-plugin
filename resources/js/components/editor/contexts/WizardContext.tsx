@@ -1,23 +1,15 @@
 import { apiFetch } from '@/lib/utils';
 import type { Auth } from '@/types';
 import { Prompt } from '@/types/prompt';
-import { ReactNode, createContext, useContext, useEffect, useState } from 'react';
+import { ReactNode, createContext, useContext, useEffect, useReducer } from 'react';
 import { WizardStep } from '../constants';
 import { CropData, MugOption, UserData, WizardState } from '../types';
+import { wizardActions } from './wizardActions';
+import { createInitialWizardState, withLogger, wizardReducer } from './wizardReducer';
 
 interface WizardContextValue extends WizardState {
-  // Authentication state
-  isAuthenticated: boolean;
+  // Additional context-only values
   auth: Auth;
-
-  // Registration state
-  isRegistering: boolean;
-  registrationError: string | null;
-
-  // Prompts data
-  prompts: Prompt[];
-  promptsLoading: boolean;
-  promptsError: string | null;
 
   // Navigation methods
   goToStep: (step: WizardStep) => void;
@@ -55,36 +47,17 @@ interface WizardProviderProps {
   auth: Auth;
 }
 
-const initialState: WizardState = {
-  currentStep: 'image-upload',
-  uploadedImage: null,
-  uploadedImageUrl: null,
-  cropData: null,
-  selectedPrompt: null,
-  selectedMug: null,
-  userData: null,
-  generatedImageUrls: null,
-  selectedGeneratedImage: null,
-  isProcessing: false,
-  error: null,
-};
+// Use the reducer with logging in development
+const enhancedReducer = process.env.NODE_ENV === 'development' ? withLogger(wizardReducer) : wizardReducer;
 
 export function WizardProvider({ children, auth }: WizardProviderProps) {
-  const [state, setState] = useState<WizardState>(initialState);
-  const [isAuthenticated, setIsAuthenticated] = useState(!!auth.user);
-  const [isRegistering, setIsRegistering] = useState(false);
-  const [registrationError, setRegistrationError] = useState<string | null>(null);
-
-  // Prompts state
-  const [prompts, setPrompts] = useState<Prompt[]>([]);
-  const [promptsLoading, setPromptsLoading] = useState(true);
-  const [promptsError, setPromptsError] = useState<string | null>(null);
+  const [state, dispatch] = useReducer(enhancedReducer, createInitialWizardState(!!auth.user));
 
   // Fetch prompts on mount
   useEffect(() => {
     const controller = new AbortController();
-    setPromptsLoading(true);
-    setPromptsError(null);
+    dispatch(wizardActions.setPromptsLoading(true));
+    dispatch(wizardActions.setPromptsError(null));
 
     apiFetch('/api/prompts', { signal: controller.signal })
       .then((response) => {
@@ -94,20 +67,20 @@ export function WizardProvider({ children, auth }: WizardProviderProps) {
         return response.json();
       })
       .then((data) => {
-        setPrompts(data);
-        setPromptsLoading(false);
+        dispatch(wizardActions.setPrompts(data));
+        dispatch(wizardActions.setPromptsLoading(false));
       })
       .catch((error) => {
         if (error.name !== 'AbortError') {
-          setPromptsError(error.message);
-          setPromptsLoading(false);
+          dispatch(wizardActions.setPromptsError(error.message));
+          dispatch(wizardActions.setPromptsLoading(false));
         }
       });
 
     return () => {
       controller.abort();
     };
-  }, []);
+  }, [dispatch]);
 
   // Scroll to top when step changes
   useEffect(() => {
@@ -116,13 +89,54 @@ export function WizardProvider({ children, auth }: WizardProviderProps) {
 
   // If user is not authenticated and tries to access image generation step, redirect back
   useEffect(() => {
-    if (!isAuthenticated && state.currentStep === 'image-generation') {
-      goToStep('user-data');
+    if (!state.isAuthenticated && state.currentStep === 'image-generation') {
+      dispatch(wizardActions.setStep('user-data'));
     }
-  }, [state.currentStep, isAuthenticated]);
+  }, [state.currentStep, state.isAuthenticated]);
 
   const updateState = <K extends keyof WizardState>(key: K, value: WizardState[K]) => {
-    setState((prev) => ({ ...prev, [key]: value }));
+    // Map old updateState calls to appropriate actions
+    switch (key) {
+      case 'currentStep':
+        dispatch(wizardActions.setStep(value as WizardStep));
+        break;
+      case 'uploadedImage':
+        // This is handled by handleImageUpload
+        break;
+      case 'cropData':
+        if (value) dispatch(wizardActions.cropImage(value as CropData));
+        break;
+      case 'selectedPrompt':
+        if (value) dispatch(wizardActions.selectPrompt(value as Prompt));
+        break;
+      case 'selectedMug':
+        if (value) dispatch(wizardActions.selectMug(value as MugOption));
+        break;
+      case 'userData':
+        if (value) dispatch(wizardActions.setUserData(value as UserData));
+        break;
+      case 'generatedImageUrls':
+        if (value) dispatch(wizardActions.setGeneratedImages(value as string[]));
+        break;
+      case 'selectedGeneratedImage':
+        if (value) dispatch(wizardActions.selectGeneratedImage(value as string));
+        break;
+      case 'isProcessing':
+        dispatch(wizardActions.setProcessing(value as boolean));
+        break;
+      case 'error':
+        dispatch(wizardActions.setError(value as string | null));
+        break;
+      // These are now handled by the reducer
+      case 'isAuthenticated':
+      case 'isRegistering':
+      case 'registrationError':
+      case 'prompts':
+      case 'promptsLoading':
+      case 'promptsError':
+        console.warn(`Attempted to update ${key} via updateState, but this should be handled by specific actions`);
+        break;
+    }
   };
 
   const canProceedFromStep = (step: WizardStep): boolean => {
@@ -148,76 +162,43 @@ export function WizardProvider({ children, auth }: WizardProviderProps) {
   const canGoPrevious = state.currentStep !== 'image-upload';
 
   const goToStep = (step: WizardStep) => {
-    setState((prev) => ({ ...prev, currentStep: step }));
+    dispatch(wizardActions.setStep(step));
   };
 
   const goNext = () => {
-    const currentIndex = ['image-upload', 'prompt-selection', 'mug-selection', 'user-data', 'image-generation', 'preview'].indexOf(state.currentStep);
-    const steps = ['image-upload', 'prompt-selection', 'mug-selection', 'user-data', 'image-generation', 'preview'] as const;
-
-    if (currentIndex < steps.length - 1 && canProceedFromStep(state.currentStep)) {
-      let nextStep = steps[currentIndex + 1];
-
-      // Skip user-data step if user is already authenticated
-      if (nextStep === 'user-data' && isAuthenticated) {
-        nextStep = 'image-generation';
-      }
-
-      goToStep(nextStep);
-    }
+    dispatch(wizardActions.goNext(state.isAuthenticated));
   };
 
   const goPrevious = () => {
-    const currentIndex = ['image-upload', 'prompt-selection', 'mug-selection', 'user-data', 'image-generation', 'preview'].indexOf(state.currentStep);
-    const steps = ['image-upload', 'prompt-selection', 'mug-selection', 'user-data', 'image-generation', 'preview'] as const;
-
-    if (currentIndex > 0) {
-      let previousStep = steps[currentIndex - 1];
-
-      // Skip user-data step when going back if user is already authenticated
-      if (previousStep === 'user-data' && isAuthenticated) {
-        previousStep = 'mug-selection';
-      }
-
-      goToStep(previousStep);
-    }
+    dispatch(wizardActions.goPrevious(state.isAuthenticated));
   };
 
   const reset = () => {
-    if (state.uploadedImageUrl) {
-      URL.revokeObjectURL(state.uploadedImageUrl);
-    }
-    setState(initialState);
+    dispatch(wizardActions.reset());
   };
 
   const handleImageUpload = (file: File, url: string) => {
-    updateState('uploadedImage', file);
-    updateState('uploadedImageUrl', url);
+    dispatch(wizardActions.uploadImage(file, url));
   };
 
   const handleCropComplete = (cropData: CropData) => {
-    updateState('cropData', cropData);
+    dispatch(wizardActions.cropImage(cropData));
   };
 
   const handleRemoveImage = () => {
-    if (state.uploadedImageUrl) {
-      URL.revokeObjectURL(state.uploadedImageUrl);
-    }
-    updateState('uploadedImage', null);
-    updateState('uploadedImageUrl', null);
-    updateState('cropData', null);
+    dispatch(wizardActions.removeImage());
   };
 
   const handlePromptSelect = (prompt: Prompt) => {
-    updateState('selectedPrompt', prompt);
+    dispatch(wizardActions.selectPrompt(prompt));
   };
 
   const handleMugSelect = (mug: MugOption) => {
-    updateState('selectedMug', mug);
+    dispatch(wizardActions.selectMug(mug));
   };
 
   const handleUserDataComplete = (data: UserData) => {
-    updateState('userData', data);
+    dispatch(wizardActions.setUserData(data));
   };
 
   const handleUserRegistration = async (): Promise<boolean> => {
@@ -225,8 +206,8 @@ export function WizardProvider({ children, auth }: WizardProviderProps) {
       return true; // Not on user data step, proceed normally
     }
 
-    setIsRegistering(true);
-    setRegistrationError(null);
+    dispatch(wizardActions.setRegistering(true));
+    dispatch(wizardActions.setRegistrationError(null));
 
     try {
       const response = await apiFetch('/api/register-or-login', {
@@ -245,20 +226,20 @@ export function WizardProvider({ children, auth }: WizardProviderProps) {
       }
 
       const data = await response.json();
-      setIsAuthenticated(data.authenticated);
+      dispatch(wizardActions.setAuthenticated(data.authenticated));
 
       return data.authenticated;
     } catch (error) {
-      setRegistrationError(error instanceof Error ? error.message : 'An error occurred during registration');
+      dispatch(wizardActions.setRegistrationError(error instanceof Error ? error.message : 'An error occurred during registration'));
       return false; // Error, prevent navigation
     } finally {
-      setIsRegistering(false);
+      dispatch(wizardActions.setRegistering(false));
     }
   };
 
   const handleNext = async () => {
     // Only handle registration if on user-data step and not authenticated
-    if (state.currentStep === 'user-data' && !isAuthenticated) {
+    if (state.currentStep === 'user-data' && !state.isAuthenticated) {
       const success = await handleUserRegistration();
       if (success) {
         goNext();
@@ -269,19 +250,19 @@ export function WizardProvider({ children, auth }: WizardProviderProps) {
   };
 
   const handleImagesGenerated = (urls: string[]) => {
-    updateState('generatedImageUrls', urls);
+    dispatch(wizardActions.setGeneratedImages(urls));
   };
 
   const handleImageSelect = (url: string) => {
-    updateState('selectedGeneratedImage', url);
+    dispatch(wizardActions.selectGeneratedImage(url));
   };
 
   const handleGenerationStart = () => {
-    updateState('isProcessing', true);
+    dispatch(wizardActions.setProcessing(true));
   };
 
   const handleGenerationEnd = () => {
-    updateState('isProcessing', false);
+    dispatch(wizardActions.setProcessing(false));
   };
 
   const getCompletedSteps = (): WizardStep[] => {
@@ -290,20 +271,14 @@ export function WizardProvider({ children, auth }: WizardProviderProps) {
     if (state.selectedPrompt) completed.push('prompt-selection');
     if (state.selectedMug) completed.push('mug-selection');
     // Mark user-data as completed if user is authenticated OR if userData is filled
-    if (isAuthenticated || state.userData) completed.push('user-data');
+    if (state.isAuthenticated || state.userData) completed.push('user-data');
     if (state.selectedGeneratedImage) completed.push('image-generation');
     return completed;
   };
 
   const value: WizardContextValue = {
     ...state,
-    isAuthenticated,
     auth,
-    isRegistering,
-    registrationError,
-    prompts,
-    promptsLoading,
-    promptsError,
     goToStep,
     goNext,
     goPrevious,
