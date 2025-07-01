@@ -1,10 +1,10 @@
 import { cn } from '@/lib/utils';
 import { Check } from 'lucide-react';
 import { STEP_INDEX, STEP_LABELS, WIZARD_STEPS } from '../constants';
-import { useWizard } from '../contexts/WizardContext';
+import { useWizardContext } from '../contexts/WizardContext';
 
 export default function WizardStepIndicator() {
-  const { currentStep, getCompletedSteps } = useWizard();
+  const { currentStep, getCompletedSteps } = useWizardContext();
   const completedSteps = getCompletedSteps();
   const currentStepIndex = STEP_INDEX[currentStep];
 

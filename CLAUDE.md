@@ -63,6 +63,7 @@ bun install
   - Prettier: 150 char line width, single quotes, semicolons
   - ESLint: TypeScript support, React hooks rules enforced
 - TypeScript strict mode enabled with path aliases (@/_ for resources/js/_)
+- Use expressive and clear function and variable names
 
 ## Architecture Overview
 

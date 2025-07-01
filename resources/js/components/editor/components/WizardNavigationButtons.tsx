@@ -3,7 +3,7 @@ import { apiFetch } from '@/lib/utils';
 import { router } from '@inertiajs/react';
 import { ArrowLeft, ArrowRight, Loader2, ShoppingCart } from 'lucide-react';
 import { useState } from 'react';
-import { useWizard } from '../contexts/WizardContext';
+import { useWizardContext } from '../contexts/WizardContext';
 
 export default function WizardNavigationButtons() {
   const {
@@ -20,7 +20,7 @@ export default function WizardNavigationButtons() {
     uploadedImageUrl,
     cropData,
     selectedPrompt,
-  } = useWizard();
+  } = useWizardContext();
   const [isAddingToCart, setIsAddingToCart] = useState(false);
 
   const handleNext = async () => {

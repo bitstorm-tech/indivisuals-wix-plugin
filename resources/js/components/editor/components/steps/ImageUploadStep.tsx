@@ -3,12 +3,12 @@ import { cn } from '@/lib/utils';
 import { Upload, X } from 'lucide-react';
 import React, { useRef } from 'react';
 import { PixelCrop } from 'react-image-crop';
-import { useWizard } from '../../contexts/WizardContext';
+import { useWizardContext } from '../../contexts/WizardContext';
 import { useImageCropper } from '../../hooks/useImageCropper';
 import ImageCropper from '../shared/ImageCropper';
 
 export default function ImageUploadStep() {
-  const { uploadImage, cropImage, removeImage, uploadedImageUrl } = useWizard();
+  const { uploadImage, cropImage, removeImage, uploadedImageUrl } = useWizardContext();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { crop, setCrop, setCompletedCrop, convertToCropData } = useImageCropper();
 

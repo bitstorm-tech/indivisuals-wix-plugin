@@ -1,11 +1,11 @@
 import { cn } from '@/lib/utils';
 import { Check } from 'lucide-react';
-import { useWizard } from '../../contexts/WizardContext';
+import { useWizardContext } from '../../contexts/WizardContext';
 import { usePromptSelection } from '../../hooks/usePromptSelection';
 import PromptCategoryFilter from '../shared/PromptCategoryFilter';
 
 export default function PromptSelectionStep() {
-  const { prompts, selectedPrompt, selectPrompt } = useWizard();
+  const { prompts, selectedPrompt, selectPrompt } = useWizardContext();
   const { selectedCategory, setSelectedCategory, filteredPrompts, categories } = usePromptSelection(prompts);
 
   return (

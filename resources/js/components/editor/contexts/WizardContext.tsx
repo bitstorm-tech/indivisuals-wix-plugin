@@ -204,10 +204,10 @@ export function WizardProvider({ children, auth }: WizardProviderProps) {
   return <WizardContext.Provider value={value}>{children}</WizardContext.Provider>;
 }
 
-export function useWizard() {
+export function useWizardContext() {
   const context = useContext(WizardContext);
   if (!context) {
-    throw new Error('useWizard must be used within a WizardProvider');
+    throw new Error('useWizardContext must be used within a WizardProvider');
   }
   return context;
 }

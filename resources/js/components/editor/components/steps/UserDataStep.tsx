@@ -2,11 +2,11 @@ import { Alert, AlertDescription } from '@/components/ui/Alert';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 import { Info, Lock } from 'lucide-react';
-import { useWizard } from '../../contexts/WizardContext';
+import { useWizardContext } from '../../contexts/WizardContext';
 import { useUserDataForm } from '../../hooks/useUserDataForm';
 
 export default function UserDataStep() {
-  const { userData, setUserData } = useWizard();
+  const { userData, setUserData } = useWizardContext();
   const { formData, errors, handleChange, validateForm } = useUserDataForm(userData);
 
   const handleEmailChange = (value: string) => {

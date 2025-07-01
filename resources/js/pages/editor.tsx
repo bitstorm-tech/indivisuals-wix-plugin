@@ -6,7 +6,7 @@ import MugSelectionStep from '@/components/editor/components/steps/MugSelectionS
 import PreviewStep from '@/components/editor/components/steps/PreviewStep';
 import PromptSelectionStep from '@/components/editor/components/steps/PromptSelectionStep';
 import UserDataStep from '@/components/editor/components/steps/UserDataStep';
-import { WizardProvider, useWizard } from '@/components/editor/contexts/WizardContext';
+import { WizardProvider, useWizardContext } from '@/components/editor/contexts/WizardContext';
 import type { Auth } from '@/types';
 
 export interface EditorProps {
@@ -14,7 +14,7 @@ export interface EditorProps {
 }
 
 function EditorContent() {
-  const wizard = useWizard();
+  const wizard = useWizardContext();
 
   if (wizard.promptsLoading) {
     return (

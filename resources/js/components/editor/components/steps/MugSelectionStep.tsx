@@ -1,10 +1,10 @@
 import { cn } from '@/lib/utils';
 import { Check, Star } from 'lucide-react';
 import { MUG_OPTIONS } from '../../constants';
-import { useWizard } from '../../contexts/WizardContext';
+import { useWizardContext } from '../../contexts/WizardContext';
 
 export default function MugSelectionStep() {
-  const { selectedMug, selectMug } = useWizard();
+  const { selectedMug, selectMug } = useWizardContext();
   return (
     <div className="space-y-6">
       <div>

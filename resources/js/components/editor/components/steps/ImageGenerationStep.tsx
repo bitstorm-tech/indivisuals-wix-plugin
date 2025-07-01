@@ -1,7 +1,7 @@
 import { Alert, AlertDescription } from '@/components/ui/Alert';
 import { Loader2, Sparkles } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import { useWizard } from '../../contexts/WizardContext';
+import { useWizardContext } from '../../contexts/WizardContext';
 import { useImageGeneration } from '../../hooks/useImageGeneration';
 import ImageVariantSelector from '../shared/ImageVariantSelector';
 
@@ -20,7 +20,7 @@ const funnyMessages = [
 
 export default function ImageGenerationStep() {
   const { uploadedImage, selectedPrompt, generatedImageUrls, selectedGeneratedImage, setProcessing, setGeneratedImages, selectGeneratedImage } =
-    useWizard();
+    useWizardContext();
   const { isGenerating, error, generateImages } = useImageGeneration();
   const hasStartedGeneration = useRef(false);
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
