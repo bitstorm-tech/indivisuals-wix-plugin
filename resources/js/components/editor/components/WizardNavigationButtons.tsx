@@ -11,7 +11,7 @@ export default function WizardNavigationButtons() {
     canGoNext,
     canGoPrevious,
     handleNext: onNext,
-    goPrevious: onPrevious,
+    goPrevious,
     isProcessing,
     isRegistering,
     selectedMug,
@@ -73,7 +73,7 @@ export default function WizardNavigationButtons() {
 
   return (
     <div className="flex items-center justify-between">
-      <Button variant="outline" onClick={onPrevious} disabled={!canGoPrevious || isProcessing || isRegistering} className="gap-2">
+      <Button variant="outline" onClick={goPrevious} disabled={!canGoPrevious || isProcessing || isRegistering} className="gap-2">
         <ArrowLeft className="h-4 w-4" />
         Back
       </Button>

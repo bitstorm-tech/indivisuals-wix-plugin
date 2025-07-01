@@ -5,8 +5,8 @@ import { WIZARD_ACTIONS, WizardAction } from './wizardActions';
 const WIZARD_STEPS: WizardStep[] = ['image-upload', 'prompt-selection', 'mug-selection', 'user-data', 'image-generation', 'preview'];
 
 export function createInitialWizardState(isAuthenticated: boolean): WizardState {
-  return {
-    currentStep: 'image-upload',
+  const state = {
+    currentStep: 'image-upload' as WizardStep,
     uploadedImage: null,
     uploadedImageUrl: null,
     cropData: null,
@@ -25,12 +25,21 @@ export function createInitialWizardState(isAuthenticated: boolean): WizardState 
     prompts: [],
     promptsLoading: true,
     promptsError: null,
+    // Navigation state - will be calculated
+    canGoNext: false,
+    canGoPrevious: false,
   };
+
+  // Calculate navigation state
+  state.canGoNext = canProceedFromStep(state, state.currentStep);
+  state.canGoPrevious = state.currentStep !== 'image-upload';
+
+  return state;
 }
 
 export const initialWizardState = createInitialWizardState(false);
 
-function canProceedFromStep(state: WizardState, step: WizardStep): boolean {
+export function canProceedFromStep(state: WizardState, step: WizardStep): boolean {
   switch (step) {
     case 'image-upload':
       return state.uploadedImage !== null;
@@ -47,6 +56,15 @@ function canProceedFromStep(state: WizardState, step: WizardStep): boolean {
     default:
       return false;
   }
+}
+
+// Update navigation state after any state change
+function updateNavigationState(state: WizardState): WizardState {
+  return {
+    ...state,
+    canGoNext: canProceedFromStep(state, state.currentStep),
+    canGoPrevious: state.currentStep !== 'image-upload',
+  };
 }
 
 function getNextStep(currentStep: WizardStep, skipUserData: boolean): WizardStep | null {
@@ -74,64 +92,78 @@ function getPreviousStep(currentStep: WizardStep, skipUserData: boolean): Wizard
 }
 
 export function wizardReducer(state: WizardState, action: WizardAction): WizardState {
+  let newState: WizardState;
+
   switch (action.type) {
     case WIZARD_ACTIONS.SET_STEP:
-      return { ...state, currentStep: action.payload };
+      newState = { ...state, currentStep: action.payload };
+      break;
 
     case WIZARD_ACTIONS.UPLOAD_IMAGE:
-      return {
+      newState = {
         ...state,
         uploadedImage: action.payload.file,
         uploadedImageUrl: action.payload.url,
         cropData: null, // Reset crop data when new image is uploaded
       };
+      break;
 
     case WIZARD_ACTIONS.CROP_IMAGE:
-      return { ...state, cropData: action.payload };
+      newState = { ...state, cropData: action.payload };
+      break;
 
     case WIZARD_ACTIONS.REMOVE_IMAGE:
       // Clean up the object URL if it exists
       if (state.uploadedImageUrl) {
         URL.revokeObjectURL(state.uploadedImageUrl);
       }
-      return {
+      newState = {
         ...state,
         uploadedImage: null,
         uploadedImageUrl: null,
         cropData: null,
       };
+      break;
 
     case WIZARD_ACTIONS.SELECT_PROMPT:
-      return { ...state, selectedPrompt: action.payload };
+      newState = { ...state, selectedPrompt: action.payload };
+      break;
 
     case WIZARD_ACTIONS.SELECT_MUG:
-      return { ...state, selectedMug: action.payload };
+      newState = { ...state, selectedMug: action.payload };
+      break;
 
     case WIZARD_ACTIONS.SET_USER_DATA:
-      return { ...state, userData: action.payload };
+      newState = { ...state, userData: action.payload };
+      break;
 
     case WIZARD_ACTIONS.SET_GENERATED_IMAGES:
-      return {
+      newState = {
         ...state,
         generatedImageUrls: action.payload,
         selectedGeneratedImage: null, // Reset selection when new images are generated
       };
+      break;
 
     case WIZARD_ACTIONS.SELECT_GENERATED_IMAGE:
-      return { ...state, selectedGeneratedImage: action.payload };
+      newState = { ...state, selectedGeneratedImage: action.payload };
+      break;
 
     case WIZARD_ACTIONS.SET_PROCESSING:
-      return { ...state, isProcessing: action.payload };
+      newState = { ...state, isProcessing: action.payload };
+      break;
 
     case WIZARD_ACTIONS.SET_ERROR:
-      return { ...state, error: action.payload };
+      newState = { ...state, error: action.payload };
+      break;
 
     case WIZARD_ACTIONS.RESET:
       // Clean up the object URL if it exists
       if (state.uploadedImageUrl) {
         URL.revokeObjectURL(state.uploadedImageUrl);
       }
-      return initialWizardState;
+      newState = createInitialWizardState(state.isAuthenticated);
+      break;
 
     case WIZARD_ACTIONS.GO_NEXT: {
       if (!canProceedFromStep(state, state.currentStep)) {
@@ -141,35 +173,43 @@ export function wizardReducer(state: WizardState, action: WizardAction): WizardS
       const nextStep = getNextStep(state.currentStep, action.payload?.skipUserData || false);
       if (!nextStep) return state;
 
-      return { ...state, currentStep: nextStep };
+      newState = { ...state, currentStep: nextStep };
+      break;
     }
 
     case WIZARD_ACTIONS.GO_PREVIOUS: {
       const previousStep = getPreviousStep(state.currentStep, action.payload?.skipUserData || false);
       if (!previousStep) return state;
 
-      return { ...state, currentStep: previousStep };
+      newState = { ...state, currentStep: previousStep };
+      break;
     }
 
     // Authentication actions
     case WIZARD_ACTIONS.SET_AUTHENTICATED:
-      return { ...state, isAuthenticated: action.payload };
+      newState = { ...state, isAuthenticated: action.payload };
+      break;
 
     case WIZARD_ACTIONS.SET_REGISTERING:
-      return { ...state, isRegistering: action.payload };
+      newState = { ...state, isRegistering: action.payload };
+      break;
 
     case WIZARD_ACTIONS.SET_REGISTRATION_ERROR:
-      return { ...state, registrationError: action.payload };
+      newState = { ...state, registrationError: action.payload };
+      break;
 
     // Prompts actions
     case WIZARD_ACTIONS.SET_PROMPTS:
-      return { ...state, prompts: action.payload };
+      newState = { ...state, prompts: action.payload };
+      break;
 
     case WIZARD_ACTIONS.SET_PROMPTS_LOADING:
-      return { ...state, promptsLoading: action.payload };
+      newState = { ...state, promptsLoading: action.payload };
+      break;
 
     case WIZARD_ACTIONS.SET_PROMPTS_ERROR:
-      return { ...state, promptsError: action.payload };
+      newState = { ...state, promptsError: action.payload };
+      break;
 
     default: {
       // Exhaustive check to ensure all actions are handled
@@ -178,6 +218,9 @@ export function wizardReducer(state: WizardState, action: WizardAction): WizardS
       return state;
     }
   }
+
+  // Update navigation state after any state change
+  return updateNavigationState(newState);
 }
 
 // Helper function for logging in development

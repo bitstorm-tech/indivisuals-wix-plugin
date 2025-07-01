@@ -5,8 +5,8 @@ import { usePromptSelection } from '../../hooks/usePromptSelection';
 import PromptCategoryFilter from '../shared/PromptCategoryFilter';
 
 export default function PromptSelectionStep() {
-  const wizard = useWizard();
-  const { selectedCategory, setSelectedCategory, filteredPrompts, categories } = usePromptSelection(wizard.prompts);
+  const { prompts, selectedPrompt, selectPrompt } = useWizard();
+  const { selectedCategory, setSelectedCategory, filteredPrompts, categories } = usePromptSelection(prompts);
 
   return (
     <div className="space-y-6">
@@ -19,12 +19,12 @@ export default function PromptSelectionStep() {
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {filteredPrompts.map((prompt) => {
-          const isSelected = wizard.selectedPrompt?.id === prompt.id;
+          const isSelected = selectedPrompt?.id === prompt.id;
 
           return (
             <div
               key={prompt.id}
-              onClick={() => wizard.handlePromptSelect(prompt)}
+              onClick={() => selectPrompt(prompt)}
               className={cn(
                 'group relative cursor-pointer overflow-hidden rounded-lg border-2 transition-all duration-300',
                 isSelected ? 'border-primary shadow-md' : 'border-gray-200 hover:-translate-y-1 hover:border-gray-300 hover:shadow-xl',

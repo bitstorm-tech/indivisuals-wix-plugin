@@ -19,16 +19,8 @@ const funnyMessages = [
 ];
 
 export default function ImageGenerationStep() {
-  const {
-    uploadedImage,
-    selectedPrompt,
-    generatedImageUrls,
-    selectedGeneratedImage,
-    handleImagesGenerated,
-    handleImageSelect,
-    handleGenerationStart,
-    handleGenerationEnd,
-  } = useWizard();
+  const { uploadedImage, selectedPrompt, generatedImageUrls, selectedGeneratedImage, setProcessing, setGeneratedImages, selectGeneratedImage } =
+    useWizard();
   const { isGenerating, error, generateImages } = useImageGeneration();
   const hasStartedGeneration = useRef(false);
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
@@ -47,16 +39,16 @@ export default function ImageGenerationStep() {
     if (!generatedImageUrls && uploadedImage && selectedPrompt?.id && !hasStartedGeneration.current) {
       hasStartedGeneration.current = true;
       const performGeneration = async () => {
-        handleGenerationStart();
+        setProcessing(true);
         const urls = await generateImages(uploadedImage, selectedPrompt.id);
         if (urls) {
-          handleImagesGenerated(urls);
+          setGeneratedImages(urls);
         }
-        handleGenerationEnd();
+        setProcessing(false);
       };
       performGeneration();
     }
-  }, [uploadedImage, selectedPrompt?.id, generatedImageUrls, generateImages, handleGenerationStart, handleGenerationEnd, handleImagesGenerated]);
+  }, [uploadedImage, selectedPrompt?.id, generatedImageUrls, generateImages, setProcessing, setGeneratedImages]);
 
   if (isGenerating) {
     return (
@@ -93,7 +85,7 @@ export default function ImageGenerationStep() {
         <p className="text-sm text-gray-600">Select the design that best captures your vision from these AI-generated variations</p>
       </div>
 
-      <ImageVariantSelector variants={generatedImageUrls} selectedVariant={selectedGeneratedImage} onVariantSelect={handleImageSelect} />
+      <ImageVariantSelector variants={generatedImageUrls} selectedVariant={selectedGeneratedImage} onVariantSelect={selectGeneratedImage} />
 
       {selectedGeneratedImage && (
         <div className="rounded-lg bg-green-50 p-4">

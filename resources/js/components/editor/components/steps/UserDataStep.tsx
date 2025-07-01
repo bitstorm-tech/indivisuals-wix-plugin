@@ -6,21 +6,21 @@ import { useWizard } from '../../contexts/WizardContext';
 import { useUserDataForm } from '../../hooks/useUserDataForm';
 
 export default function UserDataStep() {
-  const wizard = useWizard();
-  const { formData, errors, handleChange, validateForm } = useUserDataForm(wizard.userData);
+  const { userData, setUserData } = useWizard();
+  const { formData, errors, handleChange, validateForm } = useUserDataForm(userData);
 
   const handleEmailChange = (value: string) => {
     handleChange('email', value);
     // Check if email is valid and update parent state immediately
     const isValidEmail = value && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
     if (isValidEmail) {
-      wizard.handleUserDataComplete({ ...formData, email: value });
+      setUserData({ ...formData, email: value });
     }
   };
 
   const handleBlur = () => {
     if (validateForm()) {
-      wizard.handleUserDataComplete(formData);
+      setUserData(formData);
     }
   };
 

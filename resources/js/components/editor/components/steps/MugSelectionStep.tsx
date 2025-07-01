@@ -4,7 +4,7 @@ import { MUG_OPTIONS } from '../../constants';
 import { useWizard } from '../../contexts/WizardContext';
 
 export default function MugSelectionStep() {
-  const { selectedMug, handleMugSelect } = useWizard();
+  const { selectedMug, selectMug } = useWizard();
   return (
     <div className="space-y-6">
       <div>
@@ -19,7 +19,7 @@ export default function MugSelectionStep() {
           return (
             <div
               key={mug.id}
-              onClick={() => handleMugSelect(mug)}
+              onClick={() => selectMug(mug)}
               className={cn(
                 'relative cursor-pointer overflow-hidden rounded-lg border-2 transition-all',
                 isSelected ? 'border-primary shadow-lg' : 'border-gray-200 hover:border-gray-300 hover:shadow-md',

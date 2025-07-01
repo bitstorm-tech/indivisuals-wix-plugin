@@ -11,28 +11,29 @@ interface WizardContextValue extends WizardState {
   // Additional context-only values
   auth: Auth;
 
-  // Navigation methods
+  // Navigation actions
   goToStep: (step: WizardStep) => void;
   goNext: () => void;
   goPrevious: () => void;
-  canGoNext: boolean;
-  canGoPrevious: boolean;
-
-  // State update methods
-  updateState: <K extends keyof WizardState>(key: K, value: WizardState[K]) => void;
   reset: () => void;
 
-  // Event handlers
-  handleImageUpload: (file: File, url: string) => void;
-  handleCropComplete: (cropData: CropData) => void;
-  handleRemoveImage: () => void;
-  handlePromptSelect: (prompt: Prompt) => void;
-  handleMugSelect: (mug: MugOption) => void;
-  handleUserDataComplete: (data: UserData) => void;
-  handleImagesGenerated: (urls: string[]) => void;
-  handleImageSelect: (url: string) => void;
-  handleGenerationStart: () => void;
-  handleGenerationEnd: () => void;
+  // Image actions
+  uploadImage: (file: File, url: string) => void;
+  cropImage: (cropData: CropData) => void;
+  removeImage: () => void;
+
+  // Selection actions
+  selectPrompt: (prompt: Prompt) => void;
+  selectMug: (mug: MugOption) => void;
+  setUserData: (data: UserData) => void;
+
+  // Generation actions
+  setGeneratedImages: (urls: string[]) => void;
+  selectGeneratedImage: (url: string) => void;
+  setProcessing: (isProcessing: boolean) => void;
+  setError: (error: string | null) => void;
+
+  // Complex handlers (keep these as they contain business logic)
   handleNext: () => Promise<void>;
   handleUserRegistration: () => Promise<boolean>;
 
@@ -94,113 +95,26 @@ export function WizardProvider({ children, auth }: WizardProviderProps) {
     }
   }, [state.currentStep, state.isAuthenticated]);
 
-  const updateState = <K extends keyof WizardState>(key: K, value: WizardState[K]) => {
-    // Map old updateState calls to appropriate actions
-    switch (key) {
-      case 'currentStep':
-        dispatch(wizardActions.setStep(value as WizardStep));
-        break;
-      case 'uploadedImage':
-        // This is handled by handleImageUpload
-        break;
-      case 'cropData':
-        if (value) dispatch(wizardActions.cropImage(value as CropData));
-        break;
-      case 'selectedPrompt':
-        if (value) dispatch(wizardActions.selectPrompt(value as Prompt));
-        break;
-      case 'selectedMug':
-        if (value) dispatch(wizardActions.selectMug(value as MugOption));
-        break;
-      case 'userData':
-        if (value) dispatch(wizardActions.setUserData(value as UserData));
-        break;
-      case 'generatedImageUrls':
-        if (value) dispatch(wizardActions.setGeneratedImages(value as string[]));
-        break;
-      case 'selectedGeneratedImage':
-        if (value) dispatch(wizardActions.selectGeneratedImage(value as string));
-        break;
-      case 'isProcessing':
-        dispatch(wizardActions.setProcessing(value as boolean));
-        break;
-      case 'error':
-        dispatch(wizardActions.setError(value as string | null));
-        break;
-      // These are now handled by the reducer
-      case 'isAuthenticated':
-      case 'isRegistering':
-      case 'registrationError':
-      case 'prompts':
-      case 'promptsLoading':
-      case 'promptsError':
-        console.warn(`Attempted to update ${key} via updateState, but this should be handled by specific actions`);
-        break;
-    }
-  };
+  // Action functions that encapsulate dispatch calls
+  const goToStep = (step: WizardStep) => dispatch(wizardActions.setStep(step));
+  const goNext = () => dispatch(wizardActions.goNext(state.isAuthenticated));
+  const goPrevious = () => dispatch(wizardActions.goPrevious(state.isAuthenticated));
+  const reset = () => dispatch(wizardActions.reset());
 
-  const canProceedFromStep = (step: WizardStep): boolean => {
-    switch (step) {
-      case 'image-upload':
-        return state.uploadedImage !== null;
-      case 'prompt-selection':
-        return state.selectedPrompt !== null;
-      case 'mug-selection':
-        return state.selectedMug !== null;
-      case 'user-data':
-        return state.userData !== null && state.userData.email.length > 0;
-      case 'image-generation':
-        return state.selectedGeneratedImage !== null;
-      case 'preview':
-        return state.selectedMug !== null && state.selectedGeneratedImage !== null;
-      default:
-        return false;
-    }
-  };
+  const uploadImage = (file: File, url: string) => dispatch(wizardActions.uploadImage(file, url));
+  const cropImage = (cropData: CropData) => dispatch(wizardActions.cropImage(cropData));
+  const removeImage = () => dispatch(wizardActions.removeImage());
 
-  const canGoNext = canProceedFromStep(state.currentStep);
-  const canGoPrevious = state.currentStep !== 'image-upload';
+  const selectPrompt = (prompt: Prompt) => dispatch(wizardActions.selectPrompt(prompt));
+  const selectMug = (mug: MugOption) => dispatch(wizardActions.selectMug(mug));
+  const setUserData = (data: UserData) => dispatch(wizardActions.setUserData(data));
 
-  const goToStep = (step: WizardStep) => {
-    dispatch(wizardActions.setStep(step));
-  };
+  const setGeneratedImages = (urls: string[]) => dispatch(wizardActions.setGeneratedImages(urls));
+  const selectGeneratedImage = (url: string) => dispatch(wizardActions.selectGeneratedImage(url));
+  const setProcessing = (isProcessing: boolean) => dispatch(wizardActions.setProcessing(isProcessing));
+  const setError = (error: string | null) => dispatch(wizardActions.setError(error));
 
-  const goNext = () => {
-    dispatch(wizardActions.goNext(state.isAuthenticated));
-  };
-
-  const goPrevious = () => {
-    dispatch(wizardActions.goPrevious(state.isAuthenticated));
-  };
-
-  const reset = () => {
-    dispatch(wizardActions.reset());
-  };
-
-  const handleImageUpload = (file: File, url: string) => {
-    dispatch(wizardActions.uploadImage(file, url));
-  };
-
-  const handleCropComplete = (cropData: CropData) => {
-    dispatch(wizardActions.cropImage(cropData));
-  };
-
-  const handleRemoveImage = () => {
-    dispatch(wizardActions.removeImage());
-  };
-
-  const handlePromptSelect = (prompt: Prompt) => {
-    dispatch(wizardActions.selectPrompt(prompt));
-  };
-
-  const handleMugSelect = (mug: MugOption) => {
-    dispatch(wizardActions.selectMug(mug));
-  };
-
-  const handleUserDataComplete = (data: UserData) => {
-    dispatch(wizardActions.setUserData(data));
-  };
-
+  // Complex handlers with business logic
   const handleUserRegistration = async (): Promise<boolean> => {
     if (state.currentStep !== 'user-data' || !state.userData) {
       return true; // Not on user data step, proceed normally
@@ -249,22 +163,6 @@ export function WizardProvider({ children, auth }: WizardProviderProps) {
     }
   };
 
-  const handleImagesGenerated = (urls: string[]) => {
-    dispatch(wizardActions.setGeneratedImages(urls));
-  };
-
-  const handleImageSelect = (url: string) => {
-    dispatch(wizardActions.selectGeneratedImage(url));
-  };
-
-  const handleGenerationStart = () => {
-    dispatch(wizardActions.setProcessing(true));
-  };
-
-  const handleGenerationEnd = () => {
-    dispatch(wizardActions.setProcessing(false));
-  };
-
   const getCompletedSteps = (): WizardStep[] => {
     const completed: WizardStep[] = [];
     if (state.uploadedImage && state.cropData) completed.push('image-upload');
@@ -279,23 +177,25 @@ export function WizardProvider({ children, auth }: WizardProviderProps) {
   const value: WizardContextValue = {
     ...state,
     auth,
+    // Navigation actions
     goToStep,
     goNext,
     goPrevious,
-    canGoNext,
-    canGoPrevious,
-    updateState,
     reset,
-    handleImageUpload,
-    handleCropComplete,
-    handleRemoveImage,
-    handlePromptSelect,
-    handleMugSelect,
-    handleUserDataComplete,
-    handleImagesGenerated,
-    handleImageSelect,
-    handleGenerationStart,
-    handleGenerationEnd,
+    // Image actions
+    uploadImage,
+    cropImage,
+    removeImage,
+    // Selection actions
+    selectPrompt,
+    selectMug,
+    setUserData,
+    // Generation actions
+    setGeneratedImages,
+    selectGeneratedImage,
+    setProcessing,
+    setError,
+    // Complex handlers
     handleNext,
     handleUserRegistration,
     getCompletedSteps,

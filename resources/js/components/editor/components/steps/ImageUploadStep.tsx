@@ -8,7 +8,7 @@ import { useImageCropper } from '../../hooks/useImageCropper';
 import ImageCropper from '../shared/ImageCropper';
 
 export default function ImageUploadStep() {
-  const wizard = useWizard();
+  const { uploadImage, cropImage, removeImage, uploadedImageUrl } = useWizard();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { crop, setCrop, setCompletedCrop, convertToCropData } = useImageCropper();
 
@@ -16,7 +16,7 @@ export default function ImageUploadStep() {
     const file = e.target.files?.[0];
     if (file && file.type.startsWith('image/')) {
       const url = URL.createObjectURL(file);
-      wizard.handleImageUpload(file, url);
+      uploadImage(file, url);
     }
   };
 
@@ -32,7 +32,7 @@ export default function ImageUploadStep() {
     const file = e.dataTransfer.files[0];
     if (file && file.type.startsWith('image/')) {
       const url = URL.createObjectURL(file);
-      wizard.handleImageUpload(file, url);
+      uploadImage(file, url);
     }
   };
 
@@ -40,11 +40,11 @@ export default function ImageUploadStep() {
     setCompletedCrop(pixelCrop);
     if (pixelCrop.width && pixelCrop.height) {
       const cropData = convertToCropData(pixelCrop);
-      wizard.handleCropComplete(cropData);
+      cropImage(cropData);
     }
   };
 
-  if (!wizard.uploadedImageUrl) {
+  if (!uploadedImageUrl) {
     return (
       <div className="flex flex-col items-center justify-center space-y-4">
         <div
@@ -72,7 +72,7 @@ export default function ImageUploadStep() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold">Crop Your Image</h3>
-        <Button variant="ghost" size="sm" onClick={wizard.handleRemoveImage} className="text-red-600 hover:text-red-700">
+        <Button variant="ghost" size="sm" onClick={removeImage} className="text-red-600 hover:text-red-700">
           <X className="mr-2 h-4 w-4" />
           Remove Image
         </Button>
@@ -80,7 +80,7 @@ export default function ImageUploadStep() {
 
       <p className="text-sm text-gray-600">Adjust the crop area to select the perfect portion of your image for the mug</p>
 
-      <ImageCropper imageUrl={wizard.uploadedImageUrl} crop={crop} onCropChange={setCrop} onCropComplete={handleCropComplete} />
+      <ImageCropper imageUrl={uploadedImageUrl} crop={crop} onCropChange={setCrop} onCropComplete={handleCropComplete} />
     </div>
   );
 }

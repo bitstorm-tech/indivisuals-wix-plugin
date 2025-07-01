@@ -43,6 +43,9 @@ export interface WizardState {
   prompts: Prompt[];
   promptsLoading: boolean;
   promptsError: string | null;
+  // Navigation state
+  canGoNext: boolean;
+  canGoPrevious: boolean;
 }
 
 export interface WizardNavigationProps {
