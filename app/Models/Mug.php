@@ -19,7 +19,7 @@ class Mug extends Model
         'price',
         'category_id',
         'subcategory_id',
-        'image_path',
+        'image',
         'active',
     ];
 
@@ -56,10 +56,10 @@ class Mug extends Model
 
     public function getImageUrl(): ?string
     {
-        if (! $this->image_path) {
+        if (! $this->image) {
             return null;
         }
 
-        return \Storage::disk('public')->url($this->image_path);
+        return asset('storage/mugs/'.$this->image);
     }
 }

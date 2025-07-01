@@ -23,7 +23,7 @@ export interface Mug {
   price: number;
   category_id?: number;
   subcategory_id?: number;
-  image_path?: string;
+  image?: string;
   image_url?: string;
   active: boolean;
   category?: MugCategory;

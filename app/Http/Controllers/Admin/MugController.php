@@ -84,7 +84,7 @@ class MugController extends Controller
             // Store the WebP image
             Storage::disk('public')->put('mugs/'.$filename, $webpData);
 
-            $validated['image_path'] = 'mugs/'.$filename;
+            $validated['image'] = $filename;
         }
 
         Mug::create($validated);
@@ -113,8 +113,8 @@ class MugController extends Controller
 
         if ($request->hasFile('image')) {
             // Delete old image if exists
-            if ($mug->image_path) {
-                Storage::disk('public')->delete($mug->image_path);
+            if ($mug->image) {
+                Storage::disk('public')->delete('mugs/'.$mug->image);
             }
 
             $file = $request->file('image');
@@ -128,7 +128,7 @@ class MugController extends Controller
             // Store the WebP image
             Storage::disk('public')->put('mugs/'.$filename, $webpData);
 
-            $validated['image_path'] = 'mugs/'.$filename;
+            $validated['image'] = $filename;
         }
 
         $mug->update($validated);
@@ -139,8 +139,8 @@ class MugController extends Controller
     public function destroy(Mug $mug)
     {
         // Delete image if exists
-        if ($mug->image_path) {
-            Storage::disk('public')->delete($mug->image_path);
+        if ($mug->image) {
+            Storage::disk('public')->delete('mugs/'.$mug->image);
         }
 
         $mug->delete();
