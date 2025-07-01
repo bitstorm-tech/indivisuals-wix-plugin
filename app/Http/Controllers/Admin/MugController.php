@@ -15,6 +15,7 @@ class MugController extends Controller
     public function index()
     {
         $mugs = Mug::with(['category', 'subcategory'])
+            ->where('active', true)
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -22,6 +23,11 @@ class MugController extends Controller
         $mugs->each(function ($mug) {
             $mug->image_url = $mug->getImageUrl();
         });
+
+        // Check if it's an API request
+        if (request()->is('api/*')) {
+            return response()->json($mugs);
+        }
 
         $categories = MugCategory::orderBy('name')->get();
         $subcategories = MugSubCategory::orderBy('name')->get();
@@ -31,6 +37,14 @@ class MugController extends Controller
             'categories' => $categories,
             'subcategories' => $subcategories,
         ]);
+    }
+
+    public function show(Mug $mug)
+    {
+        $mug->load(['category', 'subcategory']);
+        $mug->image_url = $mug->getImageUrl();
+
+        return response()->json($mug);
     }
 
     public function store(Request $request)

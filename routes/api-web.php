@@ -76,9 +76,13 @@ Route::prefix('api')->group(function () {
         Route::delete('/{promptSubCategory}', [PromptController::class, 'destroySubCategory']);
     });
 
+    // Public mug routes
+    Route::get('/mugs', [MugController::class, 'index'])->name('api.mugs.index');
+    Route::get('/mugs/{mug}', [MugController::class, 'show'])->name('api.mugs.show');
+
     // Protected mug routes
     Route::middleware('auth')->group(function () {
-        // Mug CRUD routes (except index and show which might be public)
+        // Mug CRUD routes (except index and show which are public above)
         Route::apiResource('mugs', MugController::class)->except(['index', 'show']);
 
         // Mug categories

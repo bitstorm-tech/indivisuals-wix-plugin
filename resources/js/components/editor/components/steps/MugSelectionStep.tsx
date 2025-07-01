@@ -1,10 +1,35 @@
+import { useMugs } from '@/hooks/useMugs';
 import { cn } from '@/lib/utils';
-import { Check, Star } from 'lucide-react';
-import { MUG_OPTIONS } from '../../constants';
+import { Check, Loader2, Star } from 'lucide-react';
 import { useWizardContext } from '../../contexts/WizardContext';
 
 export default function MugSelectionStep() {
   const { selectedMug, selectMug } = useWizardContext();
+  const { mugs, isLoading, error } = useMugs();
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="rounded-lg bg-red-50 p-4 text-center">
+        <p className="text-sm text-red-600">Failed to load mugs. Please try again later.</p>
+      </div>
+    );
+  }
+
+  if (mugs.length === 0) {
+    return (
+      <div className="rounded-lg bg-gray-50 p-4 text-center">
+        <p className="text-sm text-gray-600">No mugs available at the moment.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -13,7 +38,7 @@ export default function MugSelectionStep() {
       </div>
 
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {MUG_OPTIONS.map((mug) => {
+        {mugs.map((mug) => {
           const isSelected = selectedMug?.id === mug.id;
 
           return (
