@@ -69,7 +69,11 @@ export default function MugSelectionStep() {
 
               <div className="aspect-square bg-gray-100 p-4">
                 <div className="flex h-full items-center justify-center">
-                  <div className="h-32 w-32 rounded-lg bg-gray-300" />
+                  {mug.image ? (
+                    <img src={mug.image} alt={mug.name} className="h-full w-full object-contain" />
+                  ) : (
+                    <div className="h-32 w-32 rounded-lg bg-gray-300" />
+                  )}
                 </div>
               </div>
 
