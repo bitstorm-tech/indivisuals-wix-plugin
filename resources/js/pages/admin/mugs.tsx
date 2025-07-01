@@ -301,53 +301,53 @@ export default function Mugs({ mugs, categories, subcategories, auth }: MugsProp
             </div>
 
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-              <DialogContent className="max-w-2xl">
+              <DialogContent className="max-h-[90vh] max-w-[95vw] overflow-y-auto sm:max-w-lg md:max-w-2xl">
                 <form onSubmit={handleSubmit}>
                   <DialogHeader>
                     <DialogTitle>{editingMug ? 'Edit Mug' : 'New Mug'}</DialogTitle>
                     <DialogDescription>{editingMug ? 'Update the mug details below.' : 'Create a new mug for your catalog.'}</DialogDescription>
                   </DialogHeader>
                   <div className="grid gap-4 py-4">
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="name" className="text-right">
+                    <div className="grid grid-cols-1 items-start gap-2 sm:grid-cols-4 sm:items-center sm:gap-4">
+                      <Label htmlFor="name" className="sm:text-right">
                         Name
                       </Label>
                       <Input
                         id="name"
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        className="col-span-3"
+                        className="sm:col-span-3"
                         required
                       />
                     </div>
-                    <div className="grid grid-cols-4 items-start gap-4">
-                      <Label htmlFor="description_short" className="mt-2 text-right">
+                    <div className="grid grid-cols-1 items-start gap-2 sm:grid-cols-4 sm:gap-4">
+                      <Label htmlFor="description_short" className="sm:mt-2 sm:text-right">
                         Short Description
                       </Label>
                       <Textarea
                         id="description_short"
                         value={formData.description_short}
                         onChange={(e) => setFormData({ ...formData, description_short: e.target.value })}
-                        className="col-span-3"
+                        className="sm:col-span-3"
                         rows={2}
                         placeholder="Brief description for listings"
                       />
                     </div>
-                    <div className="grid grid-cols-4 items-start gap-4">
-                      <Label htmlFor="description_long" className="mt-2 text-right">
+                    <div className="grid grid-cols-1 items-start gap-2 sm:grid-cols-4 sm:gap-4">
+                      <Label htmlFor="description_long" className="sm:mt-2 sm:text-right">
                         Long Description
                       </Label>
                       <Textarea
                         id="description_long"
                         value={formData.description_long}
                         onChange={(e) => setFormData({ ...formData, description_long: e.target.value })}
-                        className="col-span-3"
+                        className="sm:col-span-3"
                         rows={4}
                         placeholder="Detailed product description"
                       />
                     </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="price" className="text-right">
+                    <div className="grid grid-cols-1 items-start gap-2 sm:grid-cols-4 sm:items-center sm:gap-4">
+                      <Label htmlFor="price" className="sm:text-right">
                         Price
                       </Label>
                       <Input
@@ -356,16 +356,16 @@ export default function Mugs({ mugs, categories, subcategories, auth }: MugsProp
                         step="0.01"
                         value={formData.price}
                         onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                        className="col-span-3"
+                        className="sm:col-span-3"
                         required
                       />
                     </div>
 
-                    <div className="col-span-full mt-4">
-                      <h3 className="mb-3 text-lg font-semibold">Dimensions</h3>
+                    <div className="col-span-full mt-2 sm:mt-4">
+                      <h3 className="mb-2 text-base font-semibold sm:mb-3 sm:text-lg">Dimensions</h3>
                     </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="height_mm" className="text-right">
+                    <div className="grid grid-cols-1 items-start gap-2 sm:grid-cols-4 sm:items-center sm:gap-4">
+                      <Label htmlFor="height_mm" className="sm:text-right">
                         Height (mm)
                       </Label>
                       <Input
@@ -373,12 +373,12 @@ export default function Mugs({ mugs, categories, subcategories, auth }: MugsProp
                         type="number"
                         value={formData.height_mm}
                         onChange={(e) => setFormData({ ...formData, height_mm: e.target.value })}
-                        className="col-span-3"
+                        className="sm:col-span-3"
                         placeholder="e.g., 95"
                       />
                     </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="diameter_mm" className="text-right">
+                    <div className="grid grid-cols-1 items-start gap-2 sm:grid-cols-4 sm:items-center sm:gap-4">
+                      <Label htmlFor="diameter_mm" className="sm:text-right">
                         Diameter (mm)
                       </Label>
                       <Input
@@ -386,12 +386,12 @@ export default function Mugs({ mugs, categories, subcategories, auth }: MugsProp
                         type="number"
                         value={formData.diameter_mm}
                         onChange={(e) => setFormData({ ...formData, diameter_mm: e.target.value })}
-                        className="col-span-3"
+                        className="sm:col-span-3"
                         placeholder="e.g., 82"
                       />
                     </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="print_template_width_mm" className="text-right">
+                    <div className="grid grid-cols-1 items-start gap-2 sm:grid-cols-4 sm:items-center sm:gap-4">
+                      <Label htmlFor="print_template_width_mm" className="sm:text-right">
                         Print Width (mm)
                       </Label>
                       <Input
@@ -399,12 +399,12 @@ export default function Mugs({ mugs, categories, subcategories, auth }: MugsProp
                         type="number"
                         value={formData.print_template_width_mm}
                         onChange={(e) => setFormData({ ...formData, print_template_width_mm: e.target.value })}
-                        className="col-span-3"
+                        className="sm:col-span-3"
                         placeholder="Template width"
                       />
                     </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="print_template_height_mm" className="text-right">
+                    <div className="grid grid-cols-1 items-start gap-2 sm:grid-cols-4 sm:items-center sm:gap-4">
+                      <Label htmlFor="print_template_height_mm" className="sm:text-right">
                         Print Height (mm)
                       </Label>
                       <Input
@@ -412,49 +412,51 @@ export default function Mugs({ mugs, categories, subcategories, auth }: MugsProp
                         type="number"
                         value={formData.print_template_height_mm}
                         onChange={(e) => setFormData({ ...formData, print_template_height_mm: e.target.value })}
-                        className="col-span-3"
+                        className="sm:col-span-3"
                         placeholder="Template height"
                       />
                     </div>
 
-                    <div className="col-span-full mt-4">
-                      <h3 className="mb-3 text-lg font-semibold">Specifications</h3>
+                    <div className="col-span-full mt-2 sm:mt-4">
+                      <h3 className="mb-2 text-base font-semibold sm:mb-3 sm:text-lg">Specifications</h3>
                     </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="filling_quantity" className="text-right">
+                    <div className="grid grid-cols-1 items-start gap-2 sm:grid-cols-4 sm:items-center sm:gap-4">
+                      <Label htmlFor="filling_quantity" className="sm:text-right">
                         Filling Quantity
                       </Label>
                       <Input
                         id="filling_quantity"
                         value={formData.filling_quantity}
                         onChange={(e) => setFormData({ ...formData, filling_quantity: e.target.value })}
-                        className="col-span-3"
+                        className="sm:col-span-3"
                         placeholder="e.g., 325ml"
                       />
                     </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="dishwasher_safe" className="text-right">
+                    <div className="grid grid-cols-1 items-start gap-2 sm:grid-cols-4 sm:items-center sm:gap-4">
+                      <Label htmlFor="dishwasher_safe" className="sm:text-right">
                         Dishwasher Safe
                       </Label>
-                      <Switch
-                        id="dishwasher_safe"
-                        checked={formData.dishwasher_safe}
-                        onCheckedChange={(checked) => setFormData({ ...formData, dishwasher_safe: checked })}
-                      />
+                      <div className="flex items-center">
+                        <Switch
+                          id="dishwasher_safe"
+                          checked={formData.dishwasher_safe}
+                          onCheckedChange={(checked) => setFormData({ ...formData, dishwasher_safe: checked })}
+                        />
+                      </div>
                     </div>
 
-                    <div className="col-span-full mt-4">
-                      <h3 className="mb-3 text-lg font-semibold">Categories</h3>
+                    <div className="col-span-full mt-2 sm:mt-4">
+                      <h3 className="mb-2 text-base font-semibold sm:mb-3 sm:text-lg">Categories</h3>
                     </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="category" className="text-right">
+                    <div className="grid grid-cols-1 items-start gap-2 sm:grid-cols-4 sm:items-center sm:gap-4">
+                      <Label htmlFor="category" className="sm:text-right">
                         Category
                       </Label>
                       <Select
                         value={formData.category_id}
                         onValueChange={(value) => setFormData({ ...formData, category_id: value, subcategory_id: '' })}
                       >
-                        <SelectTrigger className="col-span-3">
+                        <SelectTrigger className="sm:col-span-3">
                           <SelectValue placeholder="Select a category" />
                         </SelectTrigger>
                         <SelectContent>
@@ -467,12 +469,12 @@ export default function Mugs({ mugs, categories, subcategories, auth }: MugsProp
                       </Select>
                     </div>
                     {formData.category_id && filteredSubcategories.length > 0 && (
-                      <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="subcategory" className="text-right">
+                      <div className="grid grid-cols-1 items-start gap-2 sm:grid-cols-4 sm:items-center sm:gap-4">
+                        <Label htmlFor="subcategory" className="sm:text-right">
                           Subcategory
                         </Label>
                         <Select value={formData.subcategory_id} onValueChange={(value) => setFormData({ ...formData, subcategory_id: value })}>
-                          <SelectTrigger className="col-span-3">
+                          <SelectTrigger className="sm:col-span-3">
                             <SelectValue placeholder="Select a subcategory" />
                           </SelectTrigger>
                           <SelectContent>
@@ -485,17 +487,19 @@ export default function Mugs({ mugs, categories, subcategories, auth }: MugsProp
                         </Select>
                       </div>
                     )}
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="image" className="text-right">
+                    <div className="grid grid-cols-1 items-start gap-2 sm:grid-cols-4 sm:items-center sm:gap-4">
+                      <Label htmlFor="image" className="sm:text-right">
                         Image
                       </Label>
-                      <Input id="image" type="file" accept="image/*" onChange={handleFileChange} className="col-span-3" />
+                      <Input id="image" type="file" accept="image/*" onChange={handleFileChange} className="sm:col-span-3" />
                     </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="active" className="text-right">
+                    <div className="grid grid-cols-1 items-start gap-2 sm:grid-cols-4 sm:items-center sm:gap-4">
+                      <Label htmlFor="active" className="sm:text-right">
                         Active
                       </Label>
-                      <Switch id="active" checked={formData.active} onCheckedChange={(checked) => setFormData({ ...formData, active: checked })} />
+                      <div className="flex items-center">
+                        <Switch id="active" checked={formData.active} onCheckedChange={(checked) => setFormData({ ...formData, active: checked })} />
+                      </div>
                     </div>
                   </div>
                   <DialogFooter>
