@@ -225,14 +225,13 @@ export default function Categories({ categories, subcategories, auth }: Categori
                       </TableCell>
                     </TableRow>
                   ) : (
-                    categories.map((category) => {
+                    categories.flatMap((category) => {
                       const categorySubcategories = getCategorySubcategories(category.id);
                       const isExpanded = expandedCategories.has(category.id);
                       const hasSubcategories = categorySubcategories.length > 0;
 
-                      return (
-                        <>
-                          <TableRow key={`category-${category.id}`}>
+                      return [
+                        <TableRow key={`category-${category.id}`}>
                             <TableCell>
                               {hasSubcategories && (
                                 <Button variant="ghost" size="sm" onClick={() => toggleCategory(category.id)} className="h-6 w-6 p-0">
@@ -270,9 +269,9 @@ export default function Categories({ categories, subcategories, auth }: Categori
                                 <Trash2 className="h-4 w-4" />
                               </Button>
                             </TableCell>
-                          </TableRow>
-                          {isExpanded &&
-                            categorySubcategories.map((subcategory) => (
+                          </TableRow>,
+                        ...(isExpanded
+                          ? categorySubcategories.map((subcategory) => (
                               <TableRow key={`subcategory-${subcategory.id}`} className="bg-gray-50">
                                 <TableCell></TableCell>
                                 <TableCell className="pl-12 font-medium">{subcategory.name}</TableCell>
@@ -294,9 +293,9 @@ export default function Categories({ categories, subcategories, auth }: Categori
                                   </Button>
                                 </TableCell>
                               </TableRow>
-                            ))}
-                        </>
-                      );
+                            ))
+                          : []),
+                      ];
                     })
                   )}
                 </TableBody>

@@ -207,53 +207,52 @@ export default function Categories({ categories, subcategories, auth }: Categori
                       </TableCell>
                     </TableRow>
                   ) : (
-                    categories.map((category) => {
+                    categories.flatMap((category) => {
                       const categorySubcategories = getCategorySubcategories(category.id);
                       const isExpanded = expandedCategories.has(category.id);
                       const hasSubcategories = categorySubcategories.length > 0;
 
-                      return (
-                        <>
-                          <TableRow key={`category-${category.id}`}>
-                            <TableCell>
-                              {hasSubcategories && (
-                                <Button variant="ghost" size="sm" onClick={() => toggleCategory(category.id)} className="h-6 w-6 p-0">
-                                  <ChevronRight className={`h-4 w-4 transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
-                                </Button>
-                              )}
-                            </TableCell>
-                            <TableCell className="font-medium">{category.name}</TableCell>
-                            <TableCell>{category.prompts_count || 0}</TableCell>
-                            <TableCell>{category.subcategories_count || 0}</TableCell>
-                            <TableCell>{new Date(category.created_at).toLocaleDateString()}</TableCell>
-                            <TableCell className="text-right">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleOpenSubcategoryDialog(undefined, category.id)}
-                                className="mr-1"
-                                title="Add subcategory"
-                              >
-                                <Plus className="h-4 w-4" />
+                      return [
+                        <TableRow key={`category-${category.id}`}>
+                          <TableCell>
+                            {hasSubcategories && (
+                              <Button variant="ghost" size="sm" onClick={() => toggleCategory(category.id)} className="h-6 w-6 p-0">
+                                <ChevronRight className={`h-4 w-4 transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
                               </Button>
-                              <Button variant="ghost" size="sm" onClick={() => handleOpenCategoryDialog(category)} className="mr-1">
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleDelete(category.id, 'category')}
-                                disabled={
-                                  Boolean(category.prompts_count && category.prompts_count > 0) ||
-                                  Boolean(category.subcategories_count && category.subcategories_count > 0)
-                                }
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                          {isExpanded &&
-                            categorySubcategories.map((subcategory) => (
+                            )}
+                          </TableCell>
+                          <TableCell className="font-medium">{category.name}</TableCell>
+                          <TableCell>{category.prompts_count || 0}</TableCell>
+                          <TableCell>{category.subcategories_count || 0}</TableCell>
+                          <TableCell>{new Date(category.created_at).toLocaleDateString()}</TableCell>
+                          <TableCell className="text-right">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleOpenSubcategoryDialog(undefined, category.id)}
+                              className="mr-1"
+                              title="Add subcategory"
+                            >
+                              <Plus className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="sm" onClick={() => handleOpenCategoryDialog(category)} className="mr-1">
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDelete(category.id, 'category')}
+                              disabled={
+                                Boolean(category.prompts_count && category.prompts_count > 0) ||
+                                Boolean(category.subcategories_count && category.subcategories_count > 0)
+                              }
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </TableCell>
+                        </TableRow>,
+                        ...(isExpanded
+                          ? categorySubcategories.map((subcategory) => (
                               <TableRow key={`subcategory-${subcategory.id}`} className="bg-gray-50">
                                 <TableCell></TableCell>
                                 <TableCell className="pl-12 font-medium">{subcategory.name}</TableCell>
@@ -274,9 +273,9 @@ export default function Categories({ categories, subcategories, auth }: Categori
                                   </Button>
                                 </TableCell>
                               </TableRow>
-                            ))}
-                        </>
-                      );
+                            ))
+                          : []),
+                      ];
                     })
                   )}
                 </TableBody>
