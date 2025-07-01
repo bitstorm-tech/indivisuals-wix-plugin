@@ -104,22 +104,23 @@ This is a Laravel + Inertia.js + React application focused on AI-powered image p
 ### Development Notes
 
 - Make all React components and web pages responsive -> working on Mobile and Desktop
-- Don't hessitate to correct me if I am saying something wrong or do bad decisions!
+- Don't hesitate to correct me if I am saying something wrong or do bad decisions!
 - Skeptical mode: question everything, suggest simpler explanations, stay grounded
 - Use and spawn sub-agents to run tasks in parallel whenever possible
 - Private image storage requires route-based access control
-- ALWAYS read the latest documentation from context7
+- ALWAYS read the latest documentation from context7 mcp server
+- Use the puppeteer mcp server to check if the implementation looks right in the browser
 - Concurrent development setup runs all services simultaneously
 - Use `git mv` to move files that are under version control
-- Don't write useless, unnecessary or redundat comments -> only use comments to describe complex logic
+- Don't write useless, unnecessary or redundant comments -> only use comments to describe complex logic
 
 #### React
 
 - Don't use `React.memo`, `useCallback` or `useMemo` since the React compiler handles these optimizations automatically
 - Follow Rules of React (https://react.dev/reference/rules) strictly
 - Use Tailwind flex to design the layout
-- Create small, self contained components or subcomponents where it is usefull
-- Create custom hooks where it is usefull
+- Create small, self contained components or subcomponents where it is useful
+- Create custom hooks where it is useful
 - Move subcomponents and custom hooks into dedicated folders
 - Use shadcn-ui and Tailwind CSS for the styling in the frontend
 - New UI components must be generated with shadcn-ui with `bunx --bun shadcn@latest add` (rename files to PascalCase after generation)
@@ -131,9 +132,9 @@ This is a Laravel + Inertia.js + React application focused on AI-powered image p
 
 #### Laravel
 
-- Use as much Laravel functionallity in the backend as possible
-- Use Inertia functionallity whereever possible
-- Use PHP nullsafe syntax (`?->`) whereever it is usefull
+- Use as much Laravel functionality in the backend as possible
+- Use Inertia functionality wherever possible
+- Use PHP nullsafe syntax (`?->`) wherever it is useful
 - Use `Laravel Pint` after changing php files
 
 ## Authentication Pattern
