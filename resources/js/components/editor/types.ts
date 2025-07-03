@@ -43,6 +43,7 @@ export interface WizardState {
   userData: UserData | null;
   generatedImageUrls: string[] | null;
   selectedGeneratedImage: string | null;
+  generatedImageCropData: CropData | null;
   isProcessing: boolean;
   error: string | null;
   isAuthenticated: boolean;

@@ -13,6 +13,7 @@ export function createInitialWizardState(isAuthenticated: boolean): WizardState 
     userData: null,
     generatedImageUrls: null,
     selectedGeneratedImage: null,
+    generatedImageCropData: null,
     isProcessing: false,
     error: null,
     // Authentication state
@@ -140,11 +141,20 @@ export function wizardReducer(state: WizardState, action: WizardAction): WizardS
         ...state,
         generatedImageUrls: action.payload,
         selectedGeneratedImage: null, // Reset selection when new images are generated
+        generatedImageCropData: null, // Reset crop data when new images are generated
       };
       break;
 
     case WIZARD_ACTIONS.SELECT_GENERATED_IMAGE:
-      newState = { ...state, selectedGeneratedImage: action.payload };
+      newState = { 
+        ...state, 
+        selectedGeneratedImage: action.payload,
+        generatedImageCropData: null, // Reset crop data when selecting a different image
+      };
+      break;
+
+    case WIZARD_ACTIONS.UPDATE_GENERATED_IMAGE_CROP_DATA:
+      newState = { ...state, generatedImageCropData: action.payload };
       break;
 
     case WIZARD_ACTIONS.SET_PROCESSING:

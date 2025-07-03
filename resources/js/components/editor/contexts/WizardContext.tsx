@@ -30,6 +30,7 @@ interface WizardContextValue extends WizardState {
   // Generation actions
   setGeneratedImages: (urls: string[]) => void;
   selectGeneratedImage: (url: string) => void;
+  updateGeneratedImageCropData: (cropData: CropData | null) => void;
   setProcessing: (isProcessing: boolean) => void;
   setError: (error: string | null) => void;
 
@@ -108,6 +109,7 @@ export function WizardProvider({ children, auth }: WizardProviderProps) {
 
   const setGeneratedImages = (urls: string[]) => dispatch(wizardActions.setGeneratedImages(urls));
   const selectGeneratedImage = (url: string) => dispatch(wizardActions.selectGeneratedImage(url));
+  const updateGeneratedImageCropData = (cropData: CropData | null) => dispatch(wizardActions.updateGeneratedImageCropData(cropData));
   const setProcessing = (isProcessing: boolean) => dispatch(wizardActions.setProcessing(isProcessing));
   const setError = (error: string | null) => dispatch(wizardActions.setError(error));
 
@@ -190,6 +192,7 @@ export function WizardProvider({ children, auth }: WizardProviderProps) {
     // Generation actions
     setGeneratedImages,
     selectGeneratedImage,
+    updateGeneratedImageCropData,
     setProcessing,
     setError,
     // Complex handlers
