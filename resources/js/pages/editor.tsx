@@ -1,11 +1,11 @@
 import WizardNavigationButtons from '@/components/editor/components/WizardNavigationButtons';
 import WizardStepIndicator from '@/components/editor/components/WizardStepIndicator';
-import ImageGenerationStep from '@/components/editor/components/steps/5-ImageGenerationStep';
 import ImageUploadStep from '@/components/editor/components/steps/1-ImageUploadStep';
-import MugSelectionStep from '@/components/editor/components/steps/3-MugSelectionStep';
-import PreviewStep from '@/components/editor/components/steps/6-PreviewStep';
 import PromptSelectionStep from '@/components/editor/components/steps/2-PromptSelectionStep';
+import MugSelectionStep from '@/components/editor/components/steps/3-MugSelectionStep';
 import UserDataStep from '@/components/editor/components/steps/4-UserDataStep';
+import ImageGenerationStep from '@/components/editor/components/steps/5-ImageGenerationStep';
+import PreviewStep from '@/components/editor/components/steps/6-PreviewStep';
 import { WizardProvider, useWizardContext } from '@/components/editor/contexts/WizardContext';
 import type { Auth } from '@/types';
 
