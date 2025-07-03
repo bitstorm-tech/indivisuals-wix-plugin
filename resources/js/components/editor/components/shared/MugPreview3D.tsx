@@ -29,7 +29,7 @@ function MugModel({ textureUrl }: MugModelProps) {
   }, [texture]);
 
   // Gentle rotation animation
-  useFrame((state, delta) => {
+  useFrame((_, delta) => {
     if (meshRef.current) {
       meshRef.current.rotation.y += delta * 0.1;
     }
@@ -41,7 +41,7 @@ function MugModel({ textureUrl }: MugModelProps) {
   const mugHeight = 3.2;
   const handleRadius = 0.15;
   const handleSize = 0.9;
-  const handleOffset = 0.05;
+  const handleOffset = -0.63;
   const wallThickness = 0.08;
 
   return (
@@ -59,9 +59,9 @@ function MugModel({ textureUrl }: MugModelProps) {
       </mesh>
 
       {/* Mug handle - complete C-shaped handle */}
-      <group position={[mugRadiusTop + handleSize / 2 + handleOffset, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+      <group position={[mugRadiusTop + handleSize / 2 + handleOffset, 0, 0]} rotation={[0, 0, Math.PI * 1.48]}>
         <mesh>
-          <torusGeometry args={[handleSize * 0.8, handleRadius, 12, 24, Math.PI * 1.5]} />
+          <torusGeometry args={[handleSize * 0.8, handleRadius, 12, 24, Math.PI]} />
           <meshStandardMaterial color="#ffffff" metalness={0.1} roughness={0.6} />
         </mesh>
       </group>
@@ -73,13 +73,13 @@ function MugModel({ textureUrl }: MugModelProps) {
       </mesh>
 
       {/* Bottom inner disk - closes the interior */}
-      <mesh position={[0, -mugHeight / 2 + wallThickness, 0]}>
+      <mesh position={[0, -mugHeight / 2 + wallThickness, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <circleGeometry args={[mugRadiusBottom - wallThickness, 64]} />
         <meshStandardMaterial color="#f5f5f5" metalness={0.05} roughness={0.9} side={THREE.DoubleSide} />
       </mesh>
 
       {/* Rim - rounded edge at the top */}
-      <mesh position={[0, mugHeight / 2, 0]}>
+      <mesh position={[0, mugHeight / 2, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <torusGeometry args={[mugRadiusTop - wallThickness / 2, wallThickness / 2, 8, 32]} />
         <meshStandardMaterial color="#ffffff" metalness={0.1} roughness={0.6} />
       </mesh>
