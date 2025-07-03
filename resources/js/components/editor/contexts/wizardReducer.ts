@@ -146,8 +146,8 @@ export function wizardReducer(state: WizardState, action: WizardAction): WizardS
       break;
 
     case WIZARD_ACTIONS.SELECT_GENERATED_IMAGE:
-      newState = { 
-        ...state, 
+      newState = {
+        ...state,
         selectedGeneratedImage: action.payload,
         generatedImageCropData: null, // Reset crop data when selecting a different image
       };

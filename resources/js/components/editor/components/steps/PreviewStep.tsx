@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/Button';
 import { CheckCircle, Crop, Eye } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { Crop as CropType, PixelCrop } from 'react-image-crop';
+import { Area } from 'react-easy-crop';
 import { useWizardContext } from '../../contexts/WizardContext';
 import GeneratedImageCropper from '../shared/GeneratedImageCropper';
 import MugPreview from '../shared/MugPreview';
@@ -10,7 +10,6 @@ export default function PreviewStep() {
   const { selectedMug, selectedGeneratedImage, generatedImageCropData, userData, updateGeneratedImageCropData } = useWizardContext();
 
   const [isEditingCrop, setIsEditingCrop] = useState(!generatedImageCropData);
-  const [localCrop, setLocalCrop] = useState<CropType>(generatedImageCropData || ({} as CropType));
 
   useEffect(() => {
     // If no crop data exists when component mounts, start in edit mode
@@ -31,20 +30,21 @@ export default function PreviewStep() {
     );
   }
 
-  const handleCropComplete = (crop: PixelCrop) => {
-    // Convert PixelCrop to our CropData format
-    const cropData = {
-      unit: crop.unit,
-      x: crop.x,
-      y: crop.y,
-      width: crop.width,
-      height: crop.height,
-    };
-    updateGeneratedImageCropData(cropData);
+  const handleCropComplete = (croppedArea: Area, croppedAreaPixels: Area) => {
+    // Store the crop data when user finishes adjusting
+    // Note: We don't need to store crop position and zoom separately
+    // as they are already reflected in the croppedAreaPixels
+    updateGeneratedImageCropData({
+      crop: { x: 0, y: 0 }, // Not used, but kept for type compatibility
+      zoom: 1, // Not used, but kept for type compatibility
+      croppedAreaPixels,
+    });
   };
 
   const handleSaveCrop = () => {
-    setIsEditingCrop(false);
+    if (generatedImageCropData) {
+      setIsEditingCrop(false);
+    }
   };
 
   const handleEditCrop = () => {
@@ -59,10 +59,10 @@ export default function PreviewStep() {
         <div className="mb-4 flex justify-center">
           <CheckCircle className="h-12 w-12 text-green-500" />
         </div>
-        <h3 className="mb-2 text-2xl font-bold">{isEditingCrop ? 'Crop Your Design' : 'Your Custom Mug is Ready!'}</h3>
+        <h3 className="mb-2 text-2xl font-bold">{isEditingCrop ? 'Position Your Design' : 'Your Custom Mug is Ready!'}</h3>
         <p className="text-gray-600">
           {isEditingCrop
-            ? 'Adjust the crop area to select the perfect part of your design for the mug'
+            ? 'Drag to position and zoom to scale your design perfectly'
             : `Here's how your personalized design will look on the ${selectedMug.name}`}
         </p>
       </div>
@@ -71,7 +71,7 @@ export default function PreviewStep() {
       <div className="flex justify-center gap-2">
         <Button onClick={handleEditCrop} variant={isEditingCrop ? 'default' : 'outline'} size="sm" className="gap-2">
           <Crop className="h-4 w-4" />
-          Edit Crop
+          Edit Position
         </Button>
         <Button
           onClick={handleSaveCrop}
@@ -86,14 +86,7 @@ export default function PreviewStep() {
       </div>
 
       {isEditingCrop ? (
-        <GeneratedImageCropper
-          imageUrl={imageUrl}
-          crop={localCrop}
-          onCropChange={setLocalCrop}
-          onCropComplete={handleCropComplete}
-          mug={selectedMug}
-          className="mx-auto"
-        />
+        <GeneratedImageCropper imageUrl={imageUrl} onCropComplete={handleCropComplete} mug={selectedMug} className="mx-auto" />
       ) : (
         <>
           <MugPreview mug={selectedMug} imageUrl={imageUrl} cropData={generatedImageCropData} className="mx-auto" />

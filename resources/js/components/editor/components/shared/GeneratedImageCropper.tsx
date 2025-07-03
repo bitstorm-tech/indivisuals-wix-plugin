@@ -1,80 +1,65 @@
+import { Slider } from '@/components/ui/Slider';
 import { cn } from '@/lib/utils';
-import { useEffect, useRef, useState } from 'react';
-import ReactCrop, { Crop, PixelCrop } from 'react-image-crop';
-import 'react-image-crop/dist/ReactCrop.css';
+import { useState } from 'react';
+import Cropper, { Area, Point } from 'react-easy-crop';
 import { MugOption } from '../../types';
 
 interface GeneratedImageCropperProps {
   imageUrl: string;
-  crop: Crop;
-  onCropChange: (crop: Crop) => void;
-  onCropComplete: (crop: PixelCrop) => void;
+  onCropComplete: (croppedArea: Area, croppedAreaPixels: Area) => void;
   mug: MugOption;
   className?: string;
 }
 
-export default function GeneratedImageCropper({ imageUrl, crop, onCropChange, onCropComplete, mug, className }: GeneratedImageCropperProps) {
-  const imgRef = useRef<HTMLImageElement>(null);
-  const [aspectRatio, setAspectRatio] = useState<number>(1);
+export default function GeneratedImageCropper({ imageUrl, onCropComplete, mug, className }: GeneratedImageCropperProps) {
+  const [crop, setCrop] = useState<Point>({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
 
-  useEffect(() => {
-    if (mug.print_template_width_mm && mug.print_template_height_mm) {
-      const ratio = mug.print_template_width_mm / mug.print_template_height_mm;
-      setAspectRatio(ratio);
-    }
-  }, [mug]);
+  // Calculate aspect ratio from mug dimensions
+  const aspectRatio = mug.print_template_width_mm && mug.print_template_height_mm ? mug.print_template_width_mm / mug.print_template_height_mm : 1;
 
-  const handleImageLoad = () => {
-    if (!crop.width && !crop.height && imgRef.current) {
-      const { width: imgWidth, height: imgHeight } = imgRef.current;
-
-      // Calculate initial crop to fit the mug aspect ratio
-      let cropWidth = imgWidth * 0.9;
-      let cropHeight = cropWidth / aspectRatio;
-
-      // If the calculated height is too tall, base it on height instead
-      if (cropHeight > imgHeight * 0.9) {
-        cropHeight = imgHeight * 0.9;
-        cropWidth = cropHeight * aspectRatio;
-      }
-
-      // Center the crop
-      const x = (imgWidth - cropWidth) / 2;
-      const y = (imgHeight - cropHeight) / 2;
-
-      const newCrop: PixelCrop = {
-        unit: 'px',
-        width: cropWidth,
-        height: cropHeight,
-        x,
-        y,
-      };
-
-      onCropChange(newCrop);
-    }
+  const handleCropComplete = (croppedArea: Area, croppedAreaPixels: Area) => {
+    onCropComplete(croppedArea, croppedAreaPixels);
   };
 
   return (
     <div className={cn('space-y-4', className)}>
       <div className="rounded-lg bg-gray-50 p-4">
         <div className="mb-4 text-center">
-          <h3 className="text-lg font-semibold">Crop your generated image</h3>
-          <p className="text-sm text-gray-600">Adjust the crop area to select the part of the image that will appear on your {mug.name}.</p>
+          <h3 className="text-lg font-semibold">Position and scale your design</h3>
+          <p className="text-sm text-gray-600">Drag to move your image and use the slider to zoom in or out</p>
           <p className="mt-1 text-xs text-gray-500">
-            Aspect ratio is locked to match the mug's printable area ({mug.print_template_width_mm}mm × {mug.print_template_height_mm}mm)
+            The crop area matches your {mug.name}'s printable area ({mug.print_template_width_mm}mm × {mug.print_template_height_mm}mm)
           </p>
         </div>
 
-        <div className="flex items-center justify-center rounded-lg bg-white p-4 shadow-inner">
-          <ReactCrop crop={crop} onChange={onCropChange} onComplete={onCropComplete} aspect={aspectRatio} keepSelection>
-            <img
-              ref={imgRef}
-              src={imageUrl}
-              alt="Generated image to crop"
-              className="max-h-[500px] max-w-full object-contain"
-              onLoad={handleImageLoad}
-            />
-          </ReactCrop>
+        {/* Cropper container with fixed height */}
+        <div className="custom-cropper relative h-[500px] w-full overflow-hidden rounded-lg bg-gray-100">
+          <Cropper
+            image={imageUrl}
+            crop={crop}
+            zoom={zoom}
+            aspect={aspectRatio}
+            onCropChange={setCrop}
+            onZoomChange={setZoom}
+            onCropComplete={handleCropComplete}
+            cropShape="rect"
+            showGrid={false}
+            restrictPosition={false}
+            minZoom={0.5}
+            maxZoom={3}
+          />
+        </div>
+
+        {/* Zoom controls */}
+        <div className="mt-6 space-y-2">
+          <label className="text-sm font-medium text-gray-700">Zoom</label>
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-gray-500">-</span>
+            <Slider value={[zoom]} onValueChange={(value) => setZoom(value[0])} min={0.5} max={3} step={0.1} className="flex-1" />
+            <span className="text-sm text-gray-500">+</span>
+          </div>
+          <p className="text-center text-xs text-gray-500">{Math.round(zoom * 100)}%</p>
         </div>
       </div>
     </div>

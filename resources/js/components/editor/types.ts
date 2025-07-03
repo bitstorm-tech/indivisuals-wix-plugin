@@ -26,6 +26,19 @@ export interface CropData {
   height: number;
 }
 
+export interface GeneratedImageCropData {
+  // Crop position and zoom
+  crop: { x: number; y: number };
+  zoom: number;
+  // The actual cropped area in pixels
+  croppedAreaPixels: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  };
+}
+
 export interface UserData {
   email: string;
   firstName?: string;
@@ -43,7 +56,7 @@ export interface WizardState {
   userData: UserData | null;
   generatedImageUrls: string[] | null;
   selectedGeneratedImage: string | null;
-  generatedImageCropData: CropData | null;
+  generatedImageCropData: GeneratedImageCropData | null;
   isProcessing: boolean;
   error: string | null;
   isAuthenticated: boolean;

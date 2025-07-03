@@ -1,13 +1,12 @@
-import { getCroppedImg } from '@/lib/imageCropUtils';
+import { getCroppedImgFromArea } from '@/lib/imageCropUtils';
 import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
-import { PixelCrop } from 'react-image-crop';
-import { CropData, MugOption } from '../../types';
+import { GeneratedImageCropData, MugOption } from '../../types';
 
 interface MugPreviewProps {
   mug: MugOption;
   imageUrl: string;
-  cropData?: CropData | null;
+  cropData?: GeneratedImageCropData | null;
   className?: string;
 }
 
@@ -16,54 +15,19 @@ export default function MugPreview({ mug, imageUrl, cropData, className }: MugPr
   const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
-    if (cropData && cropData.width > 0 && cropData.height > 0) {
+    if (cropData && cropData.croppedAreaPixels) {
       setIsProcessing(true);
 
-      // If crop data is in percentage, we need to load the image first to convert to pixels
-      if (cropData.unit === '%') {
-        const img = new Image();
-        img.onload = () => {
-          const pixelCrop: PixelCrop = {
-            unit: 'px',
-            x: (cropData.x / 100) * img.width,
-            y: (cropData.y / 100) * img.height,
-            width: (cropData.width / 100) * img.width,
-            height: (cropData.height / 100) * img.height,
-          };
-
-          getCroppedImg(imageUrl, pixelCrop)
-            .then((croppedUrl) => {
-              setDisplayImageUrl(croppedUrl);
-              setIsProcessing(false);
-            })
-            .catch((error) => {
-              console.error('Failed to crop image:', error);
-              setDisplayImageUrl(imageUrl); // Fallback to original
-              setIsProcessing(false);
-            });
-        };
-        img.src = imageUrl;
-      } else {
-        // Already in pixels
-        const pixelCrop: PixelCrop = {
-          unit: 'px',
-          x: cropData.x,
-          y: cropData.y,
-          width: cropData.width,
-          height: cropData.height,
-        };
-
-        getCroppedImg(imageUrl, pixelCrop)
-          .then((croppedUrl) => {
-            setDisplayImageUrl(croppedUrl);
-            setIsProcessing(false);
-          })
-          .catch((error) => {
-            console.error('Failed to crop image:', error);
-            setDisplayImageUrl(imageUrl); // Fallback to original
-            setIsProcessing(false);
-          });
-      }
+      getCroppedImgFromArea(imageUrl, cropData.croppedAreaPixels)
+        .then((croppedUrl) => {
+          setDisplayImageUrl(croppedUrl);
+          setIsProcessing(false);
+        })
+        .catch((error) => {
+          console.error('Failed to crop image:', error);
+          setDisplayImageUrl(imageUrl); // Fallback to original
+          setIsProcessing(false);
+        });
     } else {
       setDisplayImageUrl(imageUrl);
     }

@@ -1,6 +1,6 @@
 import { Prompt } from '@/types/prompt';
 import { WizardStep } from '../constants';
-import { CropData, MugOption, UserData } from '../types';
+import { CropData, GeneratedImageCropData, MugOption, UserData } from '../types';
 
 export const WIZARD_ACTIONS = {
   SET_STEP: 'SET_STEP',
@@ -38,7 +38,7 @@ export type WizardAction =
   | { type: typeof WIZARD_ACTIONS.SET_USER_DATA; payload: UserData }
   | { type: typeof WIZARD_ACTIONS.SET_GENERATED_IMAGES; payload: string[] }
   | { type: typeof WIZARD_ACTIONS.SELECT_GENERATED_IMAGE; payload: string }
-  | { type: typeof WIZARD_ACTIONS.UPDATE_GENERATED_IMAGE_CROP_DATA; payload: CropData | null }
+  | { type: typeof WIZARD_ACTIONS.UPDATE_GENERATED_IMAGE_CROP_DATA; payload: GeneratedImageCropData | null }
   | { type: typeof WIZARD_ACTIONS.SET_PROCESSING; payload: boolean }
   | { type: typeof WIZARD_ACTIONS.SET_ERROR; payload: string | null }
   | { type: typeof WIZARD_ACTIONS.RESET }
@@ -99,7 +99,7 @@ export const wizardActions = {
     payload: url,
   }),
 
-  updateGeneratedImageCropData: (cropData: CropData | null): WizardAction => ({
+  updateGeneratedImageCropData: (cropData: GeneratedImageCropData | null): WizardAction => ({
     type: WIZARD_ACTIONS.UPDATE_GENERATED_IMAGE_CROP_DATA,
     payload: cropData,
   }),
