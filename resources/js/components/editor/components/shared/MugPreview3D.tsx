@@ -19,15 +19,6 @@ function MugModel({ textureUrl }: MugModelProps) {
   const meshRef = useRef<THREE.Group>(null);
   const texture = useLoader(THREE.TextureLoader, textureUrl);
 
-  // Configure texture wrapping and repeating
-  useEffect(() => {
-    texture.wrapS = THREE.RepeatWrapping;
-    texture.wrapT = THREE.ClampToEdgeWrapping;
-    texture.repeat.set(0.7, 1); // Wrap only 70% around to leave space on both sides of handle
-    texture.offset.set(0.15, 0); // Offset to center on the front opposite the handle
-    texture.needsUpdate = true;
-  }, [texture]);
-
   // Gentle rotation animation
   useFrame((_, delta) => {
     if (meshRef.current) {
