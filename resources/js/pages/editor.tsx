@@ -94,7 +94,7 @@ function EditorContent() {
   );
 }
 
-export default function EditorNewPage({ auth }: EditorProps) {
+export default function EditorPage({ auth }: EditorProps) {
   return (
     <WizardProvider auth={auth}>
       <EditorContent />

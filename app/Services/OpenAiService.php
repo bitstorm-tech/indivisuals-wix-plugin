@@ -139,6 +139,8 @@ class OpenAiService
             ],
         ];
 
+        ini_set('max_execution_time', 300);
+
         return $this->httpClient->post($this->baseUrl, [
             'headers' => [
                 'Authorization' => 'Bearer '.$this->apiKey,
@@ -208,6 +210,8 @@ class OpenAiService
                 'contents' => $background,
             ],
         ];
+
+        ini_set('max_execution_time', 300);
 
         return $this->httpClient->post($this->baseUrl, [
             'headers' => [
