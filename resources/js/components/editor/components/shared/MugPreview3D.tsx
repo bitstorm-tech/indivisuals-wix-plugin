@@ -67,15 +67,15 @@ function MugModel({ textureUrl }: MugModelProps) {
       </group>
 
       {/* Mug bottom - solid base */}
-      <mesh position={[0, -mugHeight / 2, 0]}>
-        <cylinderGeometry args={[mugRadiusBottom, mugRadiusBottom, 0.2, 64]} />
+      <mesh position={[0, -mugHeight / 2 - 0.1, 0]}>
+        <cylinderGeometry args={[mugRadiusBottom * 0.98, mugRadiusBottom * 0.98, 0.2, 64]} />
         <meshStandardMaterial color="#ffffff" metalness={0.05} roughness={0.8} />
       </mesh>
 
       {/* Bottom inner disk - closes the interior */}
-      <mesh position={[0, -mugHeight / 2 + wallThickness, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+      <mesh position={[0, -mugHeight / 2 + wallThickness + 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <circleGeometry args={[mugRadiusBottom - wallThickness, 64]} />
-        <meshStandardMaterial color="#f5f5f5" metalness={0.05} roughness={0.9} side={THREE.DoubleSide} />
+        <meshStandardMaterial color="#f5f5f5" metalness={0.05} roughness={0.9} />
       </mesh>
 
       {/* Rim - rounded edge at the top */}

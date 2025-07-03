@@ -38,27 +38,44 @@ export default function Mug3DTest() {
           />
         </div>
 
-        <div className="mt-8 grid gap-4 md:grid-cols-2">
-          <div className="rounded-lg bg-green-50 p-4">
-            <h2 className="mb-2 font-semibold text-green-800">✅ Features Implemented</h2>
-            <ul className="list-inside list-disc space-y-1 text-sm text-green-700">
-              <li>Open top with visible interior</li>
-              <li>Proper C-shaped handle on the side</li>
-              <li>Correct UV mapping (no image on top)</li>
-              <li>Realistic wall thickness</li>
-              <li>Image wraps 80% around (space near handle)</li>
-              <li>Interactive rotation and zoom</li>
-            </ul>
+        <div className="mt-8 space-y-6">
+          {/* Original test image */}
+          <div className="rounded-lg bg-gray-100 p-4">
+            <h2 className="mb-4 text-center font-semibold">Original Test Image</h2>
+            <div className="mx-auto max-w-md overflow-hidden rounded-lg border-2 border-gray-300">
+              <img 
+                src={testImageUrl} 
+                alt="Test pattern" 
+                className="w-full"
+              />
+            </div>
+            <p className="mt-2 text-center text-sm text-gray-600">
+              This test pattern shows color bands and text to verify UV mapping
+            </p>
           </div>
-          
-          <div className="rounded-lg bg-blue-50 p-4">
-            <h2 className="mb-2 font-semibold text-blue-800">🎮 Controls</h2>
-            <ul className="list-inside list-disc space-y-1 text-sm text-blue-700">
-              <li>Drag to rotate the mug</li>
-              <li>Scroll to zoom in/out</li>
-              <li>Auto-rotation enabled</li>
-              <li>Double-click to reset view</li>
-            </ul>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="rounded-lg bg-green-50 p-4">
+              <h2 className="mb-2 font-semibold text-green-800">✅ Features Implemented</h2>
+              <ul className="list-inside list-disc space-y-1 text-sm text-green-700">
+                <li>Open top with visible interior</li>
+                <li>Proper C-shaped handle on the side</li>
+                <li>Correct UV mapping (no image on top)</li>
+                <li>Realistic wall thickness</li>
+                <li>Image wraps 70% around (space near handle)</li>
+                <li>Interactive rotation and zoom</li>
+              </ul>
+            </div>
+            
+            <div className="rounded-lg bg-blue-50 p-4">
+              <h2 className="mb-2 font-semibold text-blue-800">🎮 Controls</h2>
+              <ul className="list-inside list-disc space-y-1 text-sm text-blue-700">
+                <li>Drag to rotate the mug</li>
+                <li>Scroll to zoom in/out</li>
+                <li>Auto-rotation enabled</li>
+                <li>Double-click to reset view</li>
+              </ul>
+            </div>
           </div>
         </div>
 
