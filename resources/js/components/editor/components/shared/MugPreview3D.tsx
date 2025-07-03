@@ -23,8 +23,8 @@ function MugModel({ textureUrl }: MugModelProps) {
   useEffect(() => {
     texture.wrapS = THREE.RepeatWrapping;
     texture.wrapT = THREE.ClampToEdgeWrapping;
-    texture.repeat.set(0.8, 1); // Don't wrap completely around - leave space for handle
-    texture.offset.set(0.1, 0); // Center the image on the front
+    texture.repeat.set(0.7, 1); // Wrap only 70% around to leave space on both sides of handle
+    texture.offset.set(0.15, 0); // Offset to center on the front opposite the handle
     texture.needsUpdate = true;
   }, [texture]);
 
@@ -37,11 +37,11 @@ function MugModel({ textureUrl }: MugModelProps) {
 
   // Create mug geometry with more realistic proportions
   const mugRadiusTop = 1.4;
-  const mugRadiusBottom = 1.2;
+  const mugRadiusBottom = 1.4;
   const mugHeight = 3.2;
   const handleRadius = 0.15;
   const handleSize = 0.9;
-  const handleOffset = -0.63;
+  const handleOffset = -0.5;
   const wallThickness = 0.08;
 
   return (
@@ -59,7 +59,7 @@ function MugModel({ textureUrl }: MugModelProps) {
       </mesh>
 
       {/* Mug handle - complete C-shaped handle */}
-      <group position={[mugRadiusTop + handleSize / 2 + handleOffset, 0, 0]} rotation={[0, 0, Math.PI * 1.48]}>
+      <group position={[mugRadiusTop + handleSize / 2 + handleOffset, 0, 0]} rotation={[0, 0, Math.PI * 1.5]}>
         <mesh>
           <torusGeometry args={[handleSize * 0.8, handleRadius, 12, 24, Math.PI]} />
           <meshStandardMaterial color="#ffffff" metalness={0.1} roughness={0.6} />
@@ -68,7 +68,7 @@ function MugModel({ textureUrl }: MugModelProps) {
 
       {/* Mug bottom - solid base */}
       <mesh position={[0, -mugHeight / 2, 0]}>
-        <cylinderGeometry args={[mugRadiusBottom, mugRadiusBottom * 0.95, 0.2, 64]} />
+        <cylinderGeometry args={[mugRadiusBottom, mugRadiusBottom, 0.2, 64]} />
         <meshStandardMaterial color="#ffffff" metalness={0.05} roughness={0.8} />
       </mesh>
 
