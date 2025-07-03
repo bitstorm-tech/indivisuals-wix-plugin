@@ -47,27 +47,27 @@ function MugModel({ textureUrl }: MugModelProps) {
   return (
     <group ref={meshRef}>
       {/* Mug body - slightly tapered with open top */}
-      <mesh position={[0, 0, 0]} castShadow receiveShadow>
+      <mesh position={[0, 0, 0]}>
         <cylinderGeometry args={[mugRadiusTop, mugRadiusBottom, mugHeight, 64, 1, true]} />
         <meshStandardMaterial map={texture} metalness={0.05} roughness={0.4} envMapIntensity={0.5} side={THREE.DoubleSide} />
       </mesh>
 
       {/* Inner wall - creates the hollow interior */}
-      <mesh position={[0, wallThickness / 2, 0]} receiveShadow>
+      <mesh position={[0, wallThickness / 2, 0]}>
         <cylinderGeometry args={[mugRadiusTop - wallThickness, mugRadiusBottom - wallThickness, mugHeight - wallThickness, 64, 1, true]} />
         <meshStandardMaterial color="#f5f5f5" metalness={0.05} roughness={0.9} side={THREE.DoubleSide} />
       </mesh>
 
       {/* Mug handle - complete C-shaped handle */}
       <group position={[mugRadiusTop + handleSize / 2 + handleOffset, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
-        <mesh castShadow>
+        <mesh>
           <torusGeometry args={[handleSize * 0.8, handleRadius, 12, 24, Math.PI * 1.5]} />
           <meshStandardMaterial color="#ffffff" metalness={0.1} roughness={0.6} />
         </mesh>
       </group>
 
       {/* Mug bottom - solid base */}
-      <mesh position={[0, -mugHeight / 2, 0]} receiveShadow>
+      <mesh position={[0, -mugHeight / 2, 0]}>
         <cylinderGeometry args={[mugRadiusBottom, mugRadiusBottom * 0.95, 0.2, 64]} />
         <meshStandardMaterial color="#ffffff" metalness={0.05} roughness={0.8} />
       </mesh>
@@ -130,7 +130,7 @@ export default function MugPreview3D({ imageUrl, cropData }: MugPreview3DProps) 
 
   return (
     <div className="h-[400px] w-full rounded-lg bg-gradient-to-br from-gray-100 to-gray-200 shadow-inner">
-      <Canvas shadows camera={{ position: [5, 2, 5], fov: 40 }}>
+      <Canvas camera={{ position: [5, 2, 5], fov: 40 }}>
         <OrbitControls
           enablePan={false}
           enableZoom={true}
@@ -145,7 +145,7 @@ export default function MugPreview3D({ imageUrl, cropData }: MugPreview3DProps) 
 
         {/* Lighting */}
         <ambientLight intensity={0.5} />
-        <directionalLight position={[5, 5, 5]} intensity={1} castShadow shadow-mapSize={[1024, 1024]} />
+        <directionalLight position={[5, 5, 5]} intensity={1} />
         <directionalLight position={[-5, 3, -5]} intensity={0.3} />
 
         {/* Environment for reflections */}
@@ -155,12 +155,6 @@ export default function MugPreview3D({ imageUrl, cropData }: MugPreview3DProps) 
         <Suspense fallback={null}>
           <MugModel textureUrl={processedImageUrl} />
         </Suspense>
-
-        {/* Shadow plane */}
-        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -2, 0]} receiveShadow>
-          <planeGeometry args={[20, 20]} />
-          <shadowMaterial opacity={0.2} />
-        </mesh>
       </Canvas>
 
       {/* Instructions */}
