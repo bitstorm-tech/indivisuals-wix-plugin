@@ -12,6 +12,9 @@ Route::inertia('/editor', 'editor')->name('editor');
 Route::inertia('/cart', 'cart')->name('cart');
 Route::inertia('/checkout', 'checkout')->name('checkout');
 
+// Test route for 3D mug preview
+Route::inertia('/mug-3d-test', 'mug-3d-test')->name('mug-3d-test');
+
 // Authentication routes
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');

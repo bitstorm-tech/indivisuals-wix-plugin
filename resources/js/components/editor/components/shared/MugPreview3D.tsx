@@ -1,5 +1,5 @@
 import { getCroppedImgFromArea } from '@/lib/imageCropUtils';
-import { Environment, OrbitControls, PerspectiveCamera } from '@react-three/drei';
+import { Environment, OrbitControls } from '@react-three/drei';
 import { Canvas, useFrame, useLoader } from '@react-three/fiber';
 import { Suspense, useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
@@ -23,8 +23,8 @@ function MugModel({ textureUrl }: MugModelProps) {
   useEffect(() => {
     texture.wrapS = THREE.RepeatWrapping;
     texture.wrapT = THREE.ClampToEdgeWrapping;
-    texture.repeat.set(1, 1);
-    texture.center.set(0.5, 0.5);
+    texture.repeat.set(0.8, 1); // Don't wrap completely around - leave space for handle
+    texture.offset.set(0.1, 0); // Center the image on the front
     texture.needsUpdate = true;
   }, [texture]);
 
@@ -35,36 +35,53 @@ function MugModel({ textureUrl }: MugModelProps) {
     }
   });
 
-  // Create mug geometry
-  const mugRadius = 1.5;
-  const mugHeight = 3.5;
+  // Create mug geometry with more realistic proportions
+  const mugRadiusTop = 1.4;
+  const mugRadiusBottom = 1.2;
+  const mugHeight = 3.2;
   const handleRadius = 0.15;
-  const handleWidth = 1.2;
+  const handleSize = 0.9;
+  const handleOffset = 0.05;
+  const wallThickness = 0.08;
 
   return (
     <group ref={meshRef}>
-      {/* Mug body */}
+      {/* Mug body - slightly tapered with open top */}
       <mesh position={[0, 0, 0]} castShadow receiveShadow>
-        <cylinderGeometry args={[mugRadius, mugRadius * 0.9, mugHeight, 32]} />
-        <meshStandardMaterial map={texture} metalness={0.1} roughness={0.5} />
+        <cylinderGeometry args={[mugRadiusTop, mugRadiusBottom, mugHeight, 64, 1, true]} />
+        <meshStandardMaterial map={texture} metalness={0.05} roughness={0.4} envMapIntensity={0.5} side={THREE.DoubleSide} />
       </mesh>
 
-      {/* Mug handle */}
-      <mesh position={[mugRadius + 0.3, 0, 0]} castShadow>
-        <torusGeometry args={[handleWidth / 2, handleRadius, 8, 16, Math.PI]} />
-        <meshStandardMaterial color="#e0e0e0" metalness={0.2} roughness={0.7} />
+      {/* Inner wall - creates the hollow interior */}
+      <mesh position={[0, wallThickness / 2, 0]} receiveShadow>
+        <cylinderGeometry args={[mugRadiusTop - wallThickness, mugRadiusBottom - wallThickness, mugHeight - wallThickness, 64, 1, true]} />
+        <meshStandardMaterial color="#f5f5f5" metalness={0.05} roughness={0.9} side={THREE.DoubleSide} />
       </mesh>
 
-      {/* Mug bottom */}
+      {/* Mug handle - complete C-shaped handle */}
+      <group position={[mugRadiusTop + handleSize / 2 + handleOffset, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+        <mesh castShadow>
+          <torusGeometry args={[handleSize * 0.8, handleRadius, 12, 24, Math.PI * 1.5]} />
+          <meshStandardMaterial color="#ffffff" metalness={0.1} roughness={0.6} />
+        </mesh>
+      </group>
+
+      {/* Mug bottom - solid base */}
       <mesh position={[0, -mugHeight / 2, 0]} receiveShadow>
-        <cylinderGeometry args={[mugRadius * 0.9, mugRadius * 0.9, 0.1, 32]} />
-        <meshStandardMaterial color="#f0f0f0" metalness={0.1} roughness={0.8} />
+        <cylinderGeometry args={[mugRadiusBottom, mugRadiusBottom * 0.95, 0.2, 64]} />
+        <meshStandardMaterial color="#ffffff" metalness={0.05} roughness={0.8} />
       </mesh>
 
-      {/* Mug rim */}
+      {/* Bottom inner disk - closes the interior */}
+      <mesh position={[0, -mugHeight / 2 + wallThickness, 0]}>
+        <circleGeometry args={[mugRadiusBottom - wallThickness, 64]} />
+        <meshStandardMaterial color="#f5f5f5" metalness={0.05} roughness={0.9} side={THREE.DoubleSide} />
+      </mesh>
+
+      {/* Rim - rounded edge at the top */}
       <mesh position={[0, mugHeight / 2, 0]}>
-        <torusGeometry args={[mugRadius, 0.05, 8, 32]} />
-        <meshStandardMaterial color="#e0e0e0" metalness={0.3} roughness={0.6} />
+        <torusGeometry args={[mugRadiusTop - wallThickness / 2, wallThickness / 2, 8, 32]} />
+        <meshStandardMaterial color="#ffffff" metalness={0.1} roughness={0.6} />
       </mesh>
     </group>
   );
@@ -113,17 +130,17 @@ export default function MugPreview3D({ imageUrl, cropData }: MugPreview3DProps) 
 
   return (
     <div className="h-[400px] w-full rounded-lg bg-gradient-to-br from-gray-100 to-gray-200 shadow-inner">
-      <Canvas shadows>
-        <PerspectiveCamera makeDefault position={[5, 2, 5]} fov={45} />
+      <Canvas shadows camera={{ position: [5, 2, 5], fov: 40 }}>
         <OrbitControls
           enablePan={false}
           enableZoom={true}
           minDistance={5}
           maxDistance={10}
-          minPolarAngle={Math.PI / 4}
-          maxPolarAngle={Math.PI / 2}
+          minPolarAngle={Math.PI / 6}
+          maxPolarAngle={Math.PI / 2.2}
           autoRotate
           autoRotateSpeed={0.5}
+          target={[0, -0.5, 0]}
         />
 
         {/* Lighting */}
