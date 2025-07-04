@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\PromptTesterController;
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\ImageController;
 use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\PdfController;
 use App\Http\Controllers\Api\PromptController;
 use App\Http\Controllers\Api\UserRegistrationController;
 use Illuminate\Support\Facades\Route;
@@ -55,6 +56,10 @@ Route::prefix('api')->group(function () {
         Route::post('/orders', [OrderController::class, 'store'])->name('api.orders.store');
         Route::get('/orders/{order}', [OrderController::class, 'show'])->name('api.orders.show');
     });
+
+    // PDF generation
+    Route::post('/pdf/generate', [PdfController::class, 'generate'])->name('api.pdf.generate');
+    Route::get('/pdf/test', [PdfController::class, 'test'])->name('api.pdf.test');
 
     // Prompt categories
     Route::prefix('prompt-categories')->group(function () {
