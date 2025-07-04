@@ -26,7 +26,6 @@ class PdfService
         $download = $options['download'] ?? true;
         $width = $options['width'] ?? self::DEFAULT_WIDTH;
         $height = $options['height'] ?? self::DEFAULT_HEIGHT;
-        $orientation = $options['orientation'] ?? 'landscape';
 
         if (! str_ends_with($filename, '.pdf')) {
             $filename .= '.pdf';
@@ -35,7 +34,7 @@ class PdfService
         $html = $this->generateHtmlTemplate($content, $width, $height);
 
         $pdf = Pdf::loadHTML($html);
-        $pdf->setPaper([0, 0, $width, $height], $orientation);
+        $pdf->setPaper([0, 0, $width, $height]);
 
         if ($download) {
             return $pdf->download($filename);
@@ -66,21 +65,30 @@ class PdfService
     <meta charset="UTF-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <style>
-        @page {
-            size: {$widthMm}mm {$heightMm}mm;
+        * {
             margin: 0;
-        }
-        body {
-            margin: 0;
-            padding: 10mm;
-            font-family: sans-serif;
-            width: {$contentWidthMm}mm;
-            height: {$contentHeightMm}mm;
+            padding: 0;
             box-sizing: border-box;
         }
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: {$widthMm}mm;
+            height: {$heightMm}mm;
+            overflow: hidden;
+        }
+        body {
+            padding: 10mm;
+            font-family: sans-serif;
+            page-break-inside: avoid;
+            page-break-after: avoid;
+        }
         .content {
-            width: 100%;
-            height: 100%;
+            width: {$contentWidthMm}mm;
+            height: {$contentHeightMm}mm;
+            overflow: hidden;
+            page-break-inside: avoid;
+            page-break-after: avoid;
         }
     </style>
 </head>
