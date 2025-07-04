@@ -25,7 +25,7 @@ class OpenAiService
 
     public function generateImage(string $imagePath, string $prompt, int $n = 1, string $size = '1536x1024'): string|array
     {
-        $result = $this->generateImageWithParams($imagePath, $prompt, 'gpt-image-1', 'low', 'auto', $size, $n);
+        $result = $this->generateImageWithParams($imagePath, $prompt, 'gpt-image-1', 'high', 'auto', $size, $n);
 
         return $result['images'];
     }
@@ -139,8 +139,6 @@ class OpenAiService
             ],
         ];
 
-        ini_set('max_execution_time', 300);
-
         return $this->httpClient->post($this->baseUrl, [
             'headers' => [
                 'Authorization' => 'Bearer '.$this->apiKey,
@@ -210,8 +208,6 @@ class OpenAiService
                 'contents' => $background,
             ],
         ];
-
-        ini_set('max_execution_time', 300);
 
         return $this->httpClient->post($this->baseUrl, [
             'headers' => [

@@ -3,9 +3,6 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 
-set_time_limit(300);
-ini_set('max_execution_time', 300);
-
 define('LARAVEL_START', microtime(true));
 
 // Determine if the application is in maintenance mode...
