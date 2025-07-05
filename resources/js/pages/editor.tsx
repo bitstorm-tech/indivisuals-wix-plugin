@@ -8,6 +8,7 @@ import ImageGenerationStep from '@/components/editor/components/steps/5-ImageGen
 import PreviewStep from '@/components/editor/components/steps/6-PreviewStep';
 import { WizardProvider, useWizardContext } from '@/components/editor/contexts/WizardContext';
 import type { Auth } from '@/types';
+import { Head } from '@inertiajs/react';
 
 export interface EditorProps {
   auth: Auth;
@@ -97,6 +98,7 @@ function EditorContent() {
 export default function EditorPage({ auth }: EditorProps) {
   return (
     <WizardProvider auth={auth}>
+      <Head title="Editor" />
       <EditorContent />
     </WizardProvider>
   );
