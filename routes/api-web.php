@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\PdfController;
 use App\Http\Controllers\Api\PromptController;
 use App\Http\Controllers\Api\UserRegistrationController;
+use App\Http\Controllers\Api\CsrfTokenController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -26,6 +27,9 @@ Route::prefix('api')->group(function () {
     if (app()->environment('local')) {
         Route::get('/debug/upload-info', [\App\Http\Controllers\Api\DebugController::class, 'uploadInfo']);
     }
+
+    // CSRF token refresh route
+    Route::get('/csrf-token', CsrfTokenController::class)->name('api.csrf-token');
 
     // User registration
     Route::post('/register-or-login', [UserRegistrationController::class, 'registerOrLogin'])->name('api.register-or-login');
