@@ -73,9 +73,8 @@ export default function WizardNavigationButtons() {
 
   return (
     <div className="flex items-center justify-between">
-      <Button variant="outline" onClick={goPrevious} disabled={!canGoPrevious || isProcessing || isRegistering} className="gap-2">
+      <Button variant="outline" onClick={goPrevious} disabled={!canGoPrevious || isProcessing || isRegistering}>
         <ArrowLeft className="h-4 w-4" />
-        Back
       </Button>
 
       <Button onClick={handleNextStep} disabled={!canGoNext || isProcessing || isRegistering || isAddingToCart} className="gap-2">
@@ -87,11 +86,9 @@ export default function WizardNavigationButtons() {
         ) : currentStep === 'preview' ? (
           <>
             <ShoppingCart className="h-4 w-4" />
-            Add to Cart
           </>
         ) : (
           <>
-            Next
             <ArrowRight className="h-4 w-4" />
           </>
         )}

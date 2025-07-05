@@ -12,7 +12,9 @@ export default function Mug3DTest() {
   };
 
   // Test image with text and colors to verify UV mapping
-  const testImageUrl = 'data:image/svg+xml;base64,' + btoa(`
+  const testImageUrl =
+    'data:image/svg+xml;base64,' +
+    btoa(`
     <svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
       <rect width="800" height="400" fill="#f0f0f0"/>
       <rect x="0" y="0" width="200" height="400" fill="#ff6b6b"/>
@@ -29,13 +31,9 @@ export default function Mug3DTest() {
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="mx-auto max-w-4xl">
         <h1 className="mb-8 text-center text-3xl font-bold">3D Mug Test Page</h1>
-        
+
         <div className="rounded-lg bg-white p-6 shadow-lg">
-          <MugPreview3D 
-            mug={mockMug} 
-            imageUrl={testImageUrl} 
-            cropData={null} 
-          />
+          <MugPreview3D mug={mockMug} imageUrl={testImageUrl} cropData={null} />
         </div>
 
         <div className="mt-8 space-y-6">
@@ -43,15 +41,9 @@ export default function Mug3DTest() {
           <div className="rounded-lg bg-gray-100 p-4">
             <h2 className="mb-4 text-center font-semibold">Original Test Image</h2>
             <div className="mx-auto max-w-md overflow-hidden rounded-lg border-2 border-gray-300">
-              <img 
-                src={testImageUrl} 
-                alt="Test pattern" 
-                className="w-full"
-              />
+              <img src={testImageUrl} alt="Test pattern" className="w-full" />
             </div>
-            <p className="mt-2 text-center text-sm text-gray-600">
-              This test pattern shows color bands and text to verify UV mapping
-            </p>
+            <p className="mt-2 text-center text-sm text-gray-600">This test pattern shows color bands and text to verify UV mapping</p>
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
@@ -66,7 +58,7 @@ export default function Mug3DTest() {
                 <li>Interactive rotation and zoom</li>
               </ul>
             </div>
-            
+
             <div className="rounded-lg bg-blue-50 p-4">
               <h2 className="mb-2 font-semibold text-blue-800">🎮 Controls</h2>
               <ul className="list-inside list-disc space-y-1 text-sm text-blue-700">

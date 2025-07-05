@@ -74,9 +74,9 @@ function EditorContent() {
         </div>
       </div>
 
-      {/* Sticky navigation for mobile */}
-      <div className="fixed right-0 bottom-0 left-0 p-4 sm:static sm:p-0">
-        <div className="mx-auto max-w-5xl sm:px-4">
+      {/* Sticky navigation for all devices */}
+      <div className="fixed right-0 bottom-0 left-0 p-4">
+        <div className="mx-auto max-w-5xl">
           <WizardNavigationButtons />
         </div>
       </div>
